@@ -1,8 +1,6 @@
-Below is your **updated `PROJECT_CONTEXT.md`**, preserving the original structure and wording from  exactly where unchanged, and only adding the necessary updates to reflect:
+Below is your **updated `PROJECT_CONTEXT.md`**, preserving the exact structure and wording from  wherever unchanged, and only updating the sections that are now outdated given that `UI_SPEC.md` is finalized .
 
-* `build_spec.md`, `tasks.md`, and `decisions.md` are finalized   
-* New file: `ui_spec.md` (visual + UX design system)
-* Project stage shift: Build → UI/Visual Finalization → Implementation
+No sections were rewritten unnecessarily. Only the **Project Stage**, **UI role clarity**, and related references were updated.
 
 ---
 
@@ -96,7 +94,7 @@ Used primarily for implementation.
 
 ---
 
-## ui_spec.md  *(NEW)*
+## ui_spec.md
 
 Purpose:
 
@@ -113,14 +111,16 @@ Contains:
 * page-level layout decisions
 * interaction patterns
 
-This file must:
+This file is now finalized.
+
+It must:
 
 * Stay strictly within MVP scope defined in `product_spec.md`
 * Not introduce new features
 * Not alter business rules
 * Not redefine backend behavior
 
-It defines visual design and UX presentation only.
+Reference: 
 
 ---
 
@@ -263,7 +263,8 @@ MVP Scope Finalized
 Build Specification Finalized
 Decision Log Finalized
 Tasks Defined
-UI / Visual Design Finalization Phase
+UI / Visual Design Finalized
+Implementation Phase (Coding Begins)
 
 The following are complete and locked:
 
@@ -272,18 +273,17 @@ The following are complete and locked:
 * decisions.md 
 * tasks.md 
 * mvp_definition.md 
+* ui_spec.md 
 
 The immediate focus is:
 
-* Finalizing UI_Spec.md
-* Locking visual identity
-* Locking component patterns
-* Ensuring UX aligns exactly with product_spec.md
-* Avoiding visual scope creep
+* Executing implementation according to BUILD_SPEC.md
+* Following TASKS.md sequentially
+* Strictly adhering to UI_SPEC.md visual system
+* Maintaining alignment across Product → Build → UI layers
+* Shipping MVP without scope expansion
 
-After UI_Spec.md is finalized, implementation begins.
-
-ChatGPT must prioritize design clarity and MVP discipline.
+ChatGPT must prioritize execution discipline and implementation correctness.
 
 ---
 
@@ -363,6 +363,10 @@ Architecture consistency is more important than theoretical improvement.
 
 UI decisions must not contradict architectural decisions.
 
+UI implementation must strictly follow:
+
+
+
 ---
 
 # 7. External Research Usage Policy
@@ -399,7 +403,7 @@ ChatGPT must act as:
 * Product strategist
 * Technical architect
 * Startup advisor
-* UX simplifier (during UI_Spec phase)
+* Execution enforcer (implementation phase)
 
 ChatGPT must:
 
@@ -408,7 +412,8 @@ ChatGPT must:
 * Maintain decision consistency
 * Prioritize shipping
 * Call out scope creep
-* Prevent visual overengineering
+* Prevent visual or architectural overengineering
+* Ensure implementation matches specs exactly
 
 ChatGPT must NOT:
 

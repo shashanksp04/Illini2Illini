@@ -13,3 +13,6 @@ Use the Master Product Spec chat to create, refine, and update the product_spec.
 and user behavior. Use the Master Build Spec chat to create and update the build_spec.md file, which defines how the product will be built, 
 including architecture, database design, and technical implementation. This separation ensures brainstorming stays flexible, while the spec 
 chats remain clean, structured, and ready to guide development.
+
+## When asking GPT to update project_context using the following prompt
+I'm done finalizing my Build_Spec.md, Tasks.md and Decision.md file. Now before I start coding, I want to finalize the UI or visual design of my product. It will be stored in UI_Spec.md. Update my Project_Context.md file accordingly. Also when you update, the sections like description of .md files should stay consistent. U should preserve the verbatim of the file (refer to the project_context.md I upload the updated version before running this prompt). You should only add new content or edit the necessary relevant content
