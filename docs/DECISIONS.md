@@ -1,12 +1,122 @@
-Every time we make an important tech/design decision it will be logged here:
+# 📄 DECISIONS.md TEXT
 
-EXAMPLE:
+(Ready to paste into decisions.md )
 
-Decision: Using Supabase instead of Firebase
+---
+
+Decision: Hybrid Visibility Model (Public + Verified Access)
 
 Reason:
-Better SQL support
-Better pricing
+Encourages signup while preserving SEO and discoverability.
+Protects privacy of full addresses and personal data.
+Balances growth and trust.
 
 Date:
 2026-02-28
+
+---
+
+Decision: Username Required and Immutable
+
+Reason:
+Prevents identity churn and impersonation.
+Improves credibility.
+Simplifies moderation.
+
+Date:
+2026-02-28
+
+---
+
+Decision: Maximum 3 Active Listings Per User
+
+Reason:
+Prevents spam and abuse.
+Allows realistic multi-room subleases.
+Maintains marketplace quality.
+
+Date:
+2026-02-28
+
+---
+
+Decision: Exact Address Required but Hidden from Public
+
+Reason:
+Location is critical decision factor at UIUC.
+Improves listing quality.
+Maintains privacy for non-verified visitors.
+
+Date:
+2026-02-28
+
+---
+
+Decision: Landmark Field Publicly Visible
+
+Reason:
+Provides contextual location without exposing full address.
+Improves browsing experience for visitors.
+
+Date:
+2026-02-28
+
+---
+
+Decision: No Internal Messaging in MVP
+
+Reason:
+Reduces engineering complexity.
+Speeds launch.
+Email reveal is sufficient for connection platform.
+
+Date:
+2026-02-28
+
+---
+
+Decision: Soft Delete Instead of Hard Delete
+
+Reason:
+Allows moderation review.
+Preserves audit trail.
+Prevents accidental permanent deletion.
+
+Date:
+2026-02-28
+
+---
+
+Decision: Automatic Expiration Based on End Date
+
+Reason:
+Prevents stale inventory.
+Keeps marketplace clean without manual moderation.
+
+Date:
+2026-02-28
+
+---
+
+Decision: Lease Type Required (Sublease vs Lease Takeover)
+
+Reason:
+Important distinction in UIUC housing ecosystem.
+Improves clarity and filtering.
+
+Date:
+2026-02-28
+
+---
+
+Decision: Profile Picture Required
+
+Reason:
+Increases trust.
+Improves credibility.
+Differentiates from anonymous social media posts.
+
+Date:
+2026-02-28
+
+---
