@@ -1,3 +1,11 @@
+Below is your **updated `PROJECT_CONTEXT.md`**, preserving the original structure and wording from  exactly where unchanged, and only adding the necessary updates to reflect:
+
+* `build_spec.md`, `tasks.md`, and `decisions.md` are finalized   
+* New file: `ui_spec.md` (visual + UX design system)
+* Project stage shift: Build → UI/Visual Finalization → Implementation
+
+---
+
 # Project Context
 
 ## 1. Purpose of This File
@@ -85,6 +93,34 @@ Contains:
 Reference: 
 
 Used primarily for implementation.
+
+---
+
+## ui_spec.md  *(NEW)*
+
+Purpose:
+
+Defines HOW the product looks and feels visually.
+
+Contains:
+
+* design system
+* typography
+* color system
+* spacing rules
+* layout patterns
+* component specifications
+* page-level layout decisions
+* interaction patterns
+
+This file must:
+
+* Stay strictly within MVP scope defined in `product_spec.md`
+* Not introduce new features
+* Not alter business rules
+* Not redefine backend behavior
+
+It defines visual design and UX presentation only.
 
 ---
 
@@ -224,24 +260,30 @@ Expansion beyond UIUC is NOT part of MVP planning.
 Stage:
 
 MVP Scope Finalized
-Transitioning to Build Phase
+Build Specification Finalized
+Decision Log Finalized
+Tasks Defined
+UI / Visual Design Finalization Phase
 
-The MVP definition is complete and locked in:
+The following are complete and locked:
 
 * product_spec.md 
+* build_spec.md 
+* decisions.md 
+* tasks.md 
 * mvp_definition.md 
 
-Major structural decisions are documented in:
+The immediate focus is:
 
-* decisions.md 
+* Finalizing UI_Spec.md
+* Locking visual identity
+* Locking component patterns
+* Ensuring UX aligns exactly with product_spec.md
+* Avoiding visual scope creep
 
-The focus now shifts to:
+After UI_Spec.md is finalized, implementation begins.
 
-* build_spec.md refinement
-* tasks.md execution
-* implementation
-
-ChatGPT must prioritize shipping the defined MVP.
+ChatGPT must prioritize design clarity and MVP discipline.
 
 ---
 
@@ -279,12 +321,15 @@ Prefer:
 * Fewer services
 * Minimal dependencies
 * Clear database structure
+* Clean, minimal UI
 
 Avoid:
 
 * Microservices
 * Premature optimization
 * Complex distributed systems
+* Overdesigned visual systems
+* Unnecessary animation complexity
 
 ---
 
@@ -296,11 +341,13 @@ Focus on:
 * Clean user flows
 * Enforcement of business rules
 * Shipping
+* Visual clarity over aesthetic experimentation
 
 Not:
 
 * Theoretical scalability
 * Edge-case overengineering
+* Pixel-perfection obsession that delays launch
 
 ---
 
@@ -313,6 +360,8 @@ Tech decisions live in:
 Once stack is selected, avoid suggesting changes without strong justification.
 
 Architecture consistency is more important than theoretical improvement.
+
+UI decisions must not contradict architectural decisions.
 
 ---
 
@@ -350,6 +399,7 @@ ChatGPT must act as:
 * Product strategist
 * Technical architect
 * Startup advisor
+* UX simplifier (during UI_Spec phase)
 
 ChatGPT must:
 
@@ -358,6 +408,7 @@ ChatGPT must:
 * Maintain decision consistency
 * Prioritize shipping
 * Call out scope creep
+* Prevent visual overengineering
 
 ChatGPT must NOT:
 
@@ -365,6 +416,7 @@ ChatGPT must NOT:
 * Drift into expansion planning
 * Introduce enterprise-scale systems
 * Suggest features outside product_spec.md
+* Add UI features that require backend changes beyond MVP
 
 ---
 
@@ -379,6 +431,7 @@ Until MVP is shipped:
 * No recommendation engine
 * No admin analytics dashboards
 * No advanced moderation AI
+* No UI components implying future features
 
 If such features are suggested:
 

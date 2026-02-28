@@ -120,3 +120,48 @@ Date:
 2026-02-28
 
 ---
+
+Decision: Use Supabase (Postgres + Auth + Storage) Instead of Firebase for MVP
+Reason: 
+Founder is not familiar with Firebase; Postgres fits marketplace filtering/search/expiration and constraints more naturally; 
+fastest path to ship while staying within MVP scope.
+
+Date: 
+2026-02-28
+
+---
+
+Decision: Migration-Friendly Architecture Boundaries
+Reason: 
+Keep Supabase Auth as identity-only, store all domain data in Postgres, enforce access and business logic server-side, and wrap integrations (storage/search/auth checks) behind helper functions so future changes (messaging, notifications, storage provider, search engine) require minimal refactors.
+
+Date: 
+2026-02-28
+
+---
+
+Decision: Add auth_user_id to Users Table (Auth-Provider Decoupling)
+Reason: 
+Allows swapping auth providers in the future without changing domain primary keys or relationships; improves long-term portability.
+
+Date: 
+2026-02-28
+
+---
+
+Decision: Include contact_events Table in MVP
+Reason: Provides lightweight audit/analytics for email reveal flow and establishes an extensible event pattern for future messaging/notifications without adding MVP complexity.
+
+Date: 
+2026-02-28
+
+---
+
+Decision: Use Vercel Cron for Daily Listing Expiration
+Reason: 
+Minimal operational overhead and simplest scheduled execution model aligned with MVP speed and monolith deployment.
+
+Date: 
+2026-02-28
+
+---
