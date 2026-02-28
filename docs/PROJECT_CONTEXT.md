@@ -364,6 +364,8 @@ Current focus:
 
 Designing:
 
+
+* mvp_definitions.md
 * product_spec.md
 * build_spec.md
 * tasks.md

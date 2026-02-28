@@ -1,6 +1,6 @@
 ## For GPT Chats:
 Before starting a new chat in the Project, make sure you say 
-"Read project_context.md and follow it for all future responses."
+"Read project_context.md, follow it for all future responses and get ready."
 
 ## For Brainstorming and Updates:
 Create separate chats inside the Project for different purposes to keep work organized and context clean. 
