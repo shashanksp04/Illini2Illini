@@ -55,6 +55,47 @@ You must not deviate from these files.
 
 ---
 
+# 0️⃣ Project State (Manual Setup)
+
+The following setup has already been completed manually and must NOT be redone or modified unless explicitly instructed.
+
+## Supabase
+- Project created and configured
+- Email/password auth enabled
+- Email verification required
+- Redirect URLs configured for localhost
+- Storage buckets created:
+  - profile-pictures
+  - listing-photos
+
+## Prisma
+- Prisma is installed and pinned to v6
+- Prisma has already been initialized
+- DATABASE_URL in `.env` uses Supabase Session Pooler (IPv4 compatible)
+- Schema for TASKS 2.1–2.2 is complete
+- Initial migration has been created and applied
+- `prisma/schema.prisma` and `prisma/migrations` are finalized
+
+You must NOT:
+- Re-run prisma init
+- Modify schema.prisma
+- Modify prisma/migrations
+- Change Prisma versions
+- Alter DATABASE_URL
+- Recreate migrations
+- Touch Supabase configuration
+
+## Environment
+- `.env` and `.env.local` are correctly configured
+- App runs locally
+- Env validation exists and fails fast if missing variables
+
+## Documentation
+- Files in `/docs` are locked specifications
+- Do NOT modify any files inside `/docs`
+
+---
+
 # 2️⃣ Hard Scope Boundary (Non-Negotiable)
 
 You must NOT:
@@ -304,6 +345,9 @@ Shipping
 
 Not theoretical scalability.
 Not architectural experimentation.
+
+If you believe any part of the project state above is inconsistent or needs change,
+STOP and request explicit instruction before modifying it.
 
 Stay disciplined.
 
