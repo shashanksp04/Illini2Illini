@@ -6,3 +6,139 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+// Enums (exact names and variants from BUILD_SPEC.md)
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum ListingStatus {
+  ACTIVE
+  TAKEN
+  EXPIRED
+  DELETED
+}
+
+enum LeaseType {
+  SUBLEASE
+  LEASE_TAKEOVER
+}
+
+enum RoomType {
+  PRIVATE_ROOM
+  ENTIRE_UNIT
+}
+
+enum GenderPreference {
+  MALE
+  FEMALE
+  ANY
+}
+
+enum ReportStatus {
+  OPEN
+  RESOLVED
+}
+
+// users
+
+model User {
+  id                String   @id @db.Uuid
+  auth_user_id      String   @unique @db.Uuid
+  email             String   @unique
+  first_name        String?
+  last_name         String?
+  username          String   @unique
+  profile_picture_url String?
+  role              Role     @default(USER)
+  is_banned         Boolean  @default(false)
+  created_at        DateTime
+  updated_at        DateTime
+
+  listings      Listing[]
+  reports       Report[]       @relation("UserReports")
+  contact_events ContactEvent[]
+
+  @@map("users")
+}
+
+// listings
+
+model Listing {
+  id                 String           @id @db.Uuid
+  owner_id           String           @db.Uuid
+  title              String           @db.VarChar(100)
+  monthly_rent       Int
+  lease_type         LeaseType
+  start_date         DateTime         @db.Date
+  end_date           DateTime         @db.Date
+  exact_address      String
+  nearby_landmark    String           @db.VarChar(80)
+  total_bedrooms     Int
+  room_type          RoomType
+  furnished          Boolean
+  utilities_included Boolean
+  gender_preference  GenderPreference
+  description        String           @db.VarChar(1000)
+  status             ListingStatus    @default(ACTIVE)
+  created_at         DateTime
+  updated_at         DateTime
+
+  owner   User           @relation(fields: [owner_id], references: [id])
+  photos  ListingPhoto[]
+  reports Report[]
+  contact_events ContactEvent[]
+
+  @@index([status, created_at])
+  @@index([monthly_rent])
+  @@index([start_date, end_date])
+  @@map("listings")
+}
+
+// listing_photos
+
+model ListingPhoto {
+  id           String   @id @db.Uuid
+  listing_id   String   @db.Uuid
+  image_url    String
+  display_order Int
+  created_at   DateTime
+
+  listing Listing @relation(fields: [listing_id], references: [id])
+
+  @@map("listing_photos")
+}
+
+// reports
+
+model Report {
+  id                  String        @id @db.Uuid
+  listing_id          String        @db.Uuid
+  reported_by_user_id String        @db.Uuid
+  reason              String
+  status              ReportStatus  @default(OPEN)
+  created_at          DateTime
+
+  listing      Listing @relation(fields: [listing_id], references: [id])
+  reported_by  User    @relation("UserReports", fields: [reported_by_user_id], references: [id])
+
+  @@unique([listing_id, reported_by_user_id])
+  @@map("reports")
+}
+
+// contact_events
+
+model ContactEvent {
+  id              String   @id @db.Uuid
+  listing_id      String   @db.Uuid
+  viewer_user_id  String   @db.Uuid
+  created_at      DateTime
+
+  listing Listing @relation(fields: [listing_id], references: [id])
+  viewer  User    @relation(fields: [viewer_user_id], references: [id])
+
+  @@map("contact_events")
+}
+
