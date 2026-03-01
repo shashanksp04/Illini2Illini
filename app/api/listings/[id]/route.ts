@@ -11,16 +11,17 @@ import {
   getListingVerified,
   ListingError,
   type ListingOwner,
+  type ListingOwnerOrAdmin,
   type VerifiedViewer,
 } from "@/lib/listings/helpers";
 import { prisma } from "@/lib/prisma";
 
 type RouteContext = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 export async function GET(_request: Request, context: RouteContext) {
-  const { id } = context.params;
+  const { id } = await context.params;
 
   try {
     let isVerified = false;
@@ -91,7 +92,7 @@ export async function GET(_request: Request, context: RouteContext) {
 }
 
 export async function PUT(request: Request, context: RouteContext) {
-  const { id } = context.params;
+  const { id } = await context.params;
 
   try {
     const { authUserId } = await requireVerified();
@@ -142,7 +143,7 @@ export async function PUT(request: Request, context: RouteContext) {
 }
 
 export async function DELETE(_request: Request, context: RouteContext) {
-  const { id } = context.params;
+  const { id } = await context.params;
 
   try {
     const { authUserId } = await requireVerified();
@@ -152,7 +153,7 @@ export async function DELETE(_request: Request, context: RouteContext) {
     const listingOwner: ListingOwner = { id: domainUser.id };
 
     const { softDeleteListing } = await import("@/lib/listings/helpers");
-    const updated = await softDeleteListing(listingOwner, id);
+    const updated = await softDeleteListing(listingOwner as ListingOwnerOrAdmin, id);
 
     return NextResponse.json(
       { ok: true, data: { status: updated.status } },

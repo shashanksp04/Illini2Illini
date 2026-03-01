@@ -3,6 +3,12 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { env } from "@/lib/env";
 
+type CookieToSet = {
+  name: string;
+  value: string;
+  options?: Parameters<Awaited<ReturnType<typeof cookies>>["set"]>[2];
+};
+
 /**
  * Supabase client for use in Server Components and Route Handlers.
  * Uses cookies for session; use service role only where needed (e.g. admin operations).
@@ -17,7 +23,7 @@ export async function createClient() {
         getAll() {
           return cookieStore.getAll();
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet: CookieToSet[]) {
           try {
             cookiesToSet.forEach(({ name, value, options }) =>
               cookieStore.set(name, value, options)

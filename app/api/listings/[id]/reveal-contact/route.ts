@@ -9,11 +9,11 @@ import {
 import { prisma } from "@/lib/prisma";
 
 type RouteContext = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 export async function POST(_request: Request, context: RouteContext) {
-  const { id: listingId } = context.params;
+  const { id: listingId } = await context.params;
 
   try {
     const { authUserId } = await requireVerified();

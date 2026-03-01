@@ -1,0 +1,146 @@
+"use client";
+
+import Link from "next/link";
+import { useEffect, useState } from "react";
+
+type MeData = {
+  email_verified: boolean;
+  is_profile_complete: boolean;
+};
+
+type MeResponse =
+  | { ok: true; data: MeData }
+  | { ok: false; error?: { code: string; message: string } };
+
+type CtaState =
+  | { kind: "public" }
+  | { kind: "needs_profile" }
+  | { kind: "verified_complete" }
+  | { kind: "needs_verification" };
+
+function resolveState(resp: MeResponse): CtaState {
+  if (!resp.ok) return { kind: "public" };
+  const { email_verified, is_profile_complete } = resp.data;
+  if (!email_verified) return { kind: "needs_verification" };
+  if (!is_profile_complete) return { kind: "needs_profile" };
+  return { kind: "verified_complete" };
+}
+
+export function LandingCtas() {
+  const [state, setState] = useState<CtaState>({ kind: "public" });
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      try {
+        const res = await fetch("/api/me", { method: "GET" });
+        if (!res.ok) {
+          if (!cancelled) {
+            setState({ kind: "public" });
+            setLoaded(true);
+          }
+          return;
+        }
+        const json = (await res.json()) as MeResponse;
+        if (!cancelled) {
+          setState(resolveState(json));
+          setLoaded(true);
+        }
+      } catch {
+        if (!cancelled) {
+          setState({ kind: "public" });
+          setLoaded(true);
+        }
+      }
+    }
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const effectiveState = loaded ? state : { kind: "public" as const };
+
+  if (effectiveState.kind === "needs_profile") {
+    return (
+      <div className="flex flex-col sm:flex-row gap-3 justify-center">
+        <Link
+          href="/profile/setup"
+          className="inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-base font-medium text-white transition-shadow hover:shadow-md"
+          style={{ backgroundColor: "#13294B" }}
+        >
+          Complete your profile
+        </Link>
+        <Link
+          href="/listings"
+          className="inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-base font-medium border transition-colors hover:bg-white/80"
+          style={{ color: "#111827", borderColor: "#E5E7EB", backgroundColor: "#FFFFFF" }}
+        >
+          Browse listings
+        </Link>
+      </div>
+    );
+  }
+
+  if (effectiveState.kind === "verified_complete") {
+    return (
+      <div className="flex flex-col sm:flex-row gap-3 justify-center">
+        <Link
+          href="/listings"
+          className="inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-base font-medium text-white transition-shadow hover:shadow-md"
+          style={{ backgroundColor: "#13294B" }}
+        >
+          Browse listings
+        </Link>
+        <Link
+          href="/me/listings"
+          className="inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-base font-medium border transition-colors hover:bg-white/80"
+          style={{ color: "#111827", borderColor: "#E5E7EB", backgroundColor: "#FFFFFF" }}
+        >
+          My listings
+        </Link>
+      </div>
+    );
+  }
+
+  if (effectiveState.kind === "needs_verification") {
+    return (
+      <div className="flex flex-col sm:flex-row gap-3 justify-center">
+        <Link
+          href="/verify-email"
+          className="inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-base font-medium text-white transition-shadow hover:shadow-md"
+          style={{ backgroundColor: "#13294B" }}
+        >
+          Verify your email
+        </Link>
+        <Link
+          href="/listings"
+          className="inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-base font-medium border transition-colors hover:bg-white/80"
+          style={{ color: "#111827", borderColor: "#E5E7EB", backgroundColor: "#FFFFFF" }}
+        >
+          Browse listings
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col sm:flex-row gap-3 justify-center">
+      <Link
+        href="/listings"
+        className="inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-base font-medium text-white transition-shadow hover:shadow-md"
+        style={{ backgroundColor: "#13294B" }}
+      >
+        Browse listings
+      </Link>
+      <Link
+        href="/login"
+        className="inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-base font-medium border transition-colors hover:bg-white/80"
+        style={{ color: "#111827", borderColor: "#E5E7EB", backgroundColor: "#FFFFFF" }}
+      >
+        Log in
+      </Link>
+    </div>
+  );
+}

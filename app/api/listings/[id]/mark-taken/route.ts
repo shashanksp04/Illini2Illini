@@ -10,11 +10,11 @@ import { ListingError, type ListingOwner } from "@/lib/listings/helpers";
 import { prisma } from "@/lib/prisma";
 
 type RouteContext = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 export async function POST(_request: Request, context: RouteContext) {
-  const { id } = context.params;
+  const { id } = await context.params;
 
   try {
     const { authUserId } = await requireVerified();
