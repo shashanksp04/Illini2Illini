@@ -1,8 +1,30 @@
 {
-  "devDependencies": {
-    "prisma": "^6.19.2"
+  "name": "illini2illini",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "format": "prettier --write ."
   },
   "dependencies": {
-    "@prisma/client": "^6.19.2"
+    "@prisma/client": "^6.19.2",
+    "@supabase/ssr": "^0.5.2",
+    "@supabase/supabase-js": "^2.47.10",
+    "next": "15.0.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "eslint": "^9.16.0",
+    "eslint-config-next": "15.0.3",
+    "prettier": "^3.4.2",
+    "prisma": "^6.19.2",
+    "typescript": "^5.7.2"
   }
 }
