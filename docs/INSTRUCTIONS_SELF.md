@@ -16,3 +16,27 @@ chats remain clean, structured, and ready to guide development.
 
 ## When asking GPT to update project_context using the following prompt
 I'm done finalizing my Build_Spec.md, Tasks.md and Decision.md file. Now before I start coding, I want to finalize the UI or visual design of my product. It will be stored in UI_Spec.md. Update my Project_Context.md file accordingly. Also when you update, the sections like description of .md files should stay consistent. U should preserve the verbatim of the file (refer to the project_context.md I upload the updated version before running this prompt). You should only add new content or edit the necessary relevant content
+
+When implementing the Email Verification page (UI tasks):
+
+Current backend uses emailRedirectTo = request.origin
+
+That means users will land on the app root after clicking the verification link
+
+The landing page must correctly detect and handle a “just verified” state
+
+We must ensure:
+
+Proper session refresh
+
+Correct gating removal
+
+Clear UX feedback (“Email verified successfully”)
+
+No redirect loop back to verification instructions
+
+We will explicitly revisit this during:
+
+TASKS 5.2 — Email verification page UX
+
+I’ll proactively bring this up again when we reach UI implementation.
