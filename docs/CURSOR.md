@@ -1,21 +1,3 @@
-Perfect.
-We’ll create a **strict, execution-focused, scope-guarding `CURSOR.md`** tailored specifically to this project.
-
-This file must:
-
-* Lock Cursor into MVP scope
-* Prevent schema drift
-* Prevent feature creep
-* Enforce build order
-* Force it to stop when instructed
-* Maintain alignment with all specs
-
-Below is the finalized version.
-
-You can copy this directly into `CURSOR.md`.
-
----
-
 # `CURSOR.md`
 
 ---
@@ -60,39 +42,45 @@ You must not deviate from these files.
 The following setup has already been completed manually and must NOT be redone or modified unless explicitly instructed.
 
 ## Supabase
-- Project created and configured
-- Email/password auth enabled
-- Email verification required
-- Redirect URLs configured for localhost
-- Storage buckets created:
-  - profile-pictures
-  - listing-photos
+
+* Project created and configured
+* Email/password auth enabled
+* Email verification required
+* Redirect URLs configured for localhost
+* Storage buckets created:
+
+  * profile-pictures
+  * listing-photos
 
 ## Prisma
-- Prisma is installed and pinned to v6
-- Prisma has already been initialized
-- DATABASE_URL in `.env` uses Supabase Session Pooler (IPv4 compatible)
-- Schema for TASKS 2.1–2.2 is complete
-- Initial migration has been created and applied
-- `prisma/schema.prisma` and `prisma/migrations` are finalized
+
+* Prisma is installed and pinned to v6
+* Prisma has already been initialized
+* DATABASE_URL in `.env` uses Supabase Session Pooler (IPv4 compatible)
+* Schema for TASKS 2.1–2.2 is complete
+* Initial migration has been created and applied
+* `prisma/schema.prisma` and `prisma/migrations` are finalized
 
 You must NOT:
-- Re-run prisma init
-- Modify schema.prisma
-- Modify prisma/migrations
-- Change Prisma versions
-- Alter DATABASE_URL
-- Recreate migrations
-- Touch Supabase configuration
+
+* Re-run prisma init
+* Modify schema.prisma
+* Modify prisma/migrations
+* Change Prisma versions
+* Alter DATABASE_URL
+* Recreate migrations
+* Touch Supabase configuration
 
 ## Environment
-- `.env` and `.env.local` are correctly configured
-- App runs locally
-- Env validation exists and fails fast if missing variables
+
+* `.env` and `.env.local` are correctly configured
+* App runs locally
+* Env validation exists and fails fast if missing variables
 
 ## Documentation
-- Files in `/docs` are locked specifications
-- Do NOT modify any files inside `/docs`
+
+* Files in `/docs` are locked specifications
+* Do NOT modify any files inside `/docs`
 
 ---
 
@@ -350,6 +338,165 @@ If you believe any part of the project state above is inconsistent or needs chan
 STOP and request explicit instruction before modifying it.
 
 Stay disciplined.
+
+---
+
+# 1️⃣2️⃣ UI Consistency Enforcement (New)
+
+The UI visual language defined in `UI_SPEC.md` is the canonical design system for the entire application.
+
+Every page must visually match the **Browse Listings page style**.
+
+This includes:
+
+* Navigation bar styling
+* Card components
+* Button hierarchy
+* Spacing scale
+* Filter components
+* Listing cards
+* Badge styling
+* Form inputs
+* Typography
+* Color tokens
+* Page container widths
+* Grid layouts
+
+All pages must look like part of the same product.
+
+You must reuse the following components wherever possible:
+
+* Navbar
+* PageContainer
+* ListingCard
+* SellerCard
+* SearchBar
+* FilterBar
+* AuthCard
+* FormSection
+
+Do NOT create new UI patterns when an existing component already satisfies the requirement.
+
+---
+
+# 1️⃣3️⃣ Layout System Enforcement (New)
+
+All pages must follow the App Shell layout defined in `UI_SPEC.md`.
+
+Required structure:
+
+Navbar
+PageContainer
+Page Content
+
+Container rule:
+
+```
+mx-auto max-w-6xl px-4 sm:px-6 lg:px-8
+```
+
+Spacing rules must match the UI spec exactly.
+
+Page sections must use:
+
+```
+space-y-6 (mobile)
+space-y-8 (desktop)
+```
+
+No page should introduce a different layout pattern.
+
+---
+
+# 1️⃣4️⃣ Responsive Rules (New)
+
+All UI must be mobile-first.
+
+Breakpoints:
+
+sm = 640px
+md = 768px
+lg = 1024px
+xl = 1280px
+
+Listing grid must follow:
+
+```
+grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4
+```
+
+Filter behavior:
+
+Desktop → horizontal filter bar
+Mobile → filter drawer
+
+No horizontal overflow at 320px.
+
+---
+
+# 1️⃣5️⃣ Component Reuse Rules (New)
+
+Cursor must reuse existing components before creating new ones.
+
+Example:
+
+ListingCard must be reused on:
+
+* Browse page
+* Dashboard
+* Admin view
+
+AuthCard must be reused for:
+
+* Login
+* Signup
+* Profile setup
+
+FormSection must be reused for:
+
+* Create listing
+* Edit listing
+
+Avoid duplicating layout code.
+
+---
+
+# 1️⃣6️⃣ UI Scope Guard (New)
+
+Cursor must NOT introduce UI implying future features.
+
+Disallowed UI elements include:
+
+* Chat buttons
+* Messaging indicators
+* Payment buttons
+* Map view UI
+* Ratings UI
+* Review UI
+* Favorite/like systems
+* Notification centers
+* Activity feeds
+
+These features are not part of MVP.
+
+Do not hint at them in the UI.
+
+---
+
+# 1️⃣7️⃣ Spec Alignment Check (New)
+
+Before implementing any feature, Cursor must verify alignment with:
+
+* PRODUCT_SPEC.md
+* BUILD_SPEC.md
+* UI_SPEC.md
+* MVP_DEFINITION.md
+
+If a requested change conflicts with these documents:
+
+Stop and request clarification.
+
+Never override the spec.
 
 ---
 

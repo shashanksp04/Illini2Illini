@@ -1,24 +1,24 @@
 import Link from "next/link";
 
+import { PageContainer } from "@/components/layout/PageContainer";
+
 export default function NotFound() {
   return (
-    <div
-      className="min-h-screen flex flex-col items-center justify-center px-6"
-      style={{ backgroundColor: "#F8F9FB" }}
-    >
-      <h1 className="text-2xl font-semibold" style={{ color: "#111827" }}>
-        Page not found
-      </h1>
-      <p className="text-base mt-2" style={{ color: "#6B7280" }}>
+    <PageContainer>
+      <div className="flex flex-col items-center justify-center py-12 md:py-16 text-center">
+        <h1 className="text-2xl font-semibold text-illini-blue">
+          Page not found
+        </h1>
+        <p className="mt-2 text-base text-gray-500">
         The listing or page you’re looking for doesn’t exist or was removed.
-      </p>
-      <Link
-        href="/listings"
-        className="mt-4 rounded-lg px-4 py-2 text-sm font-medium text-white"
-        style={{ backgroundColor: "#13294B" }}
-      >
-        Browse listings
-      </Link>
-    </div>
+        </p>
+        <Link
+          href="/listings"
+          className="mt-4 inline-flex items-center justify-center rounded-lg bg-illini-orange px-4 py-2 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2"
+        >
+          Browse listings
+        </Link>
+      </div>
+    </PageContainer>
   );
 }

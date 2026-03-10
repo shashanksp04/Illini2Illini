@@ -1,426 +1,727 @@
-# 🎨 UI_SPEC.md (MVP Visual System)
+# UI_SPEC.md
 
-This document defines visual design and UX presentation only.
-It must not introduce new features or alter backend behavior defined in product_spec.md or build_spec.md.
-
----
-
-# 1️⃣ Design System
-
-## Brand Direction
-
-**Positioning:**
-Campus-native, trustworthy, structured, student-first.
-
-**Avoid:**
-
-* Landlord-corporate aesthetic
-* Overly playful startup vibe
-* Loud Illinois athletics branding
-* Gradient-heavy tech bro look
-
-We borrow from Illinois colors — but in a refined way.
+UIUC Housing Marketplace — UI System Specification
 
 ---
 
-## 🎨 Color System
+# 1. Design Philosophy
 
-### Primary Brand Color (Illinois-Inspired)
+The UI should feel:
 
-**Illini Blue (Primary)**
+• Clean
+• Structured
+• Modern
+• Trustworthy
+• Fast
+• Student-friendly
 
-* `#13294B`
-* Used for:
+Design inspiration:
 
-  * Primary buttons
-  * Headers
-  * Logo
-  * Active states
-  * Verified elements
+• Airbnb listing UX
+• Modern SaaS dashboards
+• Apple-level spacing and clarity
 
-This creates institutional trust.
+Key principle:
 
----
+**Every page must look like it belongs to the same product.**
 
-### Accent / Secondary Color
+All screens must follow:
 
-**Illini Orange (Accent)**
+• the same **navigation**
+• the same **container**
+• the same **spacing system**
+• the same **card components**
+• the same **color tokens**
 
-* `#E84A27`
-* Used sparingly:
-
-  * Hover states
-  * Links
-  * Focus rings
-  * Small accent elements
-
-Never large background fills.
+No page should introduce new styling patterns.
 
 ---
 
-### Neutrals (Core UI Backbone)
+# 2. Technology Stack
 
-| Role            | Color     |
-| --------------- | --------- |
-| Background      | `#F8F9FB` |
-| Surface / Cards | `#FFFFFF` |
-| Border          | `#E5E7EB` |
-| Text Primary    | `#111827` |
-| Text Secondary  | `#6B7280` |
-| Disabled        | `#D1D5DB` |
+Required:
 
-Clean, modern, Tailwind-friendly palette.
+• Tailwind CSS
+• shadcn/ui components
+• Lucide icons
 
----
+Rules:
 
-### Semantic Colors
-
-| State   | Color     | Usage                |
-| ------- | --------- | -------------------- |
-| Success | `#16A34A` | ACTIVE               |
-| Warning | `#D97706` | Rare use             |
-| Error   | `#DC2626` | EXPIRED, form errors |
-| Info    | `#2563EB` | Verified badge       |
-
-These are muted, not neon.
+• No custom CSS files
+• Styling through Tailwind utilities only
+• Theme tokens override allowed
+• Mobile-first development
 
 ---
 
-## 🧱 Border Radius
+# 3. Color System (UIUC Theme)
 
-* Cards: `rounded-xl`
-* Buttons: `rounded-lg`
-* Inputs: `rounded-lg`
-* Badges: `rounded-full`
+Primary brand colors:
 
-Soft but not bubbly.
+Illini Blue
+`#13294B`
+
+Illini Orange
+`#FF5F05`
+
+White
+`#FFFFFF`
+
+Supporting neutrals:
+
+Gray 50
+Gray 100
+Gray 200
+Gray 500
+Gray 700
 
 ---
 
-## 🌫 Shadow Depth
+## Color Usage Rules
 
-Use only two levels:
+Illini Blue
 
-* **Card default:** `shadow-sm`
-* **Hover:** `shadow-md`
+Used for:
 
-No heavy elevation system.
+• navbar background
+• page background accents
+• headings
+
+Illini Orange
+
+Used for:
+
+• primary CTA buttons
+• price tags on listing cards
+• focus states
+• important badges
+
+White
+
+Used for:
+
+• page surfaces
+• cards
+• input fields
+
+Never:
+
+• large orange backgrounds
+• gradient color schemes
 
 ---
 
-## 🔤 Typography
+# 4. Typography
 
-### Font Stack
+Font:
 
-Use system-native + Inter:
+Inter (fallback: system-ui)
+
+Scale:
+
+Page Title
+text-2xl md:text-3xl font-semibold
+
+Section Title
+text-lg font-semibold
+
+Card Title
+text-base font-medium
+
+Body Text
+text-sm
+
+Meta Text
+text-xs text-muted-foreground
+
+---
+
+# 5. Global Layout System
+
+All pages must follow the **App Shell layout**.
+
+Structure:
+
+Navbar
+Main container
+Page content
+
+---
+
+## Page Container
+
+All pages use:
 
 ```
-Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif
+mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8
 ```
 
-### Scale
+Vertical spacing:
 
-| Role  | Size                   |
-| ----- | ---------------------- |
-| H1    | text-3xl font-semibold |
-| H2    | text-2xl font-semibold |
-| H3    | text-xl font-medium    |
-| Body  | text-base              |
-| Small | text-sm                |
-| Micro | text-xs                |
+Mobile
+space-y-6
 
-No fancy serif. Clean, modern.
+Desktop
+space-y-8
+
+No page content should exceed **max-w-6xl**.
 
 ---
 
-# 2️⃣ Status Color Coding
+# 6. Responsive Layout Rules
 
-Consistency builds trust.
+Breakpoints (Tailwind defaults):
+
+sm 640px
+md 768px
+lg 1024px
+xl 1280px
+
+---
+
+## Mobile (< md)
+
+• single column layout
+• stacked sections
+• filter drawer instead of full filter bar
+
+---
+
+## Tablet (md)
+
+• 2 column listing grid
+
+---
+
+## Desktop (lg)
+
+• 3 column listing grid
+
+---
+
+## Large screens (xl)
+
+• 4 column listing grid
+
+---
+
+# 7. Global Navigation Bar
+
+Used on **all pages**.
+
+Height
+
+64px
+
+Layout
+
+Left
+Logo + product name
+
+Center
+Search bar (desktop only)
+
+Right
+Auth controls
+
+Visitor:
+
+Login
+Sign up
+
+Verified user:
+
+Avatar
+Dropdown menu
+
+---
+
+## Navbar Style
+
+Background
+
+Illini Blue
+
+Text
+
+White
+
+Search bar
+
+Rounded full input
+
+---
+
+# 8. Global Search Bar
+
+Centered in navbar on desktop.
+
+Design:
+
+Rounded full input
+
+Placeholder:
+
+“Search listings…”
+
+Includes icon.
+
+Mobile:
+
+Search moves below navbar.
+
+---
+
+# 9. Filter System
+
+Used on Browse Listings page.
+
+Desktop:
+
+Horizontal filter bar.
+
+Layout:
+
+```
+Price | Dates | Room Type | Furnished | Utilities | Lease Type | Sort
+```
+
+Each filter opens a popover.
+
+Style:
+
+• rounded container
+• subtle border
+• soft shadow
+
+---
+
+## Mobile Filters
+
+Filters collapse into:
+
+“Filters” button
+
+Opens bottom drawer.
+
+Includes:
+
+Apply button
+Clear button
+
+---
+
+# 10. Listing Grid
+
+Grid layout:
+
+```
+grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6
+```
+
+Cards must align evenly.
+
+Images must have fixed aspect ratio.
+
+---
+
+# 11. Listing Card Component
+
+Structure:
+
+Image
+Title + price
+Landmark
+Date range
+Tags
+Seller row
+
+---
+
+## Card Design
+
+Container
+
+rounded-xl
+border
+shadow-sm
+hover:shadow-lg
+
+Image
+
+aspect-[4/3]
+rounded-t-xl
+object-cover
+
+Price tag
+
+Top-right overlay
+
+Orange background
+
+Example:
+
+`$850 / month`
+
+---
+
+## Tags
+
+Examples:
+
+Private Room
+Entire Unit
+Furnished
+Utilities Included
+Sublease
+Lease Takeover
+
+Tag style:
+
+Rounded badge
+
+Muted background.
+
+---
+
+## Seller Row
+
+Avatar
+Username
+Verified badge
+
+---
+
+# 12. Listing Detail Page
+
+Two layouts depending on authentication.
+
+Product visibility rules from Product Spec apply. 
+
+---
+
+## Layout
+
+Mobile
+
+Single column.
+
+Desktop
+
+12 column grid.
+
+```
+Main content: col-span-8
+Sidebar: col-span-4
+```
+
+---
+
+## Main Content
+
+Order:
+
+Title
+Rent
+Landmark
+Date range
+Photo gallery
+Unit details
+Description
+Report listing
+
+---
+
+## Photo Gallery
+
+Carousel.
+
+Images:
+
+rounded-xl
+
+---
+
+## Sidebar (Verified Users)
+
+Seller card.
+
+Contains:
+
+Profile picture
+Full name
+Username
+Verified badge
+Contact Seller button
+
+---
+
+## Public Users
+
+Hidden:
+
+Photos
+Description
+Address
+Contact button
+
+Display instead:
+
+Login CTA box
+
+---
+
+# 13. Landing Page
+
+Structure:
+
+Hero
+Value proposition section
+Browse CTA
+
+---
+
+## Hero Section
+
+Centered content.
+
+Title
+
+“Find Short-Term Housing at UIUC”
+
+Subheadline.
+
+Search bar.
+
+Primary CTA
+
+Browse Listings.
+
+---
+
+## Value Props
+
+3 columns:
+
+Verified UIUC Students
+Structured Listings
+Powerful Filters
+
+Cards:
+
+rounded-xl
+shadow-sm
+
+---
+
+# 14. Authentication Pages
+
+Pages:
+
+Login
+Signup
+Email verification
+Profile setup
+
+---
+
+## Auth Layout
+
+Centered card.
+
+Max width:
+
+```
+max-w-md
+```
+
+Card style:
+
+rounded-xl
+border
+shadow-md
+
+Fields stacked vertically.
+
+Primary button:
+
+Orange.
+
+---
+
+# 15. Dashboard
+
+Layout:
+
+Simple page layout.
+
+Top section:
+
+Create Listing button.
+
+Below:
+
+User listings grid.
 
 ---
 
 ## Listing Status Badges
 
-| Status  | Style                                            |
-| ------- | ------------------------------------------------ |
-| ACTIVE  | Green background (`bg-green-100 text-green-700`) |
-| TAKEN   | Gray (`bg-gray-100 text-gray-600`)               |
-| EXPIRED | Red (`bg-red-100 text-red-700`)                  |
-| DELETED | Not shown publicly                               |
+Active
 
-Badges:
+Green badge
 
-* `text-xs`
-* `font-medium`
-* `rounded-full`
-* subtle padding
+Taken
 
----
+Gray badge
 
-## Verification Badge
+Expired
 
-**UIUC Verified**
+Muted badge
 
-* Small blue check icon
-* Color: `#2563EB`
-* Placed next to user name
-* Tooltip: “Verified UIUC Student”
+Deleted
 
-Must feel official but not dramatic.
+Muted badge
+
+Matches product lifecycle rules. 
 
 ---
 
-## Lease Type Tags
+# 16. Create Listing Page
 
-| Type           | Color                                    |
-| -------------- | ---------------------------------------- |
-| Sublease       | Purple (`bg-purple-100 text-purple-700`) |
-| Lease takeover | Teal (`bg-teal-100 text-teal-700`)       |
+Form layout.
 
-These are contextual, not dominant.
-
----
-
-## Gender Preference Tag
-
-Very subtle:
-
-* `bg-gray-100 text-gray-600`
-* Small
-* Same visual weight as bedrooms count
-
-We do NOT emphasize gender visually.
-
----
-
-# 3️⃣ Component Patterns
-
-Minimal, structured, repeatable.
-
----
-
-## 🧾 Listing Card (Browse Page)
-
-Layout:
+Max width:
 
 ```
----------------------------------------
-| Title (bold)        $750 / month    |
-| Landmark                          |
-| Date range                         |
-| -----------------------------------|
-| [Private Room] [Furnished] [UTIL]  |
-| [Sublease] [ACTIVE badge]          |
-| Username                           |
----------------------------------------
+max-w-2xl
 ```
 
-Rules:
+Sections:
 
-* Clean white card
-* 16px padding
-* No photos in public preview
-* Hover shadow increase
-* Entire card clickable
-
-Verified users:
-
-* Show 1 thumbnail photo in corner
-* Show owner profile circle (small)
+Basic Info
+Dates
+Location
+Unit Details
+Description
+Photos
 
 ---
 
-## 📄 Listing Detail Page
+## Photo Upload
 
-### Layout (Desktop)
+Grid preview.
 
-```
-Left (2/3):
-  Photo gallery (carousel or grid)
-  Title + rent
-  Tags row
-  Description
-  Exact address
+1–8 photos.
 
-Right (1/3):
-  Seller card
-    Profile picture
-    Full name
-    Verified badge
-    Contact button
-    Report link
-```
-
-Mobile:
-
-* Single column
-* Contact button sticky bottom
+Drag and drop allowed.
 
 ---
 
-## 🔍 Filter Pattern
+# 17. Admin Panel
 
-MVP simplicity:
+Minimal design.
 
-**Top horizontal filters** (NOT sidebar)
+Table layout.
 
-Why:
+Columns:
 
-* Faster to build
-* Better mobile consistency
-* Less layout complexity
+User
+Listing
+Date
+Status
+Actions
 
-Structure:
+Actions:
 
-* Rent min/max
-* Date range
-* Lease type
-* Room type
-* Furnished
-* Utilities included
-* Keyword search
-
-Compact, collapsible on mobile.
+Delete listing
+Ban user
 
 ---
 
-## 🔘 Button Styles
+# 18. Motion & Interaction
 
-### Primary
+Allowed animations:
 
-* Background: Illini Blue
-* Text: white
-* Hover: slightly darker
-* Used for:
+Card hover shadow
+Image hover zoom
+Modal fade
+Drawer slide
 
-  * Create listing
-  * Contact seller
-  * Submit
+Not allowed:
 
----
-
-### Secondary
-
-* White background
-* Border gray
-* Text dark
-* Used for:
-
-  * Cancel
-  * Edit
+Bounce animations
+Heavy transitions
+Parallax effects
 
 ---
 
-### Destructive
+# 19. Accessibility
 
-* White background
-* Red text
-* Red border
-* Used for:
+Required:
 
-  * Delete listing
-  * Ban user
-
-No filled red buttons.
+Keyboard navigation
+Visible focus ring (orange)
+Semantic HTML
+Input labels
+ARIA roles where needed
 
 ---
 
-## 📝 Form Field Style
+# 20. UI Acceptance Checklist
 
-* `rounded-lg`
-* 1px gray border
-* Focus ring: Illini Orange
-* Label above field
-* Clear error state below field
+Responsive:
 
----
+320px no horizontal scroll
 
-## ❗ Error State
+768px grid becomes 2 columns
 
-* Border: red
-* Helper text: red small text
-* Optional subtle background tint
+1024px grid becomes 3 columns
 
-No shake animations.
+1280px grid becomes 4 columns
 
 ---
 
-## 🗂 Empty State
+Visibility:
 
-Example: No listings found
+Public cannot see photos
 
-Centered:
+Public cannot see description
 
-* Small icon (house outline)
-* Message:
-  “No listings match your filters.”
-* Secondary text:
-  “Try adjusting your rent range or dates.”
+Public cannot see address
 
-Optional button:
+Public cannot contact seller
 
-* “Clear Filters”
-
-No illustrations for MVP.
+Verified users see all listing data
 
 ---
 
-# 4️⃣ Tone of Visual Identity
+Lifecycle:
 
-Final Decision:
+Expired listings hidden
 
-### Illini2Illini = Clean Campus Tech
+Taken listings marked
 
-Feels:
-
-* Built by students
-* For students
-* Structured
-* Trustworthy
-* Not flashy
-* Not landlord-corporate
-* Slightly institutional
-
-We lean on:
-
-* Structured layout
-* Strong typography
-* Subtle Illinois-inspired color accents
-
-We do NOT:
-
-* Use loud orange blocks
-* Use gradients
-* Use heavy animations
-* Mimic Zillow or leasing portals
+Deleted listings not visible publicly
 
 ---
 
-# 5️⃣ Implementation Strategy (MVP-Aligned)
-
-Use:
-
-* **Tailwind CSS**
-* **shadcn/ui**
-* Minimal customization
-* Override theme tokens only
-
-Do NOT:
-
-* Build custom component library
-* Overwrite design tokens extensively
-* Add dark mode (Post-MVP)
+If any rule fails, implementation is incomplete.
 
 ---
 
-# Final Visual Positioning Summary
+# 21. Component Reuse Rule
 
-Illini2Illini should feel like:
+All pages must reuse these core components:
 
-> “If UIUC students built a better housing board — modern, verified, and structured.”
+Navbar
+SearchBar
+FilterBar
+ListingCard
+SellerCard
+AuthCard
+PageContainer
 
-Not:
-
-> “Another landlord portal.”
+New UI patterns must not be introduced without updating this spec.
 
 ---

@@ -1,6 +1,6 @@
-"use client";
+\"use client\";
 
-import { useState } from "react";
+import { useState } from \"react\";
 
 export type ListingPhoto = {
   image_url: string;
@@ -26,7 +26,7 @@ export function PhotoUploader({ listingId, initialPhotos = [], onChange }: Photo
 
   async function handleUpload() {
     if (!selectedFiles || selectedFiles.length === 0) {
-      setError("Select one or more images to upload.");
+      setError(\"Select one or more images to upload.\");
       return;
     }
     setError(null);
@@ -34,16 +34,16 @@ export function PhotoUploader({ listingId, initialPhotos = [], onChange }: Photo
     try {
       const formData = new FormData();
       Array.from(selectedFiles).forEach((file) => {
-        formData.append("files", file);
+        formData.append(\"files\", file);
       });
       const res = await fetch(`/api/listings/${listingId}/photos`, {
-        method: "POST",
+        method: \"POST\",
         body: formData,
       });
       const json = (await res.json()) as any;
       if (!res.ok || !json.ok) {
         const message =
-          json?.error?.message ?? "Failed to upload photos. Please try again.";
+          json?.error?.message ?? \"Failed to upload photos. Please try again.\";
         setError(message);
         return;
       }
@@ -54,65 +54,62 @@ export function PhotoUploader({ listingId, initialPhotos = [], onChange }: Photo
       }
       setSelectedFiles(null);
     } catch {
-      setError("Failed to upload photos. Please try again.");
+      setError(\"Failed to upload photos. Please try again.\");
     } finally {
       setUploading(false);
     }
   }
 
   return (
-    <div className="space-y-4">
-      <div className="space-y-2">
+    <div className=\"space-y-4\">
+      <div className=\"space-y-2\">
         <label
-          htmlFor="listing_photos"
-          className="block text-sm font-medium"
-          style={{ color: "#111827" }}
+          htmlFor=\"listing_photos\"
+          className=\"block text-sm font-medium text-gray-800\"
         >
           Photos
         </label>
         <input
-          id="listing_photos"
-          type="file"
-          accept="image/*"
+          id=\"listing_photos\"
+          type=\"file\"
+          accept=\"image/*\"
           multiple
           onChange={handleFileChange}
-          className="w-full rounded-lg border border-[#E5E7EB] px-3 py-2 text-sm bg-white"
+          className=\"w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange\"
         />
-        <p className="text-xs" style={{ color: "#6B7280" }}>
+        <p className=\"text-xs text-gray-500\">
           Add at least 1 photo (max 8). JPEG, PNG, or WEBP.
         </p>
         {error && (
-          <p className="text-xs" style={{ color: "#DC2626" }}>
+          <p className=\"text-xs text-red-600\" role=\"alert\">
             {error}
           </p>
         )}
       </div>
 
       <button
-        type="button"
+        type=\"button\"
         onClick={handleUpload}
         disabled={uploading || !selectedFiles || selectedFiles.length === 0}
-        className="inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium text-white transition-shadow hover:shadow-md disabled:opacity-70"
-        style={{ backgroundColor: "#13294B" }}
+        className=\"inline-flex items-center justify-center rounded-lg bg-illini-orange px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md disabled:opacity-70 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2\"
       >
-        {uploading ? "Uploading..." : "Upload selected photos"}
+        {uploading ? \"Uploading...\" : \"Upload selected photos\"}
       </button>
 
       {photos.length > 0 && (
-        <div className="space-y-2">
-          <p className="text-sm font-medium" style={{ color: "#111827" }}>
-            Current photos
-          </p>
-          <div className="grid grid-cols-3 gap-2">
+        <div className=\"space-y-2\">
+          <p className=\"text-sm font-medium text-illini-blue\">Current photos</p>
+          <div className=\"grid grid-cols-3 gap-2\">
             {photos.map((photo) => (
               <div
                 key={`${photo.image_url}-${photo.display_order}`}
-                className="overflow-hidden rounded-lg bg-gray-100"
+                className=\"overflow-hidden rounded-lg bg-gray-100\"
               >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={photo.image_url}
-                  alt="Listing photo"
-                  className="h-24 w-full object-cover"
+                  alt=\"Listing photo\"
+                  className=\"h-24 w-full object-cover\"
                 />
               </div>
             ))}

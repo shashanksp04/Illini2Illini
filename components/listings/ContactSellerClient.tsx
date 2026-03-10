@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { PageContainer } from "@/components/layout/PageContainer";
+
 type MeData = {
   email: string;
   email_verified: boolean;
@@ -128,56 +130,40 @@ export function ContactSellerClient({ listingId }: { listingId: string }) {
 
   if (gate.kind === "loading") {
     return (
-      <main
-        className="min-h-screen flex items-center justify-center px-4"
-        style={{ backgroundColor: "#F8F9FB" }}
-      >
-        <p className="text-base" style={{ color: "#6B7280" }}>
-          Loading…
-        </p>
-      </main>
+      <PageContainer>
+        <p className="text-sm text-gray-500">Loading…</p>
+      </PageContainer>
     );
   }
 
   if (gate.kind === "unauth") {
     return (
-      <main
-        className="min-h-screen flex items-center justify-center px-4"
-        style={{ backgroundColor: "#F8F9FB" }}
-      >
-        <div className="w-full max-w-2xl">
-          <div className="rounded-xl bg-white border border-[#E5E7EB] shadow-sm px-6 py-8 text-center space-y-4">
-            <h1 className="text-2xl font-semibold" style={{ color: "#111827" }}>
-              Log in to contact sellers
-            </h1>
-            <p className="text-sm" style={{ color: "#6B7280" }}>
+      <PageContainer>
+        <div className="flex justify-center py-12">
+          <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white px-6 py-8 text-center shadow-sm space-y-4">
+            <h1 className="text-2xl font-semibold text-illini-blue">Log in to contact sellers</h1>
+            <p className="text-sm text-gray-500">
               You need to be logged in with a verified UIUC account to reveal seller contact info.
             </p>
             <Link
               href="/login"
-              className="inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-base font-medium text-white transition-shadow hover:shadow-md"
-              style={{ backgroundColor: "#13294B" }}
+              className="inline-flex items-center justify-center rounded-lg bg-illini-orange px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2"
             >
               Log in
             </Link>
           </div>
         </div>
-      </main>
+      </PageContainer>
     );
   }
 
   if (gate.kind === "needsVerify") {
     return (
-      <main
-        className="min-h-screen flex items-center justify-center px-4"
-        style={{ backgroundColor: "#F8F9FB" }}
-      >
-        <div className="w-full max-w-2xl">
-          <div className="rounded-xl bg-white border border-[#E5E7EB] shadow-sm px-6 py-8 text-center space-y-4">
-            <h1 className="text-2xl font-semibold" style={{ color: "#111827" }}>
-              Verify your email first
-            </h1>
-            <p className="text-sm" style={{ color: "#6B7280" }}>
+      <PageContainer>
+        <div className="flex justify-center py-12">
+          <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white px-6 py-8 text-center shadow-sm space-y-4">
+            <h1 className="text-2xl font-semibold text-illini-blue">Verify your email first</h1>
+            <p className="text-sm text-gray-500">
               Verify your UIUC email before you can contact sellers.
             </p>
             <Link
@@ -186,86 +172,63 @@ export function ContactSellerClient({ listingId }: { listingId: string }) {
                   ? `/verify-email?email=${encodeURIComponent(gate.email)}`
                   : "/verify-email"
               }
-              className="inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-base font-medium text-white transition-shadow hover:shadow-md"
-              style={{ backgroundColor: "#13294B" }}
+              className="inline-flex items-center justify-center rounded-lg bg-illini-orange px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2"
             >
               Verify email
             </Link>
           </div>
         </div>
-      </main>
+      </PageContainer>
     );
   }
 
   if (gate.kind === "needsProfile") {
     return (
-      <main
-        className="min-h-screen flex items-center justify-center px-4"
-        style={{ backgroundColor: "#F8F9FB" }}
-      >
-        <div className="w-full max-w-2xl">
-          <div className="rounded-xl bg-white border border-[#E5E7EB] shadow-sm px-6 py-8 text-center space-y-4">
-            <h1 className="text-2xl font-semibold" style={{ color: "#111827" }}>
-              Complete your profile first
-            </h1>
-            <p className="text-sm" style={{ color: "#6B7280" }}>
+      <PageContainer>
+        <div className="flex justify-center py-12">
+          <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white px-6 py-8 text-center shadow-sm space-y-4">
+            <h1 className="text-2xl font-semibold text-illini-blue">Complete your profile first</h1>
+            <p className="text-sm text-gray-500">
               Finish setting up your profile before you can contact sellers.
             </p>
             <Link
               href="/profile/setup"
-              className="inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-base font-medium text-white transition-shadow hover:shadow-md"
-              style={{ backgroundColor: "#13294B" }}
+              className="inline-flex items-center justify-center rounded-lg bg-illini-orange px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2"
             >
               Complete profile
             </Link>
           </div>
         </div>
-      </main>
+      </PageContainer>
     );
   }
 
   if (gate.kind === "banned") {
     return (
-      <main
-        className="min-h-screen flex items-center justify-center px-4"
-        style={{ backgroundColor: "#F8F9FB" }}
-      >
-        <div className="w-full max-w-2xl">
-          <div className="rounded-xl bg-white border border-[#E5E7EB] shadow-sm px-6 py-8 text-center space-y-4">
-            <h1 className="text-2xl font-semibold" style={{ color: "#111827" }}>
-              Account restricted
-            </h1>
-            <p className="text-sm" style={{ color: "#6B7280" }}>
+      <PageContainer>
+        <div className="flex justify-center py-12">
+          <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white px-6 py-8 text-center shadow-sm space-y-4">
+            <h1 className="text-2xl font-semibold text-illini-blue">Account restricted</h1>
+            <p className="text-sm text-gray-500">
               Your account is restricted from contacting sellers.
             </p>
           </div>
         </div>
-      </main>
+      </PageContainer>
     );
   }
 
   return (
-    <main
-      className="min-h-screen px-4 py-6"
-      style={{ backgroundColor: "#F8F9FB" }}
-    >
-      <div className="max-w-2xl mx-auto space-y-6">
-        <div className="rounded-xl bg-white border border-[#E5E7EB] shadow-sm px-6 py-8 space-y-6">
-          <h1 className="text-2xl font-semibold" style={{ color: "#111827" }}>
-            Contact seller
-          </h1>
+    <PageContainer>
+      <div className="mx-auto max-w-2xl space-y-6 md:space-y-8">
+        <div className="rounded-xl border border-gray-200 bg-white px-6 py-8 shadow-sm space-y-6">
+          <h1 className="text-2xl font-semibold text-illini-blue">Contact seller</h1>
 
           {reveal.kind === "error" && (
             <div className="space-y-2">
-              <p className="text-sm" style={{ color: "#DC2626" }}>
-                {reveal.message}
-              </p>
+              <p className="text-sm text-red-600">{reveal.message}</p>
               {reveal.message === "Listing not found." && (
-                <Link
-                  href="/listings"
-                  className="text-sm font-medium"
-                  style={{ color: "#E84A27" }}
-                >
+                <Link href="/listings" className="text-sm font-medium text-illini-orange hover:underline">
                   Browse listings
                 </Link>
               )}
@@ -274,37 +237,29 @@ export function ContactSellerClient({ listingId }: { listingId: string }) {
 
           {reveal.kind === "revealed" ? (
             <div className="space-y-4">
-              <div className="rounded-lg border border-[#E5E7EB] p-4 bg-[#F8F9FB]">
-                <p className="text-sm font-medium mb-1" style={{ color: "#111827" }}>
-                  Seller email
-                </p>
-                <p className="text-base break-all" style={{ color: "#111827" }}>
-                  {reveal.seller_email}
-                </p>
+              <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+                <p className="mb-1 text-sm font-medium text-gray-700">Seller email</p>
+                <p className="break-all text-base text-gray-900">{reveal.seller_email}</p>
                 <button
                   type="button"
                   onClick={() => handleCopyEmail(reveal.seller_email)}
-                  className="mt-3 inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium border border-[#E5E7EB] bg-white"
-                  style={{ color: "#111827" }}
+                  className="mt-3 inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-gray-300"
                 >
                   {copied ? "Copied!" : "Copy email"}
                 </button>
               </div>
               <Link
                 href={`/listings/${listingId}`}
-                className="inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium border border-[#E5E7EB] bg-white"
-                style={{ color: "#111827" }}
+                className="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-gray-300"
               >
                 Back to listing
               </Link>
             </div>
           ) : (
             <>
-              <div className="rounded-lg border border-[#E5E7EB] p-4 space-y-2">
-                <p className="text-sm font-medium" style={{ color: "#111827" }}>
-                  Safety reminder
-                </p>
-                <ul className="text-sm list-disc list-inside space-y-1" style={{ color: "#6B7280" }}>
+              <div className="rounded-lg border border-gray-200 p-4 space-y-2">
+                <p className="text-sm font-medium text-gray-700">Safety reminder</p>
+                <ul className="list-inside list-disc space-y-1 text-sm text-gray-500">
                   <li>Meet in a public place when possible.</li>
                   <li>Never send money before seeing the unit.</li>
                   <li>If something feels off, report the listing.</li>
@@ -314,16 +269,14 @@ export function ContactSellerClient({ listingId }: { listingId: string }) {
                 type="button"
                 disabled={reveal.kind === "loading"}
                 onClick={handleReveal}
-                className="inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium text-white transition-shadow hover:shadow-md disabled:opacity-70"
-                style={{ backgroundColor: "#13294B" }}
+                className="inline-flex items-center justify-center rounded-lg bg-illini-orange px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md disabled:opacity-70 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2"
               >
                 {reveal.kind === "loading" ? "Loading…" : "Reveal email"}
               </button>
               <div>
                 <Link
                   href={`/listings/${listingId}`}
-                  className="text-sm font-medium rounded-lg px-4 py-2 border border-[#E5E7EB] bg-white inline-block"
-                  style={{ color: "#111827" }}
+                  className="inline-block rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-gray-300"
                 >
                   Back to listing
                 </Link>
@@ -332,6 +285,6 @@ export function ContactSellerClient({ listingId }: { listingId: string }) {
           )}
         </div>
       </div>
-    </main>
+    </PageContainer>
   );
 }

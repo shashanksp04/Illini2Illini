@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { PageContainer } from "@/components/layout/PageContainer";
+
 type MeData = {
   email: string;
   email_verified: boolean;
@@ -141,56 +143,40 @@ export function ReportListingClient({ listingId }: { listingId: string }) {
 
   if (gate.kind === "loading") {
     return (
-      <main
-        className="min-h-screen flex items-center justify-center px-4"
-        style={{ backgroundColor: "#F8F9FB" }}
-      >
-        <p className="text-base" style={{ color: "#6B7280" }}>
-          Loading…
-        </p>
-      </main>
+      <PageContainer>
+        <p className="text-sm text-gray-500">Loading…</p>
+      </PageContainer>
     );
   }
 
   if (gate.kind === "unauth") {
     return (
-      <main
-        className="min-h-screen flex items-center justify-center px-4"
-        style={{ backgroundColor: "#F8F9FB" }}
-      >
-        <div className="w-full max-w-2xl">
-          <div className="rounded-xl bg-white border border-[#E5E7EB] shadow-sm px-6 py-8 text-center space-y-4">
-            <h1 className="text-2xl font-semibold" style={{ color: "#111827" }}>
-              Log in to report listings
-            </h1>
-            <p className="text-sm" style={{ color: "#6B7280" }}>
+      <PageContainer>
+        <div className="flex justify-center py-12">
+          <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white px-6 py-8 text-center shadow-sm space-y-4">
+            <h1 className="text-2xl font-semibold text-illini-blue">Log in to report listings</h1>
+            <p className="text-sm text-gray-500">
               You need to be logged in with a verified UIUC account to report listings.
             </p>
             <Link
               href="/login"
-              className="inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-base font-medium text-white transition-shadow hover:shadow-md"
-              style={{ backgroundColor: "#13294B" }}
+              className="inline-flex items-center justify-center rounded-lg bg-illini-orange px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2"
             >
               Log in
             </Link>
           </div>
         </div>
-      </main>
+      </PageContainer>
     );
   }
 
   if (gate.kind === "needsVerify") {
     return (
-      <main
-        className="min-h-screen flex items-center justify-center px-4"
-        style={{ backgroundColor: "#F8F9FB" }}
-      >
-        <div className="w-full max-w-2xl">
-          <div className="rounded-xl bg-white border border-[#E5E7EB] shadow-sm px-6 py-8 text-center space-y-4">
-            <h1 className="text-2xl font-semibold" style={{ color: "#111827" }}>
-              Verify your email first
-            </h1>
-            <p className="text-sm" style={{ color: "#6B7280" }}>
+      <PageContainer>
+        <div className="flex justify-center py-12">
+          <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white px-6 py-8 text-center shadow-sm space-y-4">
+            <h1 className="text-2xl font-semibold text-illini-blue">Verify your email first</h1>
+            <p className="text-sm text-gray-500">
               Verify your UIUC email before you can report listings.
             </p>
             <Link
@@ -199,122 +185,92 @@ export function ReportListingClient({ listingId }: { listingId: string }) {
                   ? `/verify-email?email=${encodeURIComponent(gate.email)}`
                   : "/verify-email"
               }
-              className="inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-base font-medium text-white transition-shadow hover:shadow-md"
-              style={{ backgroundColor: "#13294B" }}
+              className="inline-flex items-center justify-center rounded-lg bg-illini-orange px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2"
             >
               Verify email
             </Link>
           </div>
         </div>
-      </main>
+      </PageContainer>
     );
   }
 
   if (gate.kind === "needsProfile") {
     return (
-      <main
-        className="min-h-screen flex items-center justify-center px-4"
-        style={{ backgroundColor: "#F8F9FB" }}
-      >
-        <div className="w-full max-w-2xl">
-          <div className="rounded-xl bg-white border border-[#E5E7EB] shadow-sm px-6 py-8 text-center space-y-4">
-            <h1 className="text-2xl font-semibold" style={{ color: "#111827" }}>
-              Complete your profile first
-            </h1>
-            <p className="text-sm" style={{ color: "#6B7280" }}>
+      <PageContainer>
+        <div className="flex justify-center py-12">
+          <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white px-6 py-8 text-center shadow-sm space-y-4">
+            <h1 className="text-2xl font-semibold text-illini-blue">Complete your profile first</h1>
+            <p className="text-sm text-gray-500">
               Finish setting up your profile before you can report listings.
             </p>
             <Link
               href="/profile/setup"
-              className="inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-base font-medium text-white transition-shadow hover:shadow-md"
-              style={{ backgroundColor: "#13294B" }}
+              className="inline-flex items-center justify-center rounded-lg bg-illini-orange px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2"
             >
               Complete profile
             </Link>
           </div>
         </div>
-      </main>
+      </PageContainer>
     );
   }
 
   if (gate.kind === "banned") {
     return (
-      <main
-        className="min-h-screen flex items-center justify-center px-4"
-        style={{ backgroundColor: "#F8F9FB" }}
-      >
-        <div className="w-full max-w-2xl">
-          <div className="rounded-xl bg-white border border-[#E5E7EB] shadow-sm px-6 py-8 text-center space-y-4">
-            <h1 className="text-2xl font-semibold" style={{ color: "#111827" }}>
-              Account restricted
-            </h1>
-            <p className="text-sm" style={{ color: "#6B7280" }}>
+      <PageContainer>
+        <div className="flex justify-center py-12">
+          <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white px-6 py-8 text-center shadow-sm space-y-4">
+            <h1 className="text-2xl font-semibold text-illini-blue">Account restricted</h1>
+            <p className="text-sm text-gray-500">
               Your account is restricted from reporting listings.
             </p>
           </div>
         </div>
-      </main>
+      </PageContainer>
     );
   }
 
   if (submitState.kind === "success") {
     return (
-      <main
-        className="min-h-screen px-4 py-6 flex items-center justify-center"
-        style={{ backgroundColor: "#F8F9FB" }}
-      >
-        <div className="w-full max-w-2xl">
-          <div className="rounded-xl bg-white border border-[#E5E7EB] shadow-sm px-6 py-8 space-y-6">
-            <p className="text-base font-medium" style={{ color: "#16A34A" }}>
-              Report submitted.
-            </p>
+      <PageContainer>
+        <div className="flex justify-center py-12">
+          <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white px-6 py-8 shadow-sm space-y-6">
+            <p className="text-base font-medium text-green-600">Report submitted.</p>
             <div className="flex flex-wrap gap-3">
               <Link
                 href={`/listings/${listingId}`}
-                className="inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium text-white transition-shadow hover:shadow-md"
-                style={{ backgroundColor: "#13294B" }}
+                className="inline-flex items-center justify-center rounded-lg bg-illini-orange px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2"
               >
                 Back to listing
               </Link>
               <Link
                 href="/listings"
-                className="inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium border border-[#E5E7EB] bg-white"
-                style={{ color: "#111827" }}
+                className="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-gray-300"
               >
                 Browse listings
               </Link>
             </div>
           </div>
         </div>
-      </main>
+      </PageContainer>
     );
   }
 
   return (
-    <main
-      className="min-h-screen px-4 py-6"
-      style={{ backgroundColor: "#F8F9FB" }}
-    >
-      <div className="max-w-2xl mx-auto">
-        <div className="rounded-xl bg-white border border-[#E5E7EB] shadow-sm px-6 py-8 space-y-6">
-          <h1 className="text-2xl font-semibold" style={{ color: "#111827" }}>
-            Report listing
-          </h1>
-          <p className="text-sm" style={{ color: "#6B7280" }}>
+    <PageContainer>
+      <div className="mx-auto max-w-2xl space-y-6 md:space-y-8">
+        <div className="rounded-xl border border-gray-200 bg-white px-6 py-8 shadow-sm space-y-6">
+          <h1 className="text-2xl font-semibold text-illini-blue">Report listing</h1>
+          <p className="text-sm text-gray-500">
             Reports help keep the marketplace safe.
           </p>
 
           {submitState.kind === "error" && (
             <div className="space-y-2">
-              <p className="text-sm" style={{ color: "#DC2626" }}>
-                {submitState.message}
-              </p>
+              <p className="text-sm text-red-600">{submitState.message}</p>
               {submitState.message === "Listing not found." && (
-                <Link
-                  href="/listings"
-                  className="text-sm font-medium"
-                  style={{ color: "#E84A27" }}
-                >
+                <Link href="/listings" className="text-sm font-medium text-illini-orange hover:underline">
                   Browse listings
                 </Link>
               )}
@@ -323,7 +279,7 @@ export function ReportListingClient({ listingId }: { listingId: string }) {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="report-reason" className="block text-sm font-medium mb-1.5" style={{ color: "#111827" }}>
+              <label htmlFor="report-reason" className="mb-1.5 block text-sm font-medium text-gray-700">
                 Reason (required)
               </label>
               <textarea
@@ -333,15 +289,10 @@ export function ReportListingClient({ listingId }: { listingId: string }) {
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 rows={5}
-                className="w-full rounded-lg border px-3 py-2 text-base resize-y focus:outline-none focus:ring-2 focus:ring-[#E84A27]"
-                style={{
-                  borderColor: "#E5E7EB",
-                  color: "#111827",
-                  backgroundColor: "#FFFFFF",
-                }}
+                className="w-full resize-y rounded-lg border border-gray-200 bg-white px-3 py-2 text-base text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
                 placeholder="Describe why you're reporting this listing…"
               />
-              <p className="mt-1 text-xs" style={{ color: "#6B7280" }}>
+              <p className="mt-1 text-xs text-gray-500">
                 {reason.length} / {MAX_REASON_LENGTH} characters
               </p>
             </div>
@@ -349,15 +300,13 @@ export function ReportListingClient({ listingId }: { listingId: string }) {
               <button
                 type="submit"
                 disabled={submitState.kind === "submitting"}
-                className="inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium text-white transition-shadow hover:shadow-md disabled:opacity-70 focus:outline-none focus:ring-2 focus:ring-[#E84A27] focus:ring-offset-2"
-                style={{ backgroundColor: "#13294B" }}
+                className="inline-flex items-center justify-center rounded-lg bg-illini-orange px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md disabled:opacity-70 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2"
               >
                 {submitState.kind === "submitting" ? "Submitting…" : "Submit report"}
               </button>
               <Link
                 href={`/listings/${listingId}`}
-                className="inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium border border-[#E5E7EB] bg-white focus:outline-none focus:ring-2 focus:ring-[#E84A27] focus:ring-offset-2"
-                style={{ color: "#111827", borderColor: "#E5E7EB" }}
+                className="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-gray-300"
               >
                 Back to listing
               </Link>
@@ -365,6 +314,6 @@ export function ReportListingClient({ listingId }: { listingId: string }) {
           </form>
         </div>
       </div>
-    </main>
+    </PageContainer>
   );
 }

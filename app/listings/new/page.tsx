@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 
 import { PhotoUploader, type ListingPhoto } from "@/components/listings/PhotoUploader";
+import { PageContainer } from "@/components/layout/PageContainer";
+import { FormSection } from "@/components/forms/FormSection";
 
 type MeData = {
   email: string;
@@ -143,111 +145,83 @@ export default function NewListingPage() {
   function renderGate() {
     if (gate.kind === "loading") {
       return (
-        <main
-          className="min-h-screen flex items-center justify-center px-4"
-          style={{ backgroundColor: "#F8F9FB" }}
-        >
-          <p className="text-base" style={{ color: "#6B7280" }}>
-            Checking your account…
-          </p>
-        </main>
+        <PageContainer>
+          <p className="text-sm text-gray-500">Checking your account…</p>
+        </PageContainer>
       );
     }
     if (gate.kind === "unauth") {
       return (
-        <main
-          className="min-h-screen flex items-center justify-center px-4"
-          style={{ backgroundColor: "#F8F9FB" }}
-        >
-          <div className="w-full max-w-md">
-            <div className="rounded-xl bg-white border border-[#E5E7EB] shadow-sm px-6 py-8 text-center space-y-4">
-              <h1 className="text-2xl font-semibold" style={{ color: "#111827" }}>
-                Log in to create a listing
-              </h1>
-              <p className="text-sm" style={{ color: "#6B7280" }}>
+        <PageContainer>
+          <div className="flex justify-center py-12">
+            <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white px-6 py-8 text-center shadow-sm space-y-4">
+              <h1 className="text-2xl font-semibold text-illini-blue">Log in to create a listing</h1>
+              <p className="text-sm text-gray-500">
                 You need to be logged in with your UIUC account to create listings.
               </p>
               <Link
                 href="/login"
-                className="inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-base font-medium text-white transition-shadow hover:shadow-md"
-                style={{ backgroundColor: "#13294B" }}
+                className="inline-flex items-center justify-center rounded-lg bg-illini-orange px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2"
               >
                 Log in
               </Link>
             </div>
           </div>
-        </main>
+        </PageContainer>
       );
     }
     if (gate.kind === "needsVerify") {
       return (
-        <main
-          className="min-h-screen flex items-center justify-center px-4"
-          style={{ backgroundColor: "#F8F9FB" }}
-        >
-          <div className="w-full max-w-md">
-            <div className="rounded-xl bg-white border border-[#E5E7EB] shadow-sm px-6 py-8 text-center space-y-4">
-              <h1 className="text-2xl font-semibold" style={{ color: "#111827" }}>
-                Verify your email
-              </h1>
-              <p className="text-sm" style={{ color: "#6B7280" }}>
+        <PageContainer>
+          <div className="flex justify-center py-12">
+            <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white px-6 py-8 text-center shadow-sm space-y-4">
+              <h1 className="text-2xl font-semibold text-illini-blue">Verify your email</h1>
+              <p className="text-sm text-gray-500">
                 Verify your UIUC email before creating listings.
               </p>
               <Link
                 href="/verify-email"
-                className="inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-base font-medium text-white transition-shadow hover:shadow-md"
-                style={{ backgroundColor: "#13294B" }}
+                className="inline-flex items-center justify-center rounded-lg bg-illini-orange px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2"
               >
                 Verify email
               </Link>
             </div>
           </div>
-        </main>
+        </PageContainer>
       );
     }
     if (gate.kind === "needsProfile") {
       return (
-        <main
-          className="min-h-screen flex items-center justify-center px-4"
-          style={{ backgroundColor: "#F8F9FB" }}
-        >
-          <div className="w-full max-w-md">
-            <div className="rounded-xl bg-white border border-[#E5E7EB] shadow-sm px-6 py-8 text-center space-y-4">
-              <h1 className="text-2xl font-semibold" style={{ color: "#111827" }}>
-                Complete your profile
-              </h1>
-              <p className="text-sm" style={{ color: "#6B7280" }}>
+        <PageContainer>
+          <div className="flex justify-center py-12">
+            <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white px-6 py-8 text-center shadow-sm space-y-4">
+              <h1 className="text-2xl font-semibold text-illini-blue">Complete your profile</h1>
+              <p className="text-sm text-gray-500">
                 Finish your profile before creating listings.
               </p>
               <Link
                 href="/profile/setup"
-                className="inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-base font-medium text-white transition-shadow hover:shadow-md"
-                style={{ backgroundColor: "#13294B" }}
+                className="inline-flex items-center justify-center rounded-lg bg-illini-orange px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2"
               >
                 Complete profile
               </Link>
             </div>
           </div>
-        </main>
+        </PageContainer>
       );
     }
     if (gate.kind === "banned") {
       return (
-        <main
-          className="min-h-screen flex items-center justify-center px-4"
-          style={{ backgroundColor: "#F8F9FB" }}
-        >
-          <div className="w-full max-w-md">
-            <div className="rounded-xl bg-white border border-[#E5E7EB] shadow-sm px-6 py-8 text-center space-y-4">
-              <h1 className="text-2xl font-semibold" style={{ color: "#111827" }}>
-                Account restricted
-              </h1>
-              <p className="text-sm" style={{ color: "#6B7280" }}>
+        <PageContainer>
+          <div className="flex justify-center py-12">
+            <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white px-6 py-8 text-center shadow-sm space-y-4">
+              <h1 className="text-2xl font-semibold text-illini-blue">Account restricted</h1>
+              <p className="text-sm text-gray-500">
                 Your account is restricted from creating listings.
               </p>
             </div>
           </div>
-        </main>
+        </PageContainer>
       );
     }
     return null;
@@ -259,34 +233,27 @@ export default function NewListingPage() {
 
   if (step === "details") {
     return (
-      <main
-        className="min-h-screen px-4 py-6"
-        style={{ backgroundColor: "#F8F9FB" }}
-      >
-        <div className="max-w-3xl mx-auto">
-          <div className="rounded-xl bg-white border border-[#E5E7EB] shadow-sm px-6 py-8 space-y-6">
-            <div className="space-y-2">
-              <h1 className="text-3xl font-semibold" style={{ color: "#111827" }}>
-                Create listing
-              </h1>
-              <p className="text-sm" style={{ color: "#6B7280" }}>
-                Step 1 of 2: add your listing details.
-              </p>
-            </div>
+      <PageContainer>
+        <div className="mx-auto max-w-2xl space-y-6 md:space-y-8">
+          <div>
+            <h1 className="text-2xl font-semibold text-illini-blue md:text-3xl">
+              Create listing
+            </h1>
+            <p className="mt-1 text-sm text-gray-500">
+              Step 1 of 2: add your listing details.
+            </p>
+          </div>
 
-            {submitError && (
-              <p className="text-sm" style={{ color: "#DC2626" }}>
-                {submitError}
-              </p>
-            )}
+          {submitError && (
+            <p className="text-sm text-red-600" role="alert">
+              {submitError}
+            </p>
+          )}
 
-            <form className="space-y-4" onSubmit={handleDetailsSubmit}>
+          <form className="space-y-6" onSubmit={handleDetailsSubmit}>
+            <FormSection title="Basic Info">
               <div className="space-y-1">
-                <label
-                  htmlFor="title"
-                  className="block text-sm font-medium"
-                  style={{ color: "#111827" }}
-                >
+                <label htmlFor="title" className="block text-sm font-medium text-gray-800">
                   Title
                 </label>
                 <input
@@ -295,17 +262,14 @@ export default function NewListingPage() {
                   required
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="w-full rounded-lg border border-[#E5E7EB] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E84A27]"
-                  style={{ color: "#111827" }}
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
                 />
               </div>
-
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-1">
                   <label
                     htmlFor="monthly_rent"
-                    className="block text-sm font-medium"
-                    style={{ color: "#111827" }}
+                    className="block text-sm font-medium text-gray-800"
                   >
                     Monthly rent
                   </label>
@@ -316,16 +280,13 @@ export default function NewListingPage() {
                     required
                     value={monthlyRent}
                     onChange={(e) => setMonthlyRent(e.target.value)}
-                    className="w-full rounded-lg border border-[#E5E7EB] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E84A27]"
-                    style={{ color: "#111827" }}
+                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
                   />
                 </div>
-
                 <div className="space-y-1">
                   <label
                     htmlFor="total_bedrooms"
-                    className="block text-sm font-medium"
-                    style={{ color: "#111827" }}
+                    className="block text-sm font-medium text-gray-800"
                   >
                     Total bedrooms
                   </label>
@@ -336,18 +297,15 @@ export default function NewListingPage() {
                     required
                     value={totalBedrooms}
                     onChange={(e) => setTotalBedrooms(e.target.value)}
-                    className="w-full rounded-lg border border-[#E5E7EB] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E84A27]"
-                    style={{ color: "#111827" }}
+                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
                   />
                 </div>
               </div>
-
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-1">
                   <label
                     htmlFor="lease_type"
-                    className="block text-sm font-medium"
-                    style={{ color: "#111827" }}
+                    className="block text-sm font-medium text-gray-800"
                   >
                     Lease type
                   </label>
@@ -356,20 +314,17 @@ export default function NewListingPage() {
                     required
                     value={leaseType}
                     onChange={(e) => setLeaseType(e.target.value as any)}
-                    className="w-full rounded-lg border border-[#E5E7EB] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E84A27] bg-white"
-                    style={{ color: "#111827" }}
+                    className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
                   >
                     <option value="">Select lease type</option>
                     <option value="SUBLEASE">Sublease</option>
                     <option value="LEASE_TAKEOVER">Lease takeover</option>
                   </select>
                 </div>
-
                 <div className="space-y-1">
                   <label
                     htmlFor="room_type"
-                    className="block text-sm font-medium"
-                    style={{ color: "#111827" }}
+                    className="block text-sm font-medium text-gray-800"
                   >
                     Room type
                   </label>
@@ -378,8 +333,7 @@ export default function NewListingPage() {
                     required
                     value={roomType}
                     onChange={(e) => setRoomType(e.target.value as any)}
-                    className="w-full rounded-lg border border-[#E5E7EB] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E84A27] bg-white"
-                    style={{ color: "#111827" }}
+                    className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
                   >
                     <option value="">Select room type</option>
                     <option value="PRIVATE_ROOM">Private room</option>
@@ -387,13 +341,14 @@ export default function NewListingPage() {
                   </select>
                 </div>
               </div>
+            </FormSection>
 
+            <FormSection title="Dates">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-1">
                   <label
                     htmlFor="start_date"
-                    className="block text-sm font-medium"
-                    style={{ color: "#111827" }}
+                    className="block text-sm font-medium text-gray-800"
                   >
                     Start date
                   </label>
@@ -403,15 +358,13 @@ export default function NewListingPage() {
                     required
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="w-full rounded-lg border border-[#E5E7EB] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E84A27]"
-                    style={{ color: "#111827" }}
+                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
                   />
                 </div>
                 <div className="space-y-1">
                   <label
                     htmlFor="end_date"
-                    className="block text-sm font-medium"
-                    style={{ color: "#111827" }}
+                    className="block text-sm font-medium text-gray-800"
                   >
                     End date
                   </label>
@@ -421,17 +374,17 @@ export default function NewListingPage() {
                     required
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
-                    className="w-full rounded-lg border border-[#E5E7EB] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E84A27]"
-                    style={{ color: "#111827" }}
+                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
                   />
                 </div>
               </div>
+            </FormSection>
 
+            <FormSection title="Location">
               <div className="space-y-1">
                 <label
                   htmlFor="exact_address"
-                  className="block text-sm font-medium"
-                  style={{ color: "#111827" }}
+                  className="block text-sm font-medium text-gray-800"
                 >
                   Exact address
                 </label>
@@ -441,16 +394,13 @@ export default function NewListingPage() {
                   required
                   value={exactAddress}
                   onChange={(e) => setExactAddress(e.target.value)}
-                  className="w-full rounded-lg border border-[#E5E7EB] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E84A27]"
-                  style={{ color: "#111827" }}
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
                 />
               </div>
-
               <div className="space-y-1">
                 <label
                   htmlFor="nearby_landmark"
-                  className="block text-sm font-medium"
-                  style={{ color: "#111827" }}
+                  className="block text-sm font-medium text-gray-800"
                 >
                   Nearby landmark
                 </label>
@@ -460,16 +410,16 @@ export default function NewListingPage() {
                   required
                   value={nearbyLandmark}
                   onChange={(e) => setNearbyLandmark(e.target.value)}
-                  className="w-full rounded-lg border border-[#E5E7EB] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E84A27]"
-                  style={{ color: "#111827" }}
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
                 />
               </div>
+            </FormSection>
 
+            <FormSection title="Unit Details">
               <div className="space-y-1">
                 <label
                   htmlFor="gender_preference"
-                  className="block text-sm font-medium"
-                  style={{ color: "#111827" }}
+                  className="block text-sm font-medium text-gray-800"
                 >
                   Gender preference
                 </label>
@@ -478,8 +428,7 @@ export default function NewListingPage() {
                   required
                   value={genderPreference}
                   onChange={(e) => setGenderPreference(e.target.value as any)}
-                  className="w-full rounded-lg border border-[#E5E7EB] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E84A27] bg-white"
-                  style={{ color: "#111827" }}
+                  className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
                 >
                   <option value="">No preference / any</option>
                   <option value="ANY">Any</option>
@@ -487,33 +436,33 @@ export default function NewListingPage() {
                   <option value="MALE">Male</option>
                 </select>
               </div>
-
-              <div className="flex flex-wrap gap-4">
-                <label className="inline-flex items-center gap-2 text-sm" style={{ color: "#6B7280" }}>
+              <div className="flex flex-wrap gap-4 pt-1">
+                <label className="inline-flex items-center gap-2 text-sm text-gray-600">
                   <input
                     type="checkbox"
                     checked={furnished}
                     onChange={(e) => setFurnished(e.target.checked)}
-                    className="rounded border-[#E5E7EB]"
+                    className="h-4 w-4 rounded border-gray-200 text-illini-orange focus:ring-illini-orange"
                   />
                   Furnished
                 </label>
-                <label className="inline-flex items-center gap-2 text-sm" style={{ color: "#6B7280" }}>
+                <label className="inline-flex items-center gap-2 text-sm text-gray-600">
                   <input
                     type="checkbox"
                     checked={utilitiesIncluded}
                     onChange={(e) => setUtilitiesIncluded(e.target.checked)}
-                    className="rounded border-[#E5E7EB]"
+                    className="h-4 w-4 rounded border-gray-200 text-illini-orange focus:ring-illini-orange"
                   />
                   Utilities included
                 </label>
               </div>
+            </FormSection>
 
+            <FormSection title="Description">
               <div className="space-y-1">
                 <label
                   htmlFor="description"
-                  className="block text-sm font-medium"
-                  style={{ color: "#111827" }}
+                  className="block text-sm font-medium text-gray-800"
                 >
                   Description
                 </label>
@@ -522,43 +471,38 @@ export default function NewListingPage() {
                   required
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full rounded-lg border border-[#E5E7EB] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E84A27] min-h-[96px]"
-                  style={{ color: "#111827" }}
+                  className="min-h-[96px] w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
                 />
               </div>
+            </FormSection>
 
+            <div className="flex justify-end">
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium text-white transition-shadow hover:shadow-md disabled:opacity-70"
-                style={{ backgroundColor: "#13294B" }}
+                className="inline-flex items-center justify-center rounded-lg bg-illini-orange px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md disabled:opacity-70 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2"
               >
                 {submitting ? "Creating listing..." : "Continue to photos"}
               </button>
-            </form>
-          </div>
+            </div>
+          </form>
         </div>
-      </main>
+      </PageContainer>
     );
   }
 
   // Photos step
   return (
-    <main
-      className="min-h-screen px-4 py-6"
-      style={{ backgroundColor: "#F8F9FB" }}
-    >
-      <div className="max-w-3xl mx-auto">
-        <div className="rounded-xl bg-white border border-[#E5E7EB] shadow-sm px-6 py-8 space-y-6">
-          <div className="space-y-2">
-            <h1 className="text-3xl font-semibold" style={{ color: "#111827" }}>
-              Upload photos
-            </h1>
-            <p className="text-sm" style={{ color: "#6B7280" }}>
-              Step 2 of 2: add at least 1 photo (max 8) to your listing.
-            </p>
-          </div>
+    <PageContainer>
+      <div className="mx-auto max-w-2xl space-y-6 md:space-y-8">
+        <div>
+          <h1 className="text-2xl font-semibold text-illini-blue md:text-3xl">Upload photos</h1>
+          <p className="mt-1 text-sm text-gray-500">
+            Step 2 of 2: add at least 1 photo (max 8) to your listing.
+          </p>
+        </div>
 
+        <FormSection title="Photos">
           {listingId && (
             <PhotoUploader
               listingId={listingId}
@@ -566,21 +510,27 @@ export default function NewListingPage() {
               onChange={setPhotos}
             />
           )}
+        </FormSection>
 
-          <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-end items-center">
-            <button
-              type="button"
-              disabled={!photos || photos.length === 0}
-              onClick={() => router.push("/me/listings")}
-              className="inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium text-white transition-shadow hover:shadow-md disabled:opacity-70"
-              style={{ backgroundColor: "#13294B" }}
-            >
-              {photos && photos.length > 0 ? "Finish" : "Add at least 1 photo to finish"}
-            </button>
-          </div>
+        <div className="flex justify-between pt-4">
+          <button
+            type="button"
+            onClick={() => setStep("details")}
+            className="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-gray-300"
+          >
+            Back
+          </button>
+          <button
+            type="button"
+            disabled={!photos || photos.length === 0}
+            onClick={() => router.push("/me/listings")}
+            className="inline-flex items-center justify-center rounded-lg bg-illini-orange px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md disabled:opacity-70 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2"
+          >
+            {photos && photos.length > 0 ? "Finish" : "Add at least 1 photo to finish"}
+          </button>
         </div>
       </div>
-    </main>
+    </PageContainer>
   );
 }
 

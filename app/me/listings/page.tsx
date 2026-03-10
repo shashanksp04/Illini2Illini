@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { PageContainer } from "@/components/layout/PageContainer";
 
 type MeData = {
   email: string;
@@ -59,7 +60,7 @@ function StatusBadge({ status }: { status: ListingStatus }) {
   }
   if (status === "EXPIRED") {
     return (
-      <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-red-100 text-red-700">
+      <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">
         EXPIRED
       </span>
     );
@@ -195,158 +196,131 @@ export default function MyListingsPage() {
 
   if (gate.kind === "loading") {
     return (
-      <main
-        className="min-h-screen flex items-center justify-center px-4"
-        style={{ backgroundColor: "#F8F9FB" }}
-      >
-        <p className="text-base" style={{ color: "#6B7280" }}>
-          Loading your listings…
-        </p>
-      </main>
+      <PageContainer>
+        <p className="text-sm text-gray-500">Loading your listings…</p>
+      </PageContainer>
     );
   }
 
   if (gate.kind === "unauth") {
     return (
-      <main
-        className="min-h-screen flex items-center justify-center px-4"
-        style={{ backgroundColor: "#F8F9FB" }}
-      >
-        <div className="w-full max-w-md">
-          <div className="rounded-xl bg-white border border-[#E5E7EB] shadow-sm px-6 py-8 text-center space-y-4">
-            <h1 className="text-2xl font-semibold" style={{ color: "#111827" }}>
-              Log in to view your listings
-            </h1>
-            <p className="text-sm" style={{ color: "#6B7280" }}>
+      <PageContainer>
+        <div className="flex justify-center py-12">
+          <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white px-6 py-8 text-center shadow-sm space-y-4">
+            <h1 className="text-2xl font-semibold text-illini-blue">Log in to view your listings</h1>
+            <p className="text-sm text-gray-500">
               Your active, taken, and expired listings will appear here after you log in.
             </p>
             <Link
               href="/login"
-              className="inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-base font-medium text-white transition-shadow hover:shadow-md"
-              style={{ backgroundColor: "#13294B" }}
+              className="inline-flex items-center justify-center rounded-lg bg-illini-orange px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2"
             >
               Log in
             </Link>
           </div>
         </div>
-      </main>
+      </PageContainer>
     );
   }
 
   if (gate.kind === "needsVerify") {
     return (
-      <main
-        className="min-h-screen flex items-center justify-center px-4"
-        style={{ backgroundColor: "#F8F9FB" }}
-      >
-        <div className="w-full max-w-md">
-          <div className="rounded-xl bg-white border border-[#E5E7EB] shadow-sm px-6 py-8 text-center space-y-4">
-            <h1 className="text-2xl font-semibold" style={{ color: "#111827" }}>
-              Verify your email
-            </h1>
-            <p className="text-sm" style={{ color: "#6B7280" }}>
+      <PageContainer>
+        <div className="flex justify-center py-12">
+          <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white px-6 py-8 text-center shadow-sm space-y-4">
+            <h1 className="text-2xl font-semibold text-illini-blue">Verify your email</h1>
+            <p className="text-sm text-gray-500">
               Verify your UIUC email to manage your listings.
             </p>
             <Link
               href="/verify-email"
-              className="inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-base font-medium text-white transition-shadow hover:shadow-md"
-              style={{ backgroundColor: "#13294B" }}
+              className="inline-flex items-center justify-center rounded-lg bg-illini-orange px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2"
             >
               Verify email
             </Link>
           </div>
         </div>
-      </main>
+      </PageContainer>
     );
   }
 
   if (gate.kind === "needsProfile") {
     return (
-      <main
-        className="min-h-screen flex items-center justify-center px-4"
-        style={{ backgroundColor: "#F8F9FB" }}
-      >
-        <div className="w-full max-w-md">
-          <div className="rounded-xl bg-white border border-[#E5E7EB] shadow-sm px-6 py-8 text-center space-y-4">
-            <h1 className="text-2xl font-semibold" style={{ color: "#111827" }}>
-              Complete your profile
-            </h1>
-            <p className="text-sm" style={{ color: "#6B7280" }}>
+      <PageContainer>
+        <div className="flex justify-center py-12">
+          <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white px-6 py-8 text-center shadow-sm space-y-4">
+            <h1 className="text-2xl font-semibold text-illini-blue">Complete your profile</h1>
+            <p className="text-sm text-gray-500">
               Finish setting up your profile before managing listings.
             </p>
             <Link
               href="/profile/setup"
-              className="inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-base font-medium text-white transition-shadow hover:shadow-md"
-              style={{ backgroundColor: "#13294B" }}
+              className="inline-flex items-center justify-center rounded-lg bg-illini-orange px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2"
             >
               Complete profile
             </Link>
           </div>
         </div>
-      </main>
+      </PageContainer>
     );
   }
 
   if (gate.kind === "banned") {
     return (
-      <main
-        className="min-h-screen flex items-center justify-center px-4"
-        style={{ backgroundColor: "#F8F9FB" }}
-      >
-        <div className="w-full max-w-md">
-          <div className="rounded-xl bg-white border border-[#E5E7EB] shadow-sm px-6 py-8 text-center space-y-4">
-            <h1 className="text-2xl font-semibold" style={{ color: "#111827" }}>
-              Account restricted
-            </h1>
-            <p className="text-sm" style={{ color: "#6B7280" }}>
+      <PageContainer>
+        <div className="flex justify-center py-12">
+          <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white px-6 py-8 text-center shadow-sm space-y-4">
+            <h1 className="text-2xl font-semibold text-illini-blue">Account restricted</h1>
+            <p className="text-sm text-gray-500">
               Your account is restricted from managing listings.
             </p>
           </div>
         </div>
-      </main>
+      </PageContainer>
     );
   }
 
   return (
-    <main
-      className="min-h-screen px-4 py-6"
-      style={{ backgroundColor: "#F8F9FB" }}
-    >
-      <div className="max-w-5xl mx-auto space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-semibold" style={{ color: "#111827" }}>
-            My listings
-          </h1>
+    <PageContainer>
+      <div className="space-y-6 md:space-y-8">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-semibold text-illini-blue md:text-3xl">My listings</h1>
+            <p className="mt-1 text-sm text-gray-500">
+              Manage your active, taken, expired, and deleted listings.
+            </p>
+          </div>
           <Link
             href="/listings/new"
-            className="inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium text-white transition-shadow hover:shadow-md"
-            style={{ backgroundColor: "#13294B" }}
+            className="inline-flex items-center justify-center rounded-lg bg-illini-orange px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2"
           >
             Create listing
           </Link>
         </div>
 
         {actionError && (
-          <p className="text-sm" style={{ color: "#DC2626" }}>
+          <p className="text-sm text-red-600" role="alert">
             {actionError}
           </p>
         )}
 
         {loadingList ? (
-          <p className="text-sm" style={{ color: "#6B7280" }}>
-            Loading listings…
-          </p>
+          <p className="text-sm text-gray-500">Loading listings…</p>
         ) : items.length === 0 ? (
-          <div className="rounded-xl bg-white border border-[#E5E7EB] shadow-sm px-6 py-8 text-center space-y-2">
-            <p className="text-base font-medium" style={{ color: "#111827" }}>
-              You have no listings yet.
+          <div className="flex flex-col items-center justify-center rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm space-y-2">
+            <p className="text-base font-medium text-illini-blue">You have no listings yet.</p>
+            <p className="text-sm text-gray-500">
+              Create your first listing to get started and appear in search results.
             </p>
-            <p className="text-sm" style={{ color: "#6B7280" }}>
-              Create your first listing to get started.
-            </p>
+            <Link
+              href="/listings/new"
+              className="mt-4 inline-flex items-center justify-center rounded-lg bg-illini-orange px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2"
+            >
+              Create listing
+            </Link>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {items.map((listing) => {
               const firstPhoto = listing.photos[0];
               const dateRange = `${formatDate(listing.start_date)} – ${formatDate(
@@ -355,37 +329,37 @@ export default function MyListingsPage() {
               return (
                 <div
                   key={listing.id}
-                  className="rounded-xl bg-white border border-[#E5E7EB] shadow-sm p-4 flex gap-4"
+                  className="flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm"
                 >
                   {firstPhoto && (
-                    <div className="h-24 w-24 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                    <div className="relative w-full overflow-hidden rounded-lg bg-gray-100">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={firstPhoto.image_url}
                         alt={listing.title}
-                        className="h-full w-full object-cover"
+                        className="h-40 w-full object-cover"
                       />
                     </div>
                   )}
-                  <div className="flex-1 space-y-2">
-                    <div className="flex justify-between items-start gap-2">
-                      <div>
-                        <p className="text-sm" style={{ color: "#6B7280" }}>
-                          {dateRange}
-                        </p>
-                        <h2 className="text-base font-semibold" style={{ color: "#111827" }}>
-                          {listing.title}
-                        </h2>
-                        <p className="text-sm" style={{ color: "#6B7280" }}>
-                          ${listing.monthly_rent} / month
-                        </p>
+                  <div className="flex flex-1 flex-col justify-between gap-3">
+                    <div className="space-y-1">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="text-xs text-gray-500">{dateRange}</p>
+                          <h2 className="truncate text-base font-medium text-illini-blue">
+                            {listing.title}
+                          </h2>
+                          <p className="text-sm text-gray-600">
+                            ${listing.monthly_rent} / month
+                          </p>
+                        </div>
+                        <StatusBadge status={listing.status} />
                       </div>
-                      <StatusBadge status={listing.status} />
                     </div>
                     <div className="flex flex-wrap gap-2 pt-1">
                       <Link
                         href={`/listings/${listing.id}/edit`}
-                        className="text-xs font-medium rounded-lg px-3 py-1 border border-[#E5E7EB] bg-white"
-                        style={{ color: "#111827" }}
+                        className="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-3 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-gray-300"
                       >
                         Edit
                       </Link>
@@ -393,8 +367,7 @@ export default function MyListingsPage() {
                         <button
                           type="button"
                           onClick={() => handleMarkTaken(listing.id)}
-                          className="text-xs font-medium rounded-lg px-3 py-1 border border-[#E5E7EB] bg-white"
-                          style={{ color: "#111827" }}
+                          className="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-3 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-gray-300"
                         >
                           Mark taken
                         </button>
@@ -402,8 +375,7 @@ export default function MyListingsPage() {
                       <button
                         type="button"
                         onClick={() => handleDelete(listing.id)}
-                        className="text-xs font-medium rounded-lg px-3 py-1 border border-red-500 bg-white"
-                        style={{ color: "#DC2626" }}
+                        className="inline-flex items-center justify-center rounded-lg border border-red-500 bg-white px-3 py-1 text-xs font-medium text-red-600 hover:bg-red-50 focus:outline-none focus:ring-1 focus:ring-red-400"
                       >
                         Delete
                       </button>
@@ -415,7 +387,7 @@ export default function MyListingsPage() {
           </div>
         )}
       </div>
-    </main>
+    </PageContainer>
   );
 }
 

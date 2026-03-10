@@ -4,6 +4,8 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { PageContainer } from "@/components/layout/PageContainer";
+
 type MeData = {
   email: string;
   email_verified: boolean;
@@ -68,56 +70,40 @@ export function AdminGate({ children }: { children: ReactNode }) {
 
   if (gate.kind === "loading") {
     return (
-      <main
-        className="min-h-screen flex items-center justify-center px-4"
-        style={{ backgroundColor: "#F8F9FB" }}
-      >
-        <p className="text-base" style={{ color: "#6B7280" }}>
-          Loading…
-        </p>
-      </main>
+      <PageContainer>
+        <p className="text-sm text-gray-500">Loading…</p>
+      </PageContainer>
     );
   }
 
   if (gate.kind === "unauth") {
     return (
-      <main
-        className="min-h-screen flex items-center justify-center px-4"
-        style={{ backgroundColor: "#F8F9FB" }}
-      >
-        <div className="w-full max-w-2xl">
-          <div className="rounded-xl bg-white border border-[#E5E7EB] shadow-sm px-6 py-8 text-center space-y-4">
-            <h1 className="text-2xl font-semibold" style={{ color: "#111827" }}>
-              Log in
-            </h1>
-            <p className="text-sm" style={{ color: "#6B7280" }}>
+      <PageContainer>
+        <div className="flex justify-center py-12">
+          <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white px-6 py-8 text-center shadow-sm space-y-4">
+            <h1 className="text-2xl font-semibold text-illini-blue">Log in</h1>
+            <p className="text-sm text-gray-500">
               You need to be logged in with a verified UIUC account to access admin tools.
             </p>
             <Link
               href="/login"
-              className="inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-base font-medium text-white transition-shadow hover:shadow-md"
-              style={{ backgroundColor: "#13294B" }}
+              className="inline-flex items-center justify-center rounded-lg bg-illini-orange px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2"
             >
               Log in
             </Link>
           </div>
         </div>
-      </main>
+      </PageContainer>
     );
   }
 
   if (gate.kind === "needsVerify") {
     return (
-      <main
-        className="min-h-screen flex items-center justify-center px-4"
-        style={{ backgroundColor: "#F8F9FB" }}
-      >
-        <div className="w-full max-w-2xl">
-          <div className="rounded-xl bg-white border border-[#E5E7EB] shadow-sm px-6 py-8 text-center space-y-4">
-            <h1 className="text-2xl font-semibold" style={{ color: "#111827" }}>
-              Verify your email first
-            </h1>
-            <p className="text-sm" style={{ color: "#6B7280" }}>
+      <PageContainer>
+        <div className="flex justify-center py-12">
+          <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white px-6 py-8 text-center shadow-sm space-y-4">
+            <h1 className="text-2xl font-semibold text-illini-blue">Verify your email first</h1>
+            <p className="text-sm text-gray-500">
               Verify your UIUC email before you can access admin tools.
             </p>
             <Link
@@ -126,88 +112,70 @@ export function AdminGate({ children }: { children: ReactNode }) {
                   ? `/verify-email?email=${encodeURIComponent(gate.email)}`
                   : "/verify-email"
               }
-              className="inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-base font-medium text-white transition-shadow hover:shadow-md"
-              style={{ backgroundColor: "#13294B" }}
+              className="inline-flex items-center justify-center rounded-lg bg-illini-orange px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2"
             >
               Verify email
             </Link>
           </div>
         </div>
-      </main>
+      </PageContainer>
     );
   }
 
   if (gate.kind === "needsProfile") {
     return (
-      <main
-        className="min-h-screen flex items-center justify-center px-4"
-        style={{ backgroundColor: "#F8F9FB" }}
-      >
-        <div className="w-full max-w-2xl">
-          <div className="rounded-xl bg-white border border-[#E5E7EB] shadow-sm px-6 py-8 text-center space-y-4">
-            <h1 className="text-2xl font-semibold" style={{ color: "#111827" }}>
-              Complete your profile first
-            </h1>
-            <p className="text-sm" style={{ color: "#6B7280" }}>
+      <PageContainer>
+        <div className="flex justify-center py-12">
+          <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white px-6 py-8 text-center shadow-sm space-y-4">
+            <h1 className="text-2xl font-semibold text-illini-blue">Complete your profile first</h1>
+            <p className="text-sm text-gray-500">
               Finish setting up your profile before you can access admin tools.
             </p>
             <Link
               href="/profile/setup"
-              className="inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-base font-medium text-white transition-shadow hover:shadow-md"
-              style={{ backgroundColor: "#13294B" }}
+              className="inline-flex items-center justify-center rounded-lg bg-illini-orange px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2"
             >
               Complete profile
             </Link>
           </div>
         </div>
-      </main>
+      </PageContainer>
     );
   }
 
   if (gate.kind === "banned") {
     return (
-      <main
-        className="min-h-screen flex items-center justify-center px-4"
-        style={{ backgroundColor: "#F8F9FB" }}
-      >
-        <div className="w-full max-w-2xl">
-          <div className="rounded-xl bg-white border border-[#E5E7EB] shadow-sm px-6 py-8 text-center space-y-4">
-            <h1 className="text-2xl font-semibold" style={{ color: "#111827" }}>
-              Account restricted
-            </h1>
-            <p className="text-sm" style={{ color: "#6B7280" }}>
+      <PageContainer>
+        <div className="flex justify-center py-12">
+          <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white px-6 py-8 text-center shadow-sm space-y-4">
+            <h1 className="text-2xl font-semibold text-illini-blue">Account restricted</h1>
+            <p className="text-sm text-gray-500">
               Your account is restricted from accessing admin tools.
             </p>
           </div>
         </div>
-      </main>
+      </PageContainer>
     );
   }
 
   if (gate.kind === "notAdmin") {
     return (
-      <main
-        className="min-h-screen flex items-center justify-center px-4"
-        style={{ backgroundColor: "#F8F9FB" }}
-      >
-        <div className="w-full max-w-2xl">
-          <div className="rounded-xl bg-white border border-[#E5E7EB] shadow-sm px-6 py-8 text-center space-y-4">
-            <h1 className="text-2xl font-semibold" style={{ color: "#111827" }}>
-              Not authorized
-            </h1>
-            <p className="text-sm" style={{ color: "#6B7280" }}>
+      <PageContainer>
+        <div className="flex justify-center py-12">
+          <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white px-6 py-8 text-center shadow-sm space-y-4">
+            <h1 className="text-2xl font-semibold text-illini-blue">Not authorized</h1>
+            <p className="text-sm text-gray-500">
               You must be an admin to view this area.
             </p>
             <Link
               href="/"
-              className="inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-base font-medium border border-[#E5E7EB] bg-white"
-              style={{ color: "#111827" }}
+              className="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-gray-300"
             >
               Go back home
             </Link>
           </div>
         </div>
-      </main>
+      </PageContainer>
     );
   }
 

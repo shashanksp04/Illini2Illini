@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
+import { PageContainer } from "@/components/layout/PageContainer";
+
 type UserItem = {
   id: string;
   email: string;
@@ -80,89 +82,76 @@ export function AdminUsersClient() {
   }
 
   return (
-    <main
-      className="min-h-screen px-4 py-8"
-      style={{ backgroundColor: "#F8F9FB" }}
-    >
-      <div className="max-w-4xl mx-auto space-y-6">
+    <PageContainer>
+      <div className="space-y-6 md:space-y-8">
         <div className="flex flex-wrap items-center gap-4">
-          <Link
-            href="/admin"
-            className="text-sm font-medium"
-            style={{ color: "#6B7280" }}
-          >
+          <Link href="/admin" className="text-sm font-medium text-gray-500 hover:text-gray-700">
             ← Admin
           </Link>
-          <h1 className="text-2xl font-semibold" style={{ color: "#111827" }}>
-            Users
-          </h1>
+          <h1 className="text-2xl font-semibold text-illini-blue">Users</h1>
         </div>
 
-        <div className="rounded-xl bg-white border border-[#E5E7EB] shadow-sm overflow-hidden">
+        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
           {error && (
-            <p className="px-6 py-4 text-sm" style={{ color: "#DC2626" }}>
-              {error}
-            </p>
+            <p className="px-6 py-4 text-sm text-red-600">{error}</p>
           )}
           {loading ? (
-            <p className="px-6 py-8 text-sm" style={{ color: "#6B7280" }}>
-              Loading…
-            </p>
+            <div className="flex flex-col items-center justify-center px-6 py-12">
+              <p className="text-sm text-gray-500">Loading…</p>
+            </div>
           ) : items.length === 0 ? (
-            <p className="px-6 py-8 text-sm" style={{ color: "#6B7280" }}>
-              No users.
-            </p>
+            <div className="flex flex-col items-center justify-center px-6 py-12">
+              <p className="text-sm text-gray-500">No users.</p>
+            </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-[#E5E7EB] bg-[#F8F9FB]">
-                    <th className="text-left px-4 py-3 font-medium" style={{ color: "#111827" }}>Email</th>
-                    <th className="text-left px-4 py-3 font-medium" style={{ color: "#111827" }}>Username</th>
-                    <th className="text-left px-4 py-3 font-medium" style={{ color: "#111827" }}>Name</th>
-                    <th className="text-left px-4 py-3 font-medium" style={{ color: "#111827" }}>Role</th>
-                    <th className="text-left px-4 py-3 font-medium" style={{ color: "#111827" }}>Banned</th>
-                    <th className="text-left px-4 py-3 font-medium" style={{ color: "#111827" }}>Created</th>
-                    <th className="text-left px-4 py-3 font-medium" style={{ color: "#111827" }}>Action</th>
+                  <tr className="border-b border-gray-200 bg-gray-50">
+                    <th className="px-4 py-3 text-left font-medium text-gray-900">Email</th>
+                    <th className="px-4 py-3 text-left font-medium text-gray-900">Username</th>
+                    <th className="px-4 py-3 text-left font-medium text-gray-900">Name</th>
+                    <th className="px-4 py-3 text-left font-medium text-gray-900">Role</th>
+                    <th className="px-4 py-3 text-left font-medium text-gray-900">Banned</th>
+                    <th className="px-4 py-3 text-left font-medium text-gray-900">Created</th>
+                    <th className="px-4 py-3 text-left font-medium text-gray-900">Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {items.map((u) => (
-                    <tr key={u.id} className="border-b border-[#E5E7EB]">
-                      <td className="px-4 py-3" style={{ color: "#111827" }}>
+                    <tr key={u.id} className="border-b border-gray-200 bg-white last:border-b-0">
+                      <td className="px-4 py-3 text-gray-900">
                         {u.email}
                       </td>
-                      <td className="px-4 py-3" style={{ color: "#6B7280" }}>
+                      <td className="px-4 py-3 text-gray-500">
                         {u.username ?? "—"}
                       </td>
-                      <td className="px-4 py-3" style={{ color: "#111827" }}>
+                      <td className="px-4 py-3 text-gray-900">
                         {formatName(u.first_name, u.last_name)}
                       </td>
                       <td className="px-4 py-3">
                         <span
-                          className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
-                          style={
+                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
                             u.role === "ADMIN"
-                              ? { backgroundColor: "#DBEAFE", color: "#1D4ED8" }
-                              : { backgroundColor: "#F3F4F6", color: "#6B7280" }
-                          }
+                              ? "bg-gray-100 text-illini-blue"
+                              : "bg-gray-100 text-gray-600"
+                          }`}
                         >
                           {u.role}
                         </span>
                       </td>
                       <td className="px-4 py-3">
                         <span
-                          className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
-                          style={
+                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
                             u.is_banned
-                              ? { backgroundColor: "#FEE2E2", color: "#B91C1C" }
-                              : { backgroundColor: "#F3F4F6", color: "#6B7280" }
-                          }
+                              ? "bg-red-100 text-red-700"
+                              : "bg-gray-100 text-gray-500"
+                          }`}
                         >
                           {u.is_banned ? "BANNED" : "—"}
                         </span>
                       </td>
-                      <td className="px-4 py-3" style={{ color: "#6B7280" }}>
+                      <td className="px-4 py-3 text-gray-500">
                         {new Date(u.created_at).toLocaleDateString()}
                       </td>
                       <td className="px-4 py-3">
@@ -170,11 +159,11 @@ export function AdminUsersClient() {
                           type="button"
                           disabled={actionId === u.id}
                           onClick={() => handleBanToggle(u)}
-                          className="rounded-lg px-3 py-1.5 text-sm font-medium border focus:outline-none focus:ring-2 focus:ring-[#E84A27] focus:ring-offset-2 disabled:opacity-70"
-                          style={{
-                            borderColor: u.is_banned ? "#16A34A" : "#DC2626",
-                            color: u.is_banned ? "#16A34A" : "#DC2626",
-                          }}
+                          className={`inline-flex items-center justify-center rounded-lg border px-3 py-1.5 text-sm font-medium disabled:opacity-70 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                            u.is_banned
+                              ? "border-green-300 bg-white text-green-600 hover:bg-green-50 focus:ring-green-500"
+                              : "border-red-300 bg-white text-red-600 hover:bg-red-50 focus:ring-red-500"
+                          }`}
                         >
                           {actionId === u.id ? "…" : u.is_banned ? "Unban" : "Ban"}
                         </button>
@@ -187,6 +176,6 @@ export function AdminUsersClient() {
           )}
         </div>
       </div>
-    </main>
+    </PageContainer>
   );
 }

@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 
+import { PageContainer } from "@/components/layout/PageContainer";
+
 type MeOk = {
   ok: true;
   data: {
@@ -184,127 +186,102 @@ export function ProfileSetupForm() {
 
   if (gate.kind === "loading") {
     return (
-      <main
-        className="min-h-screen flex items-center justify-center px-4"
-        style={{ backgroundColor: "#F8F9FB" }}
-      >
-        <div className="w-full max-w-md">
-          <div className="rounded-xl bg-white border border-[#E5E7EB] shadow-sm px-6 py-8 space-y-4">
-            <div className="h-6 w-40 bg-gray-100 rounded-lg" />
-            <div className="h-4 w-full bg-gray-100 rounded-lg" />
+      <PageContainer>
+        <div className="flex justify-center py-12">
+          <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white px-6 py-8 shadow-sm space-y-4">
+            <div className="h-6 w-40 rounded-lg bg-gray-100" />
+            <div className="h-4 w-full rounded-lg bg-gray-100" />
           </div>
         </div>
-      </main>
+      </PageContainer>
     );
   }
 
   if (gate.kind === "unauthenticated") {
     return (
-      <main
-        className="min-h-screen flex items-center justify-center px-4"
-        style={{ backgroundColor: "#F8F9FB" }}
-      >
-        <div className="w-full max-w-md">
-          <div className="rounded-xl bg-white border border-[#E5E7EB] shadow-sm px-6 py-8 space-y-4 text-center">
-            <h1 className="text-2xl font-semibold" style={{ color: "#111827" }}>
-              Log in to continue
-            </h1>
-            <p className="text-sm" style={{ color: "#6B7280" }}>
+      <PageContainer>
+        <div className="flex justify-center py-12">
+          <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white px-6 py-8 text-center shadow-sm space-y-4">
+            <h1 className="text-2xl font-semibold text-illini-blue">Log in to continue</h1>
+            <p className="text-sm text-gray-500">
               You need to be logged in to complete your profile.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center mt-4">
+            <div className="mt-4 flex flex-col justify-center gap-3 sm:flex-row">
               <Link
                 href="/login"
-                className="inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-base font-medium text-white transition-shadow hover:shadow-md"
-                style={{ backgroundColor: "#13294B" }}
+                className="inline-flex items-center justify-center rounded-lg bg-illini-orange px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2"
               >
                 Log in
               </Link>
               <Link
                 href="/listings"
-                className="inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-base font-medium border transition-colors hover:bg-white/80"
-                style={{ color: "#111827", borderColor: "#E5E7EB", backgroundColor: "#FFFFFF" }}
+                className="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-gray-300"
               >
                 Browse listings
               </Link>
             </div>
           </div>
         </div>
-      </main>
+      </PageContainer>
     );
   }
 
   if (gate.kind === "needsVerification") {
     const email = gate.email;
     return (
-      <main
-        className="min-h-screen flex items-center justify-center px-4"
-        style={{ backgroundColor: "#F8F9FB" }}
-      >
-        <div className="w-full max-w-md">
-          <div className="rounded-xl bg-white border border-[#E5E7EB] shadow-sm px-6 py-8 space-y-4 text-center">
-            <h1 className="text-2xl font-semibold" style={{ color: "#111827" }}>
-              Verify your email
-            </h1>
-            <p className="text-sm" style={{ color: "#6B7280" }}>
+      <PageContainer>
+        <div className="flex justify-center py-12">
+          <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white px-6 py-8 text-center shadow-sm space-y-4">
+            <h1 className="text-2xl font-semibold text-illini-blue">Verify your email</h1>
+            <p className="text-sm text-gray-500">
               Before setting up your profile, verify{" "}
               <span className="font-medium">{email || "your email address"}</span>.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center mt-4">
+            <div className="mt-4 flex flex-col justify-center gap-3 sm:flex-row">
               <Link
                 href={email ? `/verify-email?email=${encodeURIComponent(email)}` : "/verify-email"}
-                className="inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-base font-medium text-white transition-shadow hover:shadow-md"
-                style={{ backgroundColor: "#13294B" }}
+                className="inline-flex items-center justify-center rounded-lg bg-illini-orange px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2"
               >
                 Verify email
               </Link>
               <Link
                 href="/listings"
-                className="inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-base font-medium border transition-colors hover:bg-white/80"
-                style={{ color: "#111827", borderColor: "#E5E7EB", backgroundColor: "#FFFFFF" }}
+                className="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-gray-300"
               >
                 Browse listings
               </Link>
             </div>
           </div>
         </div>
-      </main>
+      </PageContainer>
     );
   }
 
   if (gate.kind === "completeRedirect") {
     return (
-      <main
-        className="min-h-screen flex items-center justify-center px-4"
-        style={{ backgroundColor: "#F8F9FB" }}
-      >
-        <div className="w-full max-w-md">
-          <div className="rounded-xl bg-white border border-[#E5E7EB] shadow-sm px-6 py-8 text-center space-y-2">
-            <h1 className="text-2xl font-semibold" style={{ color: "#111827" }}>
-              Profile already complete
-            </h1>
-            <p className="text-sm" style={{ color: "#6B7280" }}>
+      <PageContainer>
+        <div className="flex justify-center py-12">
+          <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white px-6 py-8 text-center shadow-sm space-y-2">
+            <h1 className="text-2xl font-semibold text-illini-blue">Profile already complete</h1>
+            <p className="text-sm text-gray-500">
               Redirecting you to listings…
             </p>
           </div>
         </div>
-      </main>
+      </PageContainer>
     );
   }
 
   // needsProfile
   return (
-    <main
-      className="min-h-screen flex items-center justify-center px-4"
-      style={{ backgroundColor: "#F8F9FB" }}
-    >
-      <div className="w-full max-w-md">
-        <div className="rounded-xl bg-white border border-[#E5E7EB] shadow-sm px-6 py-8 space-y-6">
+    <PageContainer>
+      <div className="flex justify-center py-8 md:py-12">
+        <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white px-6 py-8 shadow-sm space-y-6">
           <div className="space-y-2 text-center">
-            <h1 className="text-3xl font-semibold" style={{ color: "#111827" }}>
+            <h1 className="text-2xl font-semibold text-illini-blue md:text-3xl">
               Complete your profile
             </h1>
-            <p className="text-sm" style={{ color: "#6B7280" }}>
+            <p className="text-sm text-gray-500">
               Add your name, username, and a profile picture. Usernames are permanent.
             </p>
           </div>
@@ -313,8 +290,7 @@ export function ProfileSetupForm() {
             <div className="space-y-1">
               <label
                 htmlFor="first_name"
-                className="block text-sm font-medium"
-                style={{ color: "#111827" }}
+                className="block text-sm font-medium text-gray-700"
               >
                 First name
               </label>
@@ -324,16 +300,14 @@ export function ProfileSetupForm() {
                 required
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
-                className="w-full rounded-lg border border-[#E5E7EB] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E84A27]"
-                style={{ color: "#111827" }}
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
               />
             </div>
 
             <div className="space-y-1">
               <label
                 htmlFor="last_name"
-                className="block text-sm font-medium"
-                style={{ color: "#111827" }}
+                className="block text-sm font-medium text-gray-700"
               >
                 Last name
               </label>
@@ -343,16 +317,14 @@ export function ProfileSetupForm() {
                 required
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
-                className="w-full rounded-lg border border-[#E5E7EB] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E84A27]"
-                style={{ color: "#111827" }}
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
               />
             </div>
 
             <div className="space-y-1">
               <label
                 htmlFor="username"
-                className="block text-sm font-medium"
-                style={{ color: "#111827" }}
+                className="block text-sm font-medium text-gray-700"
               >
                 Username
               </label>
@@ -362,10 +334,9 @@ export function ProfileSetupForm() {
                 required
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full rounded-lg border border-[#E5E7EB] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#E84A27]"
-                style={{ color: "#111827" }}
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
               />
-              <p className="text-xs" style={{ color: "#6B7280" }}>
+              <p className="text-xs text-gray-500">
                 Usernames are permanent. Use letters, numbers, and underscores only.
               </p>
             </div>
@@ -373,8 +344,7 @@ export function ProfileSetupForm() {
             <div className="space-y-2">
               <label
                 htmlFor="profile_picture"
-                className="block text-sm font-medium"
-                style={{ color: "#111827" }}
+                className="block text-sm font-medium text-gray-700"
               >
                 Profile picture
               </label>
@@ -383,10 +353,10 @@ export function ProfileSetupForm() {
                 type="file"
                 accept="image/*"
                 onChange={handleUploadChange}
-                className="w-full rounded-lg border border-[#E5E7EB] px-3 py-2 text-sm bg-white"
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm bg-white"
               />
               {uploadError && (
-                <p className="text-xs" style={{ color: "#DC2626" }}>
+                <p className="text-xs text-red-600">
                   {uploadError}
                 </p>
               )}
@@ -395,9 +365,9 @@ export function ProfileSetupForm() {
                   <img
                     src={profilePictureUrl}
                     alt="Profile preview"
-                    className="h-12 w-12 rounded-full object-cover border border-[#E5E7EB]"
+                    className="h-12 w-12 rounded-full object-cover border border-gray-200"
                   />
-                  <span className="text-xs" style={{ color: "#6B7280" }}>
+                  <span className="text-xs text-gray-500">
                     This photo will be shown on your listings.
                   </span>
                 </div>
@@ -405,7 +375,7 @@ export function ProfileSetupForm() {
             </div>
 
             {formError && (
-              <p className="text-sm" style={{ color: "#DC2626" }}>
+              <p className="text-sm text-red-600">
                 {formError}
               </p>
             )}
@@ -413,14 +383,13 @@ export function ProfileSetupForm() {
             <button
               type="submit"
               disabled={submitting || uploading || !profilePictureUrl}
-              className="w-full inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium text-white transition-shadow hover:shadow-md disabled:opacity-70"
-              style={{ backgroundColor: "#13294B" }}
+              className="w-full inline-flex items-center justify-center rounded-lg bg-illini-orange px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md disabled:opacity-70 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2"
             >
               {submitting ? "Saving..." : "Save profile"}
             </button>
           </form>
         </div>
       </div>
-    </main>
+    </PageContainer>
   );
 }
