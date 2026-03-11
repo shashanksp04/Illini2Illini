@@ -1,13 +1,9 @@
 import type { ReactNode } from "react";
 
-/**
- * Centered auth card: max-w-md, rounded-xl border shadow-md.
- * Reusable for Login, Signup, Profile Setup (and Email Verification if content fits).
- */
 export function AuthCard({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
     <div
-      className={`mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white px-6 py-8 shadow-sm ${className}`.trim()}
+      className={`mx-auto w-full max-w-md rounded-2xl border border-gray-200/60 bg-white p-8 shadow-elevated sm:p-10 ${className}`.trim()}
     >
       {children}
     </div>

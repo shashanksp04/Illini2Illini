@@ -76,19 +76,19 @@ export function AdminReportsClient() {
     <PageContainer>
       <div className="space-y-6 md:space-y-8">
         <div className="flex flex-wrap items-center gap-4">
-          <Link href="/admin" className="text-sm font-medium text-gray-500 hover:text-gray-700">
-            ← Admin
+          <Link href="/admin" className="text-sm font-medium text-gray-500 hover:text-gray-700 transition-all duration-200">
+            &larr; Admin
           </Link>
-          <h1 className="text-2xl font-semibold text-illini-blue">Reports</h1>
+          <h1 className="text-2xl font-bold text-brand">Reports</h1>
         </div>
 
         <div className="flex gap-2">
           <button
             type="button"
             onClick={() => setFilter("OPEN")}
-            className={`rounded-lg border px-4 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2 ${
+            className={`rounded-xl border px-4 py-2 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 ${
               filter === "OPEN"
-                ? "border-illini-blue bg-illini-blue text-white"
+                ? "border-brand bg-brand text-white"
                 : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
             }`}
           >
@@ -97,9 +97,9 @@ export function AdminReportsClient() {
           <button
             type="button"
             onClick={() => setFilter("RESOLVED")}
-            className={`rounded-lg border px-4 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2 ${
+            className={`rounded-xl border px-4 py-2 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 ${
               filter === "RESOLVED"
-                ? "border-illini-blue bg-illini-blue text-white"
+                ? "border-brand bg-brand text-white"
                 : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
             }`}
           >
@@ -107,7 +107,7 @@ export function AdminReportsClient() {
           </button>
         </div>
 
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+        <div className="overflow-hidden rounded-2xl border border-gray-200/60 bg-white shadow-card">
           {error && (
             <p className="px-6 py-4 text-sm text-red-600">{error}</p>
           )}
@@ -139,7 +139,7 @@ export function AdminReportsClient() {
                         {new Date(r.created_at).toLocaleDateString()}
                       </td>
                       <td className="px-4 py-3">
-                        <Link href={"/listings/" + r.listing_id} className="font-medium text-illini-orange hover:underline">
+                        <Link href={"/listings/" + r.listing_id} className="font-medium text-accent hover:underline">
                           {r.listing_id}
                         </Link>
                       </td>
@@ -166,7 +166,7 @@ export function AdminReportsClient() {
                             type="button"
                             disabled={resolvingId === r.id}
                             onClick={() => handleResolve(r.id)}
-                            className="inline-flex items-center justify-center rounded-lg bg-illini-orange px-3 py-1.5 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md disabled:opacity-70 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2"
+                            className="inline-flex items-center justify-center rounded-xl bg-accent px-3 py-1.5 text-sm font-medium text-white shadow-button transition-all duration-200 hover:bg-accent-hover hover:shadow-button-hover disabled:opacity-70 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2"
                           >
                             {resolvingId === r.id ? "…" : "Mark resolved"}
                           </button>

@@ -15,9 +15,9 @@ export function FormSection({
 }) {
   return (
     <section
-      className={`rounded-xl border border-gray-200 bg-white p-6 shadow-sm space-y-4 ${className}`.trim()}
+      className={`rounded-2xl border border-gray-200/60 bg-white p-6 shadow-card space-y-4 ${className}`.trim()}
     >
-      <h2 className="text-lg font-semibold text-illini-blue">{title}</h2>
+      <h2 className="text-lg font-semibold text-brand border-b border-gray-100 pb-3">{title}</h2>
       {children}
     </section>
   );

@@ -14,15 +14,10 @@ export type PublicListingItem = {
   owner_username: string;
 };
 
-/** Optional fields for verified/Dashboard/My Listings context */
 export type ListingCardItem = PublicListingItem & {
-  /** First photo URL (public listings have no photos) */
   image_url?: string | null;
-  /** For seller row avatar (verified only) */
   owner_profile_picture_url?: string | null;
-  /** Show verified badge in seller row (verified only) */
   show_verified_badge?: boolean;
-  /** For Dashboard/My Listings status badge */
   status?: "ACTIVE" | "TAKEN" | "EXPIRED" | "DELETED";
 };
 
@@ -34,11 +29,11 @@ function formatDate(d: string | Date): string {
 function leaseTypeBadgeClass(leaseType: string): string {
   switch (leaseType) {
     case "SUBLEASE":
-      return "bg-gray-100 text-gray-700";
+      return "bg-blue-50 text-blue-600 ring-1 ring-blue-100";
     case "LEASE_TAKEOVER":
-      return "bg-gray-100 text-gray-700";
+      return "bg-amber-50 text-amber-600 ring-1 ring-amber-100";
     default:
-      return "bg-gray-100 text-gray-600";
+      return "bg-gray-50 text-gray-600 ring-1 ring-gray-100";
   }
 }
 
@@ -49,118 +44,104 @@ function roomTypeLabel(roomType: string): string {
 function statusBadgeClass(status: string): string {
   switch (status) {
     case "ACTIVE":
-      return "bg-green-100 text-green-700";
+      return "bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100";
     case "TAKEN":
-      return "bg-gray-100 text-gray-600";
+      return "bg-gray-50 text-gray-500 ring-1 ring-gray-100";
     case "EXPIRED":
     case "DELETED":
-      return "bg-gray-100 text-gray-500";
+      return "bg-gray-50 text-gray-400 ring-1 ring-gray-100";
     default:
-      return "bg-gray-100 text-gray-600";
-  }
-}
-
-function statusLabel(status: string): string {
-  switch (status) {
-    case "ACTIVE":
-      return "ACTIVE";
-    case "TAKEN":
-      return "TAKEN";
-    case "EXPIRED":
-      return "EXPIRED";
-    case "DELETED":
-      return "DELETED";
-    default:
-      return "ACTIVE";
+      return "bg-gray-50 text-gray-500 ring-1 ring-gray-100";
   }
 }
 
 export function ListingCard({ listing }: { listing: ListingCardItem }) {
   const dateRange = `${formatDate(listing.start_date)} – ${formatDate(listing.end_date)}`;
+  const hasExplicitStatus = listing.status != null;
   const status = listing.status ?? "ACTIVE";
 
-  // Defensive defaults: public usage must never leak restricted fields.
   const imageUrl = listing.image_url ?? undefined;
-  const ownerProfilePictureUrl = listing.owner_profile_picture_url ?? undefined;
+  const ownerPicUrl = listing.owner_profile_picture_url ?? undefined;
   const showVerifiedBadge = listing.show_verified_badge === true;
 
   return (
     <Link
       href={`/listings/${listing.id}`}
-      className="block overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-lg"
+      className="group block overflow-hidden rounded-2xl border border-gray-200/60 bg-white shadow-card transition-all duration-300 hover:shadow-card-hover hover:-translate-y-0.5"
     >
-      {/* Image: aspect-[4/3], placeholder when no photo (public) */}
-      <div className="relative aspect-[4/3] w-full bg-gray-100">
+      {/* Image */}
+      <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100">
         {imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={imageUrl}
             alt=""
-            className="h-full w-full rounded-t-xl object-cover"
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center rounded-t-xl bg-gray-200 text-gray-500">
-            <span className="text-xs">No image</span>
+          <div className="flex h-full w-full flex-col items-center justify-center gap-2 text-gray-300">
+            <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0 0 22.5 18.75V5.25A2.25 2.25 0 0 0 20.25 3H3.75A2.25 2.25 0 0 0 1.5 5.25v13.5A2.25 2.25 0 0 0 3.75 21Z" />
+            </svg>
+            <span className="text-xs font-medium text-gray-400">No preview</span>
           </div>
         )}
-        {/* Price tag: top-right overlay, Illini Orange */}
-        <span className="absolute right-2 top-2 rounded-lg bg-illini-orange px-2 py-1 text-sm font-medium text-white">
-          ${listing.monthly_rent} / month
+        <span className="absolute right-2.5 top-2.5 rounded-lg bg-brand/90 px-2.5 py-1 text-sm font-bold tabular-nums text-white shadow-lg backdrop-blur-sm">
+          ${listing.monthly_rent}<span className="text-xs font-medium opacity-70">/mo</span>
         </span>
       </div>
 
-      <div className="p-4 space-y-2">
-        <h3 className="text-base font-medium text-illini-blue line-clamp-2">{listing.title}</h3>
-        <p className="text-sm text-gray-500">{listing.nearby_landmark}</p>
-        <p className="text-xs text-gray-500">{dateRange}</p>
+      {/* Content */}
+      <div className="space-y-3 p-4">
+        <div>
+          <h3 className="text-[15px] font-semibold leading-snug text-gray-900 transition-colors group-hover:text-accent">
+            {listing.title}
+          </h3>
+          <p className="mt-0.5 text-xs text-gray-400">{listing.nearby_landmark}</p>
+        </div>
 
-        {/* Tags: rounded badge, muted background */}
-        <div className="flex flex-wrap gap-1.5 pt-1">
-          <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
+        <p className="text-xs text-gray-400">{dateRange}</p>
+
+        <div className="flex flex-wrap gap-1.5">
+          <span className="rounded-full bg-gray-50 px-2 py-0.5 text-xs font-medium text-gray-500 ring-1 ring-gray-100">
             {roomTypeLabel(listing.room_type)}
           </span>
           {listing.furnished && (
-            <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
+            <span className="rounded-full bg-gray-50 px-2 py-0.5 text-xs font-medium text-gray-500 ring-1 ring-gray-100">
               Furnished
             </span>
           )}
           {listing.utilities_included && (
-            <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
-              Utilities Included
+            <span className="rounded-full bg-gray-50 px-2 py-0.5 text-xs font-medium text-gray-500 ring-1 ring-gray-100">
+              Utilities
             </span>
           )}
-          <span
-            className={`rounded-full px-2 py-0.5 text-xs font-medium ${leaseTypeBadgeClass(
-              listing.lease_type
-            )}`}
-          >
+          <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${leaseTypeBadgeClass(listing.lease_type)}`}>
             {listing.lease_type === "SUBLEASE" ? "Sublease" : "Lease Takeover"}
           </span>
-          <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusBadgeClass(status)}`}>
-            {statusLabel(status)}
-          </span>
+          {hasExplicitStatus && (
+            <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusBadgeClass(status)}`}>
+              {status}
+            </span>
+          )}
         </div>
 
-        {/* Seller row: avatar and verified badge only when explicitly passed (verified API). Public: username only. */}
-        <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
-          {ownerProfilePictureUrl ? (
+        {/* Seller row */}
+        <div className="flex items-center gap-2 border-t border-gray-100 pt-3">
+          {ownerPicUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={ownerProfilePictureUrl}
-              alt=""
-              className="h-6 w-6 rounded-full object-cover border border-gray-200"
-            />
-          ) : null}
-          <span className="text-xs text-gray-500">@{listing.owner_username}</span>
-          {showVerifiedBadge ? (
-            <span
-              className="inline-flex items-center gap-0.5 rounded-full bg-gray-100 px-1.5 py-0.5 text-xs font-medium text-illini-blue"
-              title="Verified UIUC Student"
-            >
-              <span aria-hidden>✓</span>
-              <span>Verified</span>
+            <img src={ownerPicUrl} alt="" className="h-6 w-6 rounded-full object-cover ring-1 ring-gray-100" />
+          ) : (
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 text-[10px] font-bold text-gray-400">
+              {listing.owner_username[0]?.toUpperCase()}
             </span>
-          ) : null}
+          )}
+          <span className="text-xs text-gray-400">@{listing.owner_username}</span>
+          {showVerifiedBadge && (
+            <span className="ml-auto inline-flex items-center gap-0.5 rounded-full bg-blue-50 px-1.5 py-0.5 text-[10px] font-semibold text-blue-600 ring-1 ring-blue-100">
+              &#10003; Verified
+            </span>
+          )}
         </div>
       </div>
     </Link>

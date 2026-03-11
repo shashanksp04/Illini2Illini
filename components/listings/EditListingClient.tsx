@@ -6,6 +6,7 @@ import { FormEvent, useEffect, useState } from "react";
 
 import { PhotoUploader, type ListingPhoto } from "@/components/listings/PhotoUploader";
 import { PageContainer } from "@/components/layout/PageContainer";
+import { AuthCard } from "@/components/auth/AuthCard";
 import { FormSection } from "@/components/forms/FormSection";
 
 type MeData = {
@@ -47,6 +48,22 @@ type GateState =
   | { kind: "needsProfile" }
   | { kind: "banned" }
   | { kind: "ready" };
+
+function GateScreen({ title, description, cta }: { title: string; description: string; cta?: React.ReactNode }) {
+  return (
+    <PageContainer>
+      <div className="flex justify-center py-8 md:py-12">
+        <AuthCard>
+          <div className="space-y-4 text-center">
+            <h1 className="text-2xl font-bold text-brand">{title}</h1>
+            <p className="text-sm text-gray-500">{description}</p>
+            {cta}
+          </div>
+        </AuthCard>
+      </div>
+    </PageContainer>
+  );
+}
 
 export function EditListingClient({ id }: { id: string }) {
   const router = useRouter();
@@ -132,7 +149,7 @@ export function EditListingClient({ id }: { id: string }) {
         const data = json.data;
         if (data.requires_login_for_details) {
           setRequiresLoginFlag(true);
-          setLoadError("You don’t have access to this listing.");
+          setLoadError("You don't have access to this listing.");
           return;
         }
         const l = data.listing;
@@ -220,76 +237,52 @@ export function EditListingClient({ id }: { id: string }) {
 
   if (gate.kind === "unauth") {
     return (
-      <PageContainer>
-        <div className="flex justify-center py-12">
-          <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white px-6 py-8 text-center shadow-sm space-y-4">
-            <h1 className="text-2xl font-semibold text-illini-blue">Log in to edit this listing</h1>
-            <Link
-              href="/login"
-              className="inline-flex items-center justify-center rounded-lg bg-illini-orange px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2"
-            >
-              Log in
-            </Link>
-          </div>
-        </div>
-      </PageContainer>
+      <GateScreen
+        title="Log in to edit this listing"
+        description="You need to be logged in to edit listings."
+        cta={
+          <Link href="/login" className="inline-flex items-center justify-center rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-white shadow-button transition-all duration-200 hover:bg-accent-hover hover:shadow-button-hover focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2">
+            Log in
+          </Link>
+        }
+      />
     );
   }
 
   if (gate.kind === "needsVerify") {
     return (
-      <PageContainer>
-        <div className="flex justify-center py-12">
-          <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white px-6 py-8 text-center shadow-sm space-y-4">
-            <h1 className="text-2xl font-semibold text-illini-blue">Verify your email</h1>
-            <p className="text-sm text-gray-500">
-              Verify your UIUC email before editing listings.
-            </p>
-            <Link
-              href="/verify-email"
-              className="inline-flex items-center justify-center rounded-lg bg-illini-orange px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2"
-            >
-              Verify email
-            </Link>
-          </div>
-        </div>
-      </PageContainer>
+      <GateScreen
+        title="Verify your email"
+        description="Verify your UIUC email before editing listings."
+        cta={
+          <Link href="/verify-email" className="inline-flex items-center justify-center rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-white shadow-button transition-all duration-200 hover:bg-accent-hover hover:shadow-button-hover focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2">
+            Verify email
+          </Link>
+        }
+      />
     );
   }
 
   if (gate.kind === "needsProfile") {
     return (
-      <PageContainer>
-        <div className="flex justify-center py-12">
-          <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white px-6 py-8 text-center shadow-sm space-y-4">
-            <h1 className="text-2xl font-semibold text-illini-blue">Complete your profile</h1>
-            <p className="text-sm text-gray-500">
-              Finish your profile before editing listings.
-            </p>
-            <Link
-              href="/profile/setup"
-              className="inline-flex items-center justify-center rounded-lg bg-illini-orange px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2"
-            >
-              Complete profile
-            </Link>
-          </div>
-        </div>
-      </PageContainer>
+      <GateScreen
+        title="Complete your profile"
+        description="Finish your profile before editing listings."
+        cta={
+          <Link href="/profile/setup" className="inline-flex items-center justify-center rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-white shadow-button transition-all duration-200 hover:bg-accent-hover hover:shadow-button-hover focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2">
+            Complete profile
+          </Link>
+        }
+      />
     );
   }
 
   if (gate.kind === "banned") {
     return (
-      <PageContainer>
-        <div className="flex justify-center py-12">
-          <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white px-6 py-8 text-center shadow-sm space-y-4">
-            <h1 className="text-2xl font-semibold text-illini-blue">Account restricted</h1>
-            <p className="text-sm text-gray-500">
-              Your account is restricted from editing listings.
-            </p>
-          </div>
-        </div>
-      </PageContainer>
+      <GateScreen
+        title="Account restricted"
+        description="Your account is restricted from editing listings."
+      />
     );
   }
 
@@ -303,22 +296,15 @@ export function EditListingClient({ id }: { id: string }) {
 
   if (!listing || requiresLoginFlag || loadError) {
     return (
-      <PageContainer>
-        <div className="flex justify-center py-12">
-          <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white px-6 py-8 text-center shadow-sm space-y-4">
-            <h1 className="text-2xl font-semibold text-illini-blue">Unable to edit listing</h1>
-            <p className="text-sm text-gray-500">
-              {loadError ?? "You don’t have access to this listing."}
-            </p>
-            <Link
-              href="/listings"
-              className="inline-flex items-center justify-center rounded-lg bg-illini-orange px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2"
-            >
-              Back to listings
-            </Link>
-          </div>
-        </div>
-      </PageContainer>
+      <GateScreen
+        title="Unable to edit listing"
+        description={loadError ?? "You don't have access to this listing."}
+        cta={
+          <Link href="/listings" className="inline-flex items-center justify-center rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-white shadow-button transition-all duration-200 hover:bg-accent-hover hover:shadow-button-hover focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2">
+            Back to listings
+          </Link>
+        }
+      />
     );
   }
 
@@ -326,17 +312,19 @@ export function EditListingClient({ id }: { id: string }) {
     <PageContainer>
       <div className="max-w-2xl mx-auto space-y-6 md:space-y-8">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold text-illini-blue">Edit listing</h1>
+          <h1 className="text-2xl font-semibold text-brand">Edit listing</h1>
           <Link
             href="/me/listings"
-            className="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-gray-300"
+            className="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-gray-300"
           >
             Back to my listings
           </Link>
         </div>
 
         {submitError && (
-          <p className="text-sm text-red-600">{submitError}</p>
+          <div className="rounded-xl bg-red-50 px-3 py-2">
+            <p className="text-sm text-red-600">{submitError}</p>
+          </div>
         )}
 
         <form className="space-y-6 md:space-y-8" onSubmit={handleSubmit}>
@@ -351,7 +339,7 @@ export function EditListingClient({ id }: { id: string }) {
                 required
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
+                className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2.5 text-sm text-gray-700 placeholder-gray-500 focus:outline-none focus:border-accent focus:bg-white focus:shadow-input-focus transition-all duration-200"
               />
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -366,7 +354,7 @@ export function EditListingClient({ id }: { id: string }) {
                   required
                   value={monthlyRent}
                   onChange={(e) => setMonthlyRent(e.target.value)}
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2.5 text-sm text-gray-700 placeholder-gray-500 focus:outline-none focus:border-accent focus:bg-white focus:shadow-input-focus transition-all duration-200"
                 />
               </div>
               <div className="space-y-1">
@@ -380,7 +368,7 @@ export function EditListingClient({ id }: { id: string }) {
                   required
                   value={totalBedrooms}
                   onChange={(e) => setTotalBedrooms(e.target.value)}
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2.5 text-sm text-gray-700 placeholder-gray-500 focus:outline-none focus:border-accent focus:bg-white focus:shadow-input-focus transition-all duration-200"
                 />
               </div>
             </div>
@@ -394,7 +382,7 @@ export function EditListingClient({ id }: { id: string }) {
                   required
                   value={leaseType}
                   onChange={(e) => setLeaseType(e.target.value as any)}
-                  className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-accent focus:bg-white focus:shadow-input-focus transition-all duration-200"
                 >
                   <option value="">Select lease type</option>
                   <option value="SUBLEASE">Sublease</option>
@@ -410,7 +398,7 @@ export function EditListingClient({ id }: { id: string }) {
                   required
                   value={roomType}
                   onChange={(e) => setRoomType(e.target.value as any)}
-                  className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-accent focus:bg-white focus:shadow-input-focus transition-all duration-200"
                 >
                   <option value="">Select room type</option>
                   <option value="PRIVATE_ROOM">Private room</option>
@@ -432,7 +420,7 @@ export function EditListingClient({ id }: { id: string }) {
                   required
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-accent focus:bg-white focus:shadow-input-focus transition-all duration-200"
                 />
               </div>
               <div className="space-y-1">
@@ -445,7 +433,7 @@ export function EditListingClient({ id }: { id: string }) {
                   required
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-accent focus:bg-white focus:shadow-input-focus transition-all duration-200"
                 />
               </div>
             </div>
@@ -462,7 +450,7 @@ export function EditListingClient({ id }: { id: string }) {
                 required
                 value={exactAddress}
                 onChange={(e) => setExactAddress(e.target.value)}
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
+                className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2.5 text-sm text-gray-700 placeholder-gray-500 focus:outline-none focus:border-accent focus:bg-white focus:shadow-input-focus transition-all duration-200"
               />
             </div>
             <div className="space-y-1">
@@ -475,7 +463,7 @@ export function EditListingClient({ id }: { id: string }) {
                 required
                 value={nearbyLandmark}
                 onChange={(e) => setNearbyLandmark(e.target.value)}
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
+                className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2.5 text-sm text-gray-700 placeholder-gray-500 focus:outline-none focus:border-accent focus:bg-white focus:shadow-input-focus transition-all duration-200"
               />
             </div>
           </FormSection>
@@ -490,7 +478,7 @@ export function EditListingClient({ id }: { id: string }) {
                 required
                 value={genderPreference}
                 onChange={(e) => setGenderPreference(e.target.value as any)}
-                className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
+                className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-accent focus:bg-white focus:shadow-input-focus transition-all duration-200"
               >
                 <option value="">No preference / any</option>
                 <option value="ANY">Any</option>
@@ -504,7 +492,7 @@ export function EditListingClient({ id }: { id: string }) {
                   type="checkbox"
                   checked={furnished}
                   onChange={(e) => setFurnished(e.target.checked)}
-                  className="h-4 w-4 rounded border-gray-200 text-illini-orange focus:ring-illini-orange"
+                  className="h-4 w-4 rounded border-gray-200 text-accent focus:ring-accent"
                 />
                 Furnished
               </label>
@@ -513,7 +501,7 @@ export function EditListingClient({ id }: { id: string }) {
                   type="checkbox"
                   checked={utilitiesIncluded}
                   onChange={(e) => setUtilitiesIncluded(e.target.checked)}
-                  className="h-4 w-4 rounded border-gray-200 text-illini-orange focus:ring-illini-orange"
+                  className="h-4 w-4 rounded border-gray-200 text-accent focus:ring-accent"
                 />
                 Utilities included
               </label>
@@ -530,7 +518,7 @@ export function EditListingClient({ id }: { id: string }) {
                 required
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="min-h-[96px] w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
+                className="min-h-[96px] w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2.5 text-sm text-gray-700 placeholder-gray-500 focus:outline-none focus:border-accent focus:bg-white focus:shadow-input-focus transition-all duration-200"
               />
             </div>
           </FormSection>
@@ -546,14 +534,14 @@ export function EditListingClient({ id }: { id: string }) {
           <div className="flex justify-between pt-4">
             <Link
               href="/me/listings"
-              className="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-gray-300"
+              className="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-gray-300"
             >
               Back to my listings
             </Link>
             <button
               type="submit"
               disabled={submitting}
-              className="inline-flex items-center justify-center rounded-lg bg-illini-orange px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md disabled:opacity-70 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2"
+              className="inline-flex items-center justify-center rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-white shadow-button transition-all duration-200 hover:bg-accent-hover hover:shadow-button-hover disabled:opacity-70 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2"
             >
               {submitting ? "Saving…" : "Save changes"}
             </button>
@@ -563,4 +551,3 @@ export function EditListingClient({ id }: { id: string }) {
     </PageContainer>
   );
 }
-

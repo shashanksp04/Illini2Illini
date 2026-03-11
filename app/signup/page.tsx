@@ -5,17 +5,10 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 
 import { PageContainer } from "@/components/layout/PageContainer";
+import { AuthCard } from "@/components/auth/AuthCard";
 
-type ApiErrorCode =
-  | "INVALID_EMAIL_DOMAIN"
-  | "VALIDATION_ERROR"
-  | "AUTH_CONFLICT"
-  | "SERVER_ERROR"
-  | string;
-
-type ApiResponse =
-  | { ok: true; data?: { needs_verification?: boolean } }
-  | { ok: false; error?: { code: ApiErrorCode; message: string } };
+type ApiErrorCode = "INVALID_EMAIL_DOMAIN" | "VALIDATION_ERROR" | "AUTH_CONFLICT" | "SERVER_ERROR" | string;
+type ApiResponse = { ok: true; data?: { needs_verification?: boolean } } | { ok: false; error?: { code: ApiErrorCode; message: string } };
 
 export default function SignupPage() {
   const router = useRouter();
@@ -36,14 +29,10 @@ export default function SignupPage() {
       });
       const json: ApiResponse = (await res.json()) as ApiResponse;
       if (!res.ok || !json.ok) {
-        const message =
-          (!json.ok && json.error?.message) ||
-          "Unable to create account. Please try again.";
-        setError(message);
+        setError((!json.ok && json.error?.message) || "Unable to create account. Please try again.");
         return;
       }
-      const target = `/verify-email?email=${encodeURIComponent(email)}`;
-      router.push(target);
+      router.push(`/verify-email?email=${encodeURIComponent(email)}`);
     } catch {
       setError("Unable to create account. Please try again.");
     } finally {
@@ -53,71 +42,69 @@ export default function SignupPage() {
 
   return (
     <PageContainer>
-      <div className="flex justify-center py-8 md:py-12">
-        <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white px-6 py-8 shadow-sm space-y-6">
-          <div className="space-y-2 text-center">
-            <h1 className="text-2xl font-semibold text-illini-blue md:text-3xl">Create your account</h1>
-            <p className="text-sm text-gray-500">
-              Use your <span className="font-medium">@illinois.edu</span> email to sign up.
-            </p>
-          </div>
-
-          {error && (
-            <p className="text-sm text-red-600">{error}</p>
-          )}
-
-          <form className="space-y-4" onSubmit={handleSubmit}>
-            <div className="space-y-1">
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                autoComplete="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
-              />
-              <p className="text-xs text-gray-500">
-                Must be a UIUC <span className="font-medium">@illinois.edu</span> address.
+      <div className="flex justify-center py-6 md:py-12">
+        <AuthCard>
+          <div className="space-y-6">
+            <div className="space-y-2 text-center">
+              <h1 className="text-2xl font-bold tracking-tight text-brand">Create your account</h1>
+              <p className="text-sm text-gray-500">
+                Use your <span className="font-medium text-gray-600">@illinois.edu</span> email to get started.
               </p>
             </div>
 
-            <div className="space-y-1">
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                autoComplete="new-password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
-              />
-            </div>
+            {error && (
+              <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+                <p className="text-sm text-red-600">{error}</p>
+              </div>
+            )}
 
-            <button
-              type="submit"
-              disabled={submitting}
-              className="w-full inline-flex items-center justify-center rounded-lg bg-illini-orange px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md disabled:opacity-70 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2"
-            >
-              {submitting ? "Creating account..." : "Create account"}
-            </button>
-          </form>
+            <form className="space-y-4" onSubmit={handleSubmit}>
+              <div className="space-y-1.5">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+                <input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="netid@illinois.edu"
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition-all focus:border-accent focus:bg-white focus:outline-none focus:shadow-input-focus"
+                />
+                <p className="text-xs text-gray-400">Must be a UIUC @illinois.edu address.</p>
+              </div>
 
-          <p className="text-center text-sm text-gray-500">
-            Already have an account?{" "}
-            <Link href="/login" className="font-medium text-illini-blue hover:underline">
-              Log in
-            </Link>
-          </p>
-        </div>
+              <div className="space-y-1.5">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+                <input
+                  id="password"
+                  type="password"
+                  autoComplete="new-password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition-all focus:border-accent focus:bg-white focus:outline-none focus:shadow-input-focus"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={submitting}
+                className="w-full rounded-xl bg-accent px-4 py-3 text-sm font-semibold text-white shadow-button transition-all duration-200 hover:bg-accent-hover hover:shadow-button-hover disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:ring-offset-2"
+              >
+                {submitting ? "Creating account…" : "Create account"}
+              </button>
+            </form>
+
+            <p className="text-center text-sm text-gray-500">
+              Already have an account?{" "}
+              <Link href="/login" className="font-semibold text-accent transition-colors hover:text-accent-hover">
+                Sign in
+              </Link>
+            </p>
+          </div>
+        </AuthCard>
       </div>
     </PageContainer>
   );
 }
-

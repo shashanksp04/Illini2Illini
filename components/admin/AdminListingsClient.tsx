@@ -91,19 +91,19 @@ export function AdminListingsClient() {
     <PageContainer>
       <div className="space-y-6 md:space-y-8">
         <div className="flex flex-wrap items-center gap-4">
-          <Link href="/admin" className="text-sm font-medium text-gray-500 hover:text-gray-700">
-            ← Admin
+          <Link href="/admin" className="text-sm font-medium text-gray-500 hover:text-gray-700 transition-all duration-200">
+            &larr; Admin
           </Link>
-          <h1 className="text-2xl font-semibold text-illini-blue">Listings</h1>
+          <h1 className="text-2xl font-bold text-brand">Listings</h1>
         </div>
 
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
             onClick={() => setFilter("")}
-            className={`rounded-lg border px-4 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2 ${
+            className={`rounded-xl border px-4 py-2 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 ${
               filter === ""
-                ? "border-illini-blue bg-illini-blue text-white"
+                ? "border-brand bg-brand text-white"
                 : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
             }`}
           >
@@ -114,9 +114,9 @@ export function AdminListingsClient() {
               key={s}
               type="button"
               onClick={() => setFilter(s)}
-              className={`rounded-lg border px-4 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2 ${
+              className={`rounded-xl border px-4 py-2 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 ${
                 filter === s
-                  ? "border-illini-blue bg-illini-blue text-white"
+                  ? "border-brand bg-brand text-white"
                   : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
               }`}
             >
@@ -125,7 +125,7 @@ export function AdminListingsClient() {
           ))}
         </div>
 
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+        <div className="overflow-hidden rounded-2xl border border-gray-200/60 bg-white shadow-card">
           {error && (
             <p className="px-6 py-4 text-sm text-red-600">{error}</p>
           )}
@@ -156,7 +156,7 @@ export function AdminListingsClient() {
                   {items.map((l) => (
                     <tr key={l.id} className="border-b border-gray-200 bg-white last:border-b-0">
                       <td className="max-w-[180px] px-4 py-3">
-                        <Link href={`/listings/${l.id}`} className="block truncate font-medium text-illini-orange hover:underline">
+                        <Link href={`/listings/${l.id}`} className="block truncate font-medium text-accent hover:underline">
                           {l.title}
                         </Link>
                       </td>
@@ -188,7 +188,7 @@ export function AdminListingsClient() {
                             type="button"
                             disabled={deletingId === l.id}
                             onClick={() => handleDelete(l.id)}
-                            className="inline-flex items-center justify-center rounded-lg border border-red-300 bg-white px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-70 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                            className="inline-flex items-center justify-center rounded-xl border border-red-300 bg-white px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 transition-all duration-200 disabled:opacity-70 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                           >
                             {deletingId === l.id ? "…" : "Delete"}
                           </button>

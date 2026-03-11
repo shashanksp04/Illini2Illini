@@ -85,13 +85,13 @@ export function AdminUsersClient() {
     <PageContainer>
       <div className="space-y-6 md:space-y-8">
         <div className="flex flex-wrap items-center gap-4">
-          <Link href="/admin" className="text-sm font-medium text-gray-500 hover:text-gray-700">
-            ← Admin
+          <Link href="/admin" className="text-sm font-medium text-gray-500 hover:text-gray-700 transition-all duration-200">
+            &larr; Admin
           </Link>
-          <h1 className="text-2xl font-semibold text-illini-blue">Users</h1>
+          <h1 className="text-2xl font-bold text-brand">Users</h1>
         </div>
 
-        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+        <div className="overflow-hidden rounded-2xl border border-gray-200/60 bg-white shadow-card">
           {error && (
             <p className="px-6 py-4 text-sm text-red-600">{error}</p>
           )}
@@ -133,7 +133,7 @@ export function AdminUsersClient() {
                         <span
                           className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
                             u.role === "ADMIN"
-                              ? "bg-gray-100 text-illini-blue"
+                              ? "bg-gray-100 text-brand"
                               : "bg-gray-100 text-gray-600"
                           }`}
                         >
@@ -159,7 +159,7 @@ export function AdminUsersClient() {
                           type="button"
                           disabled={actionId === u.id}
                           onClick={() => handleBanToggle(u)}
-                          className={`inline-flex items-center justify-center rounded-lg border px-3 py-1.5 text-sm font-medium disabled:opacity-70 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                          className={`inline-flex items-center justify-center rounded-xl border px-3 py-1.5 text-sm font-medium transition-all duration-200 disabled:opacity-70 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                             u.is_banned
                               ? "border-green-300 bg-white text-green-600 hover:bg-green-50 focus:ring-green-500"
                               : "border-red-300 bg-white text-red-600 hover:bg-red-50 focus:ring-red-500"

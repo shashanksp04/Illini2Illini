@@ -6,46 +6,39 @@ import { SearchBar } from "@/components/ui/SearchBar";
 import type { NavUser } from "./NavbarAuth";
 import { NavbarAuth } from "./NavbarAuth";
 
-type NavbarProps = {
-  user: NavUser | null;
-};
+type NavbarProps = { user: NavUser | null };
 
-/**
- * Global Navbar. Illini Blue, h-16, white text.
- * Layout: left (brand) / center (search max-w-xl) / right (login + signup).
- */
 export function Navbar({ user }: NavbarProps) {
   const pathname = usePathname();
   const showSearch = pathname === "/" || pathname === "/listings";
 
   return (
-    <header className="h-16 shrink-0 bg-illini-blue text-white">
-      <div className="mx-auto flex h-full w-full max-w-6xl items-center px-4 sm:px-6 lg:px-8">
-        {/* Left: Brand */}
-        <div className="flex shrink-0 items-center">
-          <Link
-            href="/"
-            className="font-semibold text-white transition-colors hover:text-white/90"
-          >
-            Illini2Illini
-          </Link>
-        </div>
+    <header className="sticky top-0 z-40 border-b border-white/10 bg-brand/95 text-white backdrop-blur-xl">
+      <div className="mx-auto flex h-16 max-w-6xl items-center gap-5 px-4 sm:px-6 lg:px-8">
+        <Link href="/" className="shrink-0 text-lg font-bold tracking-tight text-white transition-opacity hover:opacity-80">
+          Illini2Illini
+        </Link>
 
-        {/* Center: Search bar — centered, full-width inside max-w-xl */}
-        <div className="flex flex-1 justify-center min-w-0">
-          {showSearch ? (
-            <div className="hidden w-full max-w-xl md:block">
+        <Link
+          href="/listings"
+          className={`hidden shrink-0 rounded-md px-3 py-1.5 text-sm font-medium transition-all sm:block ${
+            pathname === "/listings"
+              ? "bg-white/15 text-white"
+              : "text-white/60 hover:bg-white/10 hover:text-white"
+          }`}
+        >
+          Browse
+        </Link>
+
+        <div className="flex min-w-0 flex-1 justify-center">
+          {showSearch && (
+            <div className="hidden w-full max-w-md md:block">
               <SearchBar variant="navbar" className="w-full" />
             </div>
-          ) : (
-            <div className="hidden flex-1 md:block" aria-hidden />
           )}
         </div>
 
-        {/* Right: Login + Sign up */}
-        <div className="flex shrink-0 items-center">
-          <NavbarAuth user={user} />
-        </div>
+        <NavbarAuth user={user} />
       </div>
     </header>
   );

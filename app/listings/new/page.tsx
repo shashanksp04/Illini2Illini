@@ -6,6 +6,7 @@ import { FormEvent, useEffect, useState } from "react";
 
 import { PhotoUploader, type ListingPhoto } from "@/components/listings/PhotoUploader";
 import { PageContainer } from "@/components/layout/PageContainer";
+import { AuthCard } from "@/components/auth/AuthCard";
 import { FormSection } from "@/components/forms/FormSection";
 
 type MeData = {
@@ -28,6 +29,22 @@ type GateState =
   | { kind: "ready" };
 
 type Step = "details" | "photos";
+
+function GateScreen({ title, description, cta }: { title: string; description: string; cta?: React.ReactNode }) {
+  return (
+    <PageContainer>
+      <div className="flex justify-center py-8 md:py-12">
+        <AuthCard>
+          <div className="space-y-4 text-center">
+            <h1 className="text-2xl font-bold text-brand">{title}</h1>
+            <p className="text-sm text-gray-500">{description}</p>
+            {cta}
+          </div>
+        </AuthCard>
+      </div>
+    </PageContainer>
+  );
+}
 
 export default function NewListingPage() {
   const router = useRouter();
@@ -142,93 +159,63 @@ export default function NewListingPage() {
     }
   }
 
-  function renderGate() {
-    if (gate.kind === "loading") {
-      return (
-        <PageContainer>
-          <p className="text-sm text-gray-500">Checking your account…</p>
-        </PageContainer>
-      );
-    }
-    if (gate.kind === "unauth") {
-      return (
-        <PageContainer>
-          <div className="flex justify-center py-12">
-            <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white px-6 py-8 text-center shadow-sm space-y-4">
-              <h1 className="text-2xl font-semibold text-illini-blue">Log in to create a listing</h1>
-              <p className="text-sm text-gray-500">
-                You need to be logged in with your UIUC account to create listings.
-              </p>
-              <Link
-                href="/login"
-                className="inline-flex items-center justify-center rounded-lg bg-illini-orange px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2"
-              >
-                Log in
-              </Link>
-            </div>
-          </div>
-        </PageContainer>
-      );
-    }
-    if (gate.kind === "needsVerify") {
-      return (
-        <PageContainer>
-          <div className="flex justify-center py-12">
-            <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white px-6 py-8 text-center shadow-sm space-y-4">
-              <h1 className="text-2xl font-semibold text-illini-blue">Verify your email</h1>
-              <p className="text-sm text-gray-500">
-                Verify your UIUC email before creating listings.
-              </p>
-              <Link
-                href="/verify-email"
-                className="inline-flex items-center justify-center rounded-lg bg-illini-orange px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2"
-              >
-                Verify email
-              </Link>
-            </div>
-          </div>
-        </PageContainer>
-      );
-    }
-    if (gate.kind === "needsProfile") {
-      return (
-        <PageContainer>
-          <div className="flex justify-center py-12">
-            <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white px-6 py-8 text-center shadow-sm space-y-4">
-              <h1 className="text-2xl font-semibold text-illini-blue">Complete your profile</h1>
-              <p className="text-sm text-gray-500">
-                Finish your profile before creating listings.
-              </p>
-              <Link
-                href="/profile/setup"
-                className="inline-flex items-center justify-center rounded-lg bg-illini-orange px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2"
-              >
-                Complete profile
-              </Link>
-            </div>
-          </div>
-        </PageContainer>
-      );
-    }
-    if (gate.kind === "banned") {
-      return (
-        <PageContainer>
-          <div className="flex justify-center py-12">
-            <div className="mx-auto w-full max-w-md rounded-xl border border-gray-200 bg-white px-6 py-8 text-center shadow-sm space-y-4">
-              <h1 className="text-2xl font-semibold text-illini-blue">Account restricted</h1>
-              <p className="text-sm text-gray-500">
-                Your account is restricted from creating listings.
-              </p>
-            </div>
-          </div>
-        </PageContainer>
-      );
-    }
-    return null;
+  if (gate.kind === "loading") {
+    return (
+      <PageContainer>
+        <p className="text-sm text-gray-500">Checking your account…</p>
+      </PageContainer>
+    );
   }
 
-  if (gate.kind !== "ready") {
-    return renderGate();
+  if (gate.kind === "unauth") {
+    return (
+      <GateScreen
+        title="Log in to create a listing"
+        description="You need to be logged in with your UIUC account to create listings."
+        cta={
+          <Link href="/login" className="inline-flex items-center justify-center rounded-xl bg-accent px-4 py-2.5 text-sm font-medium text-white shadow-button transition-all duration-200 hover:bg-accent-hover hover:shadow-button-hover focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2">
+            Log in
+          </Link>
+        }
+      />
+    );
+  }
+
+  if (gate.kind === "needsVerify") {
+    return (
+      <GateScreen
+        title="Verify your email"
+        description="Verify your UIUC email before creating listings."
+        cta={
+          <Link href="/verify-email" className="inline-flex items-center justify-center rounded-xl bg-accent px-4 py-2.5 text-sm font-medium text-white shadow-button transition-all duration-200 hover:bg-accent-hover hover:shadow-button-hover focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2">
+            Verify email
+          </Link>
+        }
+      />
+    );
+  }
+
+  if (gate.kind === "needsProfile") {
+    return (
+      <GateScreen
+        title="Complete your profile"
+        description="Finish your profile before creating listings."
+        cta={
+          <Link href="/profile/setup" className="inline-flex items-center justify-center rounded-xl bg-accent px-4 py-2.5 text-sm font-medium text-white shadow-button transition-all duration-200 hover:bg-accent-hover hover:shadow-button-hover focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2">
+            Complete profile
+          </Link>
+        }
+      />
+    );
+  }
+
+  if (gate.kind === "banned") {
+    return (
+      <GateScreen
+        title="Account restricted"
+        description="Your account is restricted from creating listings."
+      />
+    );
   }
 
   if (step === "details") {
@@ -236,7 +223,7 @@ export default function NewListingPage() {
       <PageContainer>
         <div className="mx-auto max-w-2xl space-y-6 md:space-y-8">
           <div>
-            <h1 className="text-2xl font-semibold text-illini-blue md:text-3xl">
+            <h1 className="text-2xl font-semibold text-brand md:text-3xl">
               Create listing
             </h1>
             <p className="mt-1 text-sm text-gray-500">
@@ -250,7 +237,7 @@ export default function NewListingPage() {
             </p>
           )}
 
-          <form className="space-y-6" onSubmit={handleDetailsSubmit}>
+          <form className="space-y-6 rounded-2xl border border-gray-200/60 bg-white p-6 shadow-card md:p-8" onSubmit={handleDetailsSubmit}>
             <FormSection title="Basic Info">
               <div className="space-y-1">
                 <label htmlFor="title" className="block text-sm font-medium text-gray-800">
@@ -262,7 +249,7 @@ export default function NewListingPage() {
                   required
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2 text-sm text-gray-700 placeholder-gray-500 transition-all duration-200 focus:border-accent focus:bg-white focus:shadow-input-focus focus:outline-none"
                 />
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -280,7 +267,7 @@ export default function NewListingPage() {
                     required
                     value={monthlyRent}
                     onChange={(e) => setMonthlyRent(e.target.value)}
-                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
+                    className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2 text-sm text-gray-700 placeholder-gray-500 transition-all duration-200 focus:border-accent focus:bg-white focus:shadow-input-focus focus:outline-none"
                   />
                 </div>
                 <div className="space-y-1">
@@ -297,7 +284,7 @@ export default function NewListingPage() {
                     required
                     value={totalBedrooms}
                     onChange={(e) => setTotalBedrooms(e.target.value)}
-                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
+                    className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2 text-sm text-gray-700 placeholder-gray-500 transition-all duration-200 focus:border-accent focus:bg-white focus:shadow-input-focus focus:outline-none"
                   />
                 </div>
               </div>
@@ -314,7 +301,7 @@ export default function NewListingPage() {
                     required
                     value={leaseType}
                     onChange={(e) => setLeaseType(e.target.value as any)}
-                    className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
+                    className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2 text-sm text-gray-700 transition-all duration-200 focus:border-accent focus:bg-white focus:shadow-input-focus focus:outline-none"
                   >
                     <option value="">Select lease type</option>
                     <option value="SUBLEASE">Sublease</option>
@@ -333,7 +320,7 @@ export default function NewListingPage() {
                     required
                     value={roomType}
                     onChange={(e) => setRoomType(e.target.value as any)}
-                    className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
+                    className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2 text-sm text-gray-700 transition-all duration-200 focus:border-accent focus:bg-white focus:shadow-input-focus focus:outline-none"
                   >
                     <option value="">Select room type</option>
                     <option value="PRIVATE_ROOM">Private room</option>
@@ -358,7 +345,7 @@ export default function NewListingPage() {
                     required
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
+                    className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2 text-sm text-gray-700 transition-all duration-200 focus:border-accent focus:bg-white focus:shadow-input-focus focus:outline-none"
                   />
                 </div>
                 <div className="space-y-1">
@@ -374,7 +361,7 @@ export default function NewListingPage() {
                     required
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
-                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
+                    className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2 text-sm text-gray-700 transition-all duration-200 focus:border-accent focus:bg-white focus:shadow-input-focus focus:outline-none"
                   />
                 </div>
               </div>
@@ -394,7 +381,7 @@ export default function NewListingPage() {
                   required
                   value={exactAddress}
                   onChange={(e) => setExactAddress(e.target.value)}
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2 text-sm text-gray-700 placeholder-gray-500 transition-all duration-200 focus:border-accent focus:bg-white focus:shadow-input-focus focus:outline-none"
                 />
               </div>
               <div className="space-y-1">
@@ -410,7 +397,7 @@ export default function NewListingPage() {
                   required
                   value={nearbyLandmark}
                   onChange={(e) => setNearbyLandmark(e.target.value)}
-                  className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2 text-sm text-gray-700 placeholder-gray-500 transition-all duration-200 focus:border-accent focus:bg-white focus:shadow-input-focus focus:outline-none"
                 />
               </div>
             </FormSection>
@@ -428,7 +415,7 @@ export default function NewListingPage() {
                   required
                   value={genderPreference}
                   onChange={(e) => setGenderPreference(e.target.value as any)}
-                  className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2 text-sm text-gray-700 transition-all duration-200 focus:border-accent focus:bg-white focus:shadow-input-focus focus:outline-none"
                 >
                   <option value="">No preference / any</option>
                   <option value="ANY">Any</option>
@@ -442,7 +429,7 @@ export default function NewListingPage() {
                     type="checkbox"
                     checked={furnished}
                     onChange={(e) => setFurnished(e.target.checked)}
-                    className="h-4 w-4 rounded border-gray-200 text-illini-orange focus:ring-illini-orange"
+                    className="h-4 w-4 rounded border-gray-200 text-accent focus:ring-accent"
                   />
                   Furnished
                 </label>
@@ -451,7 +438,7 @@ export default function NewListingPage() {
                     type="checkbox"
                     checked={utilitiesIncluded}
                     onChange={(e) => setUtilitiesIncluded(e.target.checked)}
-                    className="h-4 w-4 rounded border-gray-200 text-illini-orange focus:ring-illini-orange"
+                    className="h-4 w-4 rounded border-gray-200 text-accent focus:ring-accent"
                   />
                   Utilities included
                 </label>
@@ -471,7 +458,7 @@ export default function NewListingPage() {
                   required
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="min-h-[96px] w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:border-illini-orange"
+                  className="min-h-[96px] w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2 text-sm text-gray-700 placeholder-gray-500 transition-all duration-200 focus:border-accent focus:bg-white focus:shadow-input-focus focus:outline-none"
                 />
               </div>
             </FormSection>
@@ -480,7 +467,7 @@ export default function NewListingPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="inline-flex items-center justify-center rounded-lg bg-illini-orange px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md disabled:opacity-70 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2"
+                className="inline-flex items-center justify-center rounded-xl bg-accent px-4 py-2.5 text-sm font-medium text-white shadow-button transition-all duration-200 hover:bg-accent-hover hover:shadow-button-hover disabled:opacity-70 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2"
               >
                 {submitting ? "Creating listing..." : "Continue to photos"}
               </button>
@@ -491,32 +478,33 @@ export default function NewListingPage() {
     );
   }
 
-  // Photos step
   return (
     <PageContainer>
       <div className="mx-auto max-w-2xl space-y-6 md:space-y-8">
         <div>
-          <h1 className="text-2xl font-semibold text-illini-blue md:text-3xl">Upload photos</h1>
+          <h1 className="text-2xl font-semibold text-brand md:text-3xl">Upload photos</h1>
           <p className="mt-1 text-sm text-gray-500">
             Step 2 of 2: add at least 1 photo (max 8) to your listing.
           </p>
         </div>
 
-        <FormSection title="Photos">
-          {listingId && (
-            <PhotoUploader
-              listingId={listingId}
-              initialPhotos={photos}
-              onChange={setPhotos}
-            />
-          )}
-        </FormSection>
+        <div className="rounded-2xl border border-gray-200/60 bg-white p-6 shadow-card md:p-8">
+          <FormSection title="Photos">
+            {listingId && (
+              <PhotoUploader
+                listingId={listingId}
+                initialPhotos={photos}
+                onChange={setPhotos}
+              />
+            )}
+          </FormSection>
+        </div>
 
         <div className="flex justify-between pt-4">
           <button
             type="button"
             onClick={() => setStep("details")}
-            className="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-gray-300"
+            className="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-gray-300"
           >
             Back
           </button>
@@ -524,7 +512,7 @@ export default function NewListingPage() {
             type="button"
             disabled={!photos || photos.length === 0}
             onClick={() => router.push("/me/listings")}
-            className="inline-flex items-center justify-center rounded-lg bg-illini-orange px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-shadow hover:shadow-md disabled:opacity-70 focus:outline-none focus:ring-2 focus:ring-illini-orange focus:ring-offset-2"
+            className="inline-flex items-center justify-center rounded-xl bg-accent px-4 py-2.5 text-sm font-medium text-white shadow-button transition-all duration-200 hover:bg-accent-hover hover:shadow-button-hover disabled:opacity-70 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2"
           >
             {photos && photos.length > 0 ? "Finish" : "Add at least 1 photo to finish"}
           </button>
@@ -533,4 +521,3 @@ export default function NewListingPage() {
     </PageContainer>
   );
 }
-
