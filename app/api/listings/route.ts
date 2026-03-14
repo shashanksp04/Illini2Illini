@@ -90,24 +90,6 @@ export async function GET(request: Request) {
     const includeTakenParam = params.get("include_taken");
     const includeTaken = includeTakenParam === "true";
 
-    const filters: ListingFilters = {
-      min_rent: minRent as number | undefined,
-      max_rent: maxRent as number | undefined,
-      start_date: startDate as Date | undefined,
-      end_date: endDate as Date | undefined,
-      room_type: (params.get("room_type") ?? undefined) as any,
-      furnished: furnished as boolean | undefined,
-      utilities_included: utilitiesIncluded as boolean | undefined,
-      lease_type: (params.get("lease_type") ?? undefined) as any,
-      total_bedrooms: totalBedrooms as number | undefined,
-      total_bathrooms: totalBathrooms as number | undefined,
-      keyword: params.get("keyword") ?? undefined,
-      sort: sort as any,
-      page: basePage,
-      page_size: effectivePageSize,
-      include_taken: isVerified && viewer?.role === "ADMIN" && includeTaken ? true : undefined,
-    };
-
     let isVerified = false;
     let viewer: VerifiedViewer | null = null;
     try {
@@ -136,6 +118,24 @@ export async function GET(request: Request) {
       }
       isVerified = false;
     }
+
+    const filters: ListingFilters = {
+      min_rent: minRent as number | undefined,
+      max_rent: maxRent as number | undefined,
+      start_date: startDate as Date | undefined,
+      end_date: endDate as Date | undefined,
+      room_type: (params.get("room_type") ?? undefined) as any,
+      furnished: furnished as boolean | undefined,
+      utilities_included: utilitiesIncluded as boolean | undefined,
+      lease_type: (params.get("lease_type") ?? undefined) as any,
+      total_bedrooms: totalBedrooms as number | undefined,
+      total_bathrooms: totalBathrooms as number | undefined,
+      keyword: params.get("keyword") ?? undefined,
+      sort: sort as any,
+      page: basePage,
+      page_size: effectivePageSize,
+      include_taken: isVerified && viewer?.role === "ADMIN" && includeTaken ? true : undefined,
+    };
 
     const listings = isVerified && viewer
       ? await getVerifiedListings(filters, viewer)
