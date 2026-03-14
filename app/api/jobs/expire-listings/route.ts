@@ -4,10 +4,15 @@ import { expireListingsJob } from "@/lib/listings/helpers";
 
 export async function POST(request: Request) {
   try {
-    const secret = request.headers.get("X-CRON-SECRET");
+    const authHeader = request.headers.get("authorization");
+    const xCronSecret = request.headers.get("X-CRON-SECRET");
     const expected = process.env.CRON_SECRET;
 
-    if (!expected || secret !== expected) {
+    const isValid =
+      expected &&
+      (authHeader === `Bearer ${expected}` || xCronSecret === expected);
+
+    if (!isValid) {
       return NextResponse.json(
         { ok: false, error: { code: "FORBIDDEN", message: "Invalid cron secret." } },
         { status: 403 }
