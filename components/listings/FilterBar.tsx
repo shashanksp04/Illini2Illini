@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState, useId } from "react";
 
 export type FilterBarValues = {
@@ -9,28 +10,54 @@ export type FilterBarValues = {
   start_date: string;
   end_date: string;
   room_type: string;
+  total_bedrooms: string;
+  total_bathrooms: string;
   furnished: string;
   utilities_included: string;
   lease_type: string;
   sort: string;
   keyword: string;
+  include_taken: string;
 };
 
 const defaultValues: FilterBarValues = {
   min_rent: "", max_rent: "", start_date: "", end_date: "",
-  room_type: "", furnished: "", utilities_included: "",
-  lease_type: "", sort: "newest", keyword: "",
+  room_type: "", total_bedrooms: "", total_bathrooms: "",
+  furnished: "", utilities_included: "",
+  lease_type: "", sort: "newest", keyword: "", include_taken: "",
 };
 
-type FilterBarProps = { values?: Partial<FilterBarValues> };
+type FilterBarProps = { values?: Partial<FilterBarValues>; isAdmin?: boolean };
 
 const inputCls =
   "w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2 text-sm text-gray-700 placeholder-gray-400 transition-all focus:border-accent focus:bg-white focus:outline-none focus:shadow-input-focus";
 
-export function FilterBar({ values = {} }: FilterBarProps) {
+export function FilterBar({ values = {}, isAdmin = false }: FilterBarProps) {
+  const router = useRouter();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [resetCount, setResetCount] = useState(0);
   const merged = { ...defaultValues, ...values };
   const formId = useId();
+  const formKey = `${JSON.stringify(merged)}-${resetCount}`;
+
+  function handleClear() {
+    setResetCount((c) => c + 1);
+    setDrawerOpen(false);
+    router.push("/listings");
+  }
+
+  const includeTakenInput = isAdmin ? (
+    <label className="flex items-center gap-2 whitespace-nowrap">
+      <input
+        type="checkbox"
+        name="include_taken"
+        value="true"
+        defaultChecked={merged.include_taken === "true"}
+        className="h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent/30"
+      />
+      <span className="text-sm text-gray-700">Include taken</span>
+    </label>
+  ) : null;
 
   const formContent = (
     <>
@@ -60,11 +87,27 @@ export function FilterBar({ values = {} }: FilterBarProps) {
           <option value="SUBLEASE">Sublease</option>
           <option value="LEASE_TAKEOVER">Lease takeover</option>
         </select>
+        <select name="total_bedrooms" defaultValue={merged.total_bedrooms} className={`${inputCls} sm:w-28`} aria-label="Bedrooms">
+          <option value="">Beds</option>
+          <option value="1">1 Bed</option>
+          <option value="2">2 Beds</option>
+          <option value="3">3 Beds</option>
+          <option value="4">4 Beds</option>
+          <option value="5">5+ Beds</option>
+        </select>
+        <select name="total_bathrooms" defaultValue={merged.total_bathrooms} className={`${inputCls} sm:w-28`} aria-label="Bathrooms">
+          <option value="">Baths</option>
+          <option value="1">1 Bath</option>
+          <option value="2">2 Baths</option>
+          <option value="3">3 Baths</option>
+          <option value="4">4+ Baths</option>
+        </select>
         <select name="sort" defaultValue={merged.sort} className={`${inputCls} sm:w-32`} aria-label="Sort">
           <option value="newest">Newest</option>
           <option value="price_asc">Price (low)</option>
         </select>
         <input type="search" name="keyword" placeholder="Keyword" defaultValue={merged.keyword} className={`${inputCls} sm:min-w-[120px] sm:flex-1`} aria-label="Keyword search" />
+        {includeTakenInput}
       </div>
       <div className="mt-3 flex flex-wrap gap-2">
         <button
@@ -73,19 +116,20 @@ export function FilterBar({ values = {} }: FilterBarProps) {
         >
           Apply
         </button>
-        <Link
-          href="/listings"
+        <button
+          type="button"
+          onClick={handleClear}
           className="rounded-xl border border-gray-200 bg-white px-5 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200"
         >
           Clear
-        </Link>
+        </button>
       </div>
     </>
   );
 
   return (
     <>
-      <form id={formId} method="GET" action="/listings" className="rounded-2xl border border-gray-200/60 bg-white p-5 shadow-card">
+      <form key={formKey} id={formId} method="GET" action="/listings" className="rounded-2xl border border-gray-200/60 bg-white p-5 shadow-card">
         <div className="hidden md:block">{formContent}</div>
         <div className="flex flex-wrap items-center gap-2 md:hidden">
           <button
@@ -97,9 +141,13 @@ export function FilterBar({ values = {} }: FilterBarProps) {
           >
             Filters
           </button>
-          <Link href="/listings" className="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50">
+          <button
+            type="button"
+            onClick={handleClear}
+            className="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
+          >
             Clear
-          </Link>
+          </button>
         </div>
       </form>
 
@@ -123,7 +171,7 @@ export function FilterBar({ values = {} }: FilterBarProps) {
                 ✕
               </button>
             </div>
-            <form method="GET" action="/listings" onSubmit={() => setDrawerOpen(false)}>
+            <form key={formKey} method="GET" action="/listings" onSubmit={() => setDrawerOpen(false)}>
               <input type="hidden" name="page" value="1" />
               <div className="space-y-4">
                 <FilterGroup label="Rent range">
@@ -150,20 +198,44 @@ export function FilterBar({ values = {} }: FilterBarProps) {
                 <FilterGroup label="Lease type">
                   <select name="lease_type" defaultValue={merged.lease_type} className={inputCls}><option value="">Any</option><option value="SUBLEASE">Sublease</option><option value="LEASE_TAKEOVER">Lease takeover</option></select>
                 </FilterGroup>
+                <FilterGroup label="Bedrooms">
+                  <select name="total_bedrooms" defaultValue={merged.total_bedrooms} className={inputCls}><option value="">Any</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5+</option></select>
+                </FilterGroup>
+                <FilterGroup label="Bathrooms">
+                  <select name="total_bathrooms" defaultValue={merged.total_bathrooms} className={inputCls}><option value="">Any</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4+</option></select>
+                </FilterGroup>
                 <FilterGroup label="Sort">
                   <select name="sort" defaultValue={merged.sort} className={inputCls}><option value="newest">Newest</option><option value="price_asc">Price (low)</option></select>
                 </FilterGroup>
                 <FilterGroup label="Keyword">
                   <input type="search" name="keyword" defaultValue={merged.keyword} placeholder="Search…" className={inputCls} />
                 </FilterGroup>
+                {isAdmin && (
+                  <FilterGroup label="Admin">
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        name="include_taken"
+                        value="true"
+                        defaultChecked={merged.include_taken === "true"}
+                        className="h-4 w-4 rounded border-gray-300 text-accent focus:ring-accent/30"
+                      />
+                      <span className="text-sm text-gray-700">Include taken listings</span>
+                    </label>
+                  </FilterGroup>
+                )}
               </div>
               <div className="mt-5 flex gap-2">
                 <button type="submit" className="flex-1 rounded-xl bg-accent py-3 text-sm font-semibold text-white shadow-button transition-all hover:bg-accent-hover hover:shadow-button-hover focus:outline-none focus:ring-2 focus:ring-accent/30 focus:ring-offset-2">
                   Apply
                 </button>
-                <Link href="/listings" className="flex items-center rounded-xl border border-gray-200 bg-white px-5 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50" onClick={() => setDrawerOpen(false)}>
+                <button
+                  type="button"
+                  onClick={handleClear}
+                  className="flex items-center rounded-xl border border-gray-200 bg-white px-5 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50"
+                >
                   Clear
-                </Link>
+                </button>
               </div>
             </form>
           </div>

@@ -51,6 +51,7 @@ export interface CreateListingPayload {
   exact_address: string;
   nearby_landmark: string;
   total_bedrooms: number;
+  total_bathrooms: number;
   room_type: RoomType;
   furnished: boolean;
   utilities_included: boolean;
@@ -70,6 +71,7 @@ function validateCreatePayload(payload: CreateListingPayload): void {
     payload.exact_address == null ||
     payload.nearby_landmark == null ||
     payload.total_bedrooms == null ||
+    payload.total_bathrooms == null ||
     payload.room_type == null ||
     payload.furnished == null ||
     payload.utilities_included == null ||
@@ -124,6 +126,13 @@ function validateCreatePayload(payload: CreateListingPayload): void {
       message: "total_bedrooms must be a positive integer.",
     });
   }
+  if (!Number.isInteger(payload.total_bathrooms) || payload.total_bathrooms < 1) {
+    throw new ListingError({
+      status: 400,
+      code: "VALIDATION_ERROR",
+      message: "total_bathrooms must be a positive integer.",
+    });
+  }
 }
 
 function validateUpdatePayload(payload: UpdateListingPayload): void {
@@ -169,6 +178,13 @@ function validateUpdatePayload(payload: UpdateListingPayload): void {
       message: "total_bedrooms must be a positive integer.",
     });
   }
+  if (payload.total_bathrooms != null && (!Number.isInteger(payload.total_bathrooms) || payload.total_bathrooms < 1)) {
+    throw new ListingError({
+      status: 400,
+      code: "VALIDATION_ERROR",
+      message: "total_bathrooms must be a positive integer.",
+    });
+  }
 }
 
 export type ListingSort = "newest" | "price_asc";
@@ -182,10 +198,14 @@ export interface ListingFilters {
   furnished?: boolean;
   utilities_included?: boolean;
   lease_type?: LeaseType;
+  total_bedrooms?: number;
+  total_bathrooms?: number;
   keyword?: string;
   sort?: ListingSort;
   page?: number;
   page_size?: number;
+  /** When true (admin only), include TAKEN listings. */
+  include_taken?: boolean;
 }
 
 export type PublicListing = {
@@ -197,9 +217,12 @@ export type PublicListing = {
   nearby_landmark: string;
   lease_type: LeaseType;
   room_type: RoomType;
+  total_bedrooms: number;
+  total_bathrooms: number;
   furnished: boolean;
   utilities_included: boolean;
   owner_username: string;
+  thumbnail_url: string | null;
 };
 
 export type PublicListingDetail = PublicListing;
@@ -214,6 +237,7 @@ export type VerifiedListing = {
   exact_address: string;
   nearby_landmark: string;
   total_bedrooms: number;
+  total_bathrooms: number;
   room_type: RoomType;
   furnished: boolean;
   utilities_included: boolean;
@@ -239,7 +263,9 @@ export type VerifiedViewer = Pick<User, "id" | "role" | "is_banned">;
 
 function buildWhereClause(filters: ListingFilters) {
   const where: Record<string, unknown> = {
-    status: "ACTIVE" as ListingStatus,
+    status: filters.include_taken
+      ? { in: ["ACTIVE", "TAKEN"] as ListingStatus[] }
+      : ("ACTIVE" as ListingStatus),
   };
 
   if (typeof filters.min_rent === "number") {
@@ -283,6 +309,18 @@ function buildWhereClause(filters: ListingFilters) {
     where.lease_type = filters.lease_type;
   }
 
+  if (typeof filters.total_bedrooms === "number") {
+    where.total_bedrooms = filters.total_bedrooms >= 5
+      ? { gte: filters.total_bedrooms }
+      : filters.total_bedrooms;
+  }
+
+  if (typeof filters.total_bathrooms === "number") {
+    where.total_bathrooms = filters.total_bathrooms >= 4
+      ? { gte: filters.total_bathrooms }
+      : filters.total_bathrooms;
+  }
+
   if (filters.keyword && filters.keyword.trim().length > 0) {
     const keyword = filters.keyword.trim();
     where.OR = [
@@ -323,7 +361,8 @@ function buildPagination(filters: ListingFilters) {
   };
 }
 
-function mapPublicListing(row: ListingModel & { owner: User }): PublicListing {
+function mapPublicListing(row: ListingModel & { owner: User; photos?: ListingPhotoModel[] }): PublicListing {
+  const sorted = row.photos?.slice().sort((a, b) => a.display_order - b.display_order);
   return {
     id: row.id,
     title: row.title,
@@ -333,9 +372,12 @@ function mapPublicListing(row: ListingModel & { owner: User }): PublicListing {
     nearby_landmark: row.nearby_landmark,
     lease_type: row.lease_type,
     room_type: row.room_type,
+    total_bedrooms: row.total_bedrooms,
+    total_bathrooms: row.total_bathrooms,
     furnished: row.furnished,
     utilities_included: row.utilities_included,
     owner_username: row.owner.username,
+    thumbnail_url: sorted?.[0]?.image_url ?? null,
   };
 }
 
@@ -352,6 +394,7 @@ function mapVerifiedListing(
     exact_address: row.exact_address,
     nearby_landmark: row.nearby_landmark,
     total_bedrooms: row.total_bedrooms,
+    total_bathrooms: row.total_bathrooms,
     room_type: row.room_type,
     furnished: row.furnished,
     utilities_included: row.utilities_included,
@@ -386,6 +429,7 @@ export async function getPublicListings(filters: ListingFilters): Promise<Public
     ...pagination,
     include: {
       owner: true,
+      photos: true,
     },
   });
 
@@ -421,6 +465,7 @@ export async function getListingPublic(id: string): Promise<PublicListingDetail 
     },
     include: {
       owner: true,
+      photos: true,
     },
   });
 
@@ -486,6 +531,7 @@ export async function createListing(
       exact_address: payload.exact_address,
       nearby_landmark: payload.nearby_landmark,
       total_bedrooms: payload.total_bedrooms,
+      total_bathrooms: payload.total_bathrooms,
       room_type: payload.room_type,
       furnished: payload.furnished,
       utilities_included: payload.utilities_included,
@@ -533,6 +579,7 @@ export async function updateListing(
       ...(payload.exact_address !== undefined && { exact_address: payload.exact_address }),
       ...(payload.nearby_landmark !== undefined && { nearby_landmark: payload.nearby_landmark }),
       ...(payload.total_bedrooms !== undefined && { total_bedrooms: payload.total_bedrooms }),
+      ...(payload.total_bathrooms !== undefined && { total_bathrooms: payload.total_bathrooms }),
       ...(payload.room_type !== undefined && { room_type: payload.room_type }),
       ...(payload.furnished !== undefined && { furnished: payload.furnished }),
       ...(payload.utilities_included !== undefined && { utilities_included: payload.utilities_included }),

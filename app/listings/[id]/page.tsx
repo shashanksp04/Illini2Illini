@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
 
 import { getApiBaseUrl } from "@/lib/api-base-url";
 import { PageContainer } from "@/components/layout/PageContainer";
@@ -15,9 +16,12 @@ type PublicListingDetail = {
   nearby_landmark: string;
   lease_type: string;
   room_type: string;
+  total_bedrooms?: number;
+  total_bathrooms?: number;
   furnished: boolean;
   utilities_included: boolean;
   owner_username: string;
+  thumbnail_url?: string | null;
 };
 
 type VerifiedPhoto = { image_url: string; display_order: number };
@@ -25,7 +29,6 @@ type VerifiedPhoto = { image_url: string; display_order: number };
 type VerifiedListingDetail = PublicListingDetail & {
   exact_address: string;
   description: string;
-  total_bedrooms?: number;
   gender_preference?: string;
   photos: VerifiedPhoto[];
   owner_first_name: string | null;
@@ -58,7 +61,9 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
   let requiresLogin = false;
 
   try {
-    const res = await fetch(`${base}/api/listings/${id}`, { cache: "no-store" });
+    const cookieStore = await cookies();
+    const cookieHeader = cookieStore.getAll().map(c => `${c.name}=${c.value}`).join('; ');
+    const res = await fetch(`${base}/api/listings/${id}`, { cache: "no-store", headers: { Cookie: cookieHeader } });
     const json = (await res.json()) as {
       ok?: boolean;
       data?: { listing?: PublicListingDetail | VerifiedListingDetail; requires_login_for_details?: boolean };
@@ -112,6 +117,11 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
             </div>
 
             <div className="mt-4 flex flex-wrap gap-1.5">
+              {(l.total_bedrooms != null || l.total_bathrooms != null) && (
+                <span className="rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-600 ring-1 ring-indigo-100">
+                  {l.total_bedrooms ?? "?"}B / {l.total_bathrooms ?? "?"}Ba
+                </span>
+              )}
               <Badge>{roomTypeLabel(l.room_type)}</Badge>
               {l.furnished && <Badge>Furnished</Badge>}
               {l.utilities_included && <Badge>Utilities included</Badge>}
@@ -128,6 +138,13 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
             </div>
           )}
 
+          {!isVerifiedView && publicListing?.thumbnail_url && (
+            <div className="overflow-hidden rounded-2xl border border-gray-200/60 bg-white shadow-card">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={publicListing.thumbnail_url} alt="" className="w-full object-cover" />
+            </div>
+          )}
+
           {/* Unit details */}
           {isVerifiedView && verifiedListing && (
             <div className="rounded-2xl border border-gray-200/60 bg-white p-6 shadow-card sm:p-8">
@@ -135,6 +152,9 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
               <dl className="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3">
                 {typeof verifiedListing.total_bedrooms === "number" && (
                   <DetailItem label="Bedrooms" value={String(verifiedListing.total_bedrooms)} />
+                )}
+                {typeof verifiedListing.total_bathrooms === "number" && (
+                  <DetailItem label="Bathrooms" value={String(verifiedListing.total_bathrooms)} />
                 )}
                 <DetailItem label="Room type" value={roomTypeLabel(verifiedListing.room_type)} />
                 <DetailItem label="Furnished" value={verifiedListing.furnished ? "Yes" : "No"} />
@@ -187,7 +207,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
                       <p className="mt-1 text-sm text-gray-500">Log in with your @illinois.edu account to view photos, description, exact address, and contact the seller.</p>
                     </div>
                   </div>
-                  <Link href="/login" className="mt-5 inline-flex items-center justify-center rounded-xl bg-accent px-6 py-3 text-sm font-semibold text-white shadow-button transition-all hover:bg-accent-hover hover:shadow-button-hover focus:outline-none focus:ring-2 focus:ring-accent/30 focus:ring-offset-2">
+                  <Link href={`/login?redirect=/listings/${id}`} className="mt-5 inline-flex items-center justify-center rounded-xl bg-accent px-6 py-3 text-sm font-semibold text-white shadow-button transition-all hover:bg-accent-hover hover:shadow-button-hover focus:outline-none focus:ring-2 focus:ring-accent/30 focus:ring-offset-2">
                     Log in
                   </Link>
                 </div>
@@ -213,7 +233,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
             <div className="rounded-2xl border border-gray-200/60 bg-white p-6 shadow-card">
               <p className="text-sm font-semibold text-gray-900">Want to see more?</p>
               <p className="mt-1.5 text-sm text-gray-500">Sign in with your @illinois.edu account to view photos, description, and contact the seller.</p>
-              <Link href="/login" className="mt-5 inline-flex w-full items-center justify-center rounded-xl bg-accent px-4 py-3 text-sm font-semibold text-white shadow-button transition-all hover:bg-accent-hover hover:shadow-button-hover focus:outline-none focus:ring-2 focus:ring-accent/30 focus:ring-offset-2">
+              <Link href={`/login?redirect=/listings/${id}`} className="mt-5 inline-flex w-full items-center justify-center rounded-xl bg-accent px-4 py-3 text-sm font-semibold text-white shadow-button transition-all hover:bg-accent-hover hover:shadow-button-hover focus:outline-none focus:ring-2 focus:ring-accent/30 focus:ring-offset-2">
                 Log in
               </Link>
             </div>

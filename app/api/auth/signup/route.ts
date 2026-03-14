@@ -8,6 +8,9 @@ function isAllowedEmail(email: string): boolean {
 }
 
 export async function POST(request: Request) {
+  // #region agent log
+  fetch('http://127.0.0.1:7739/ingest/abe32b33-c7b2-4ec4-af97-867fdda097b1',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'d1509e'},body:JSON.stringify({sessionId:'d1509e',location:'api/auth/signup/route.ts:POST-entry',message:'Signup POST called',data:{},timestamp:Date.now(),hypothesisId:'A'})}).catch(()=>{});
+  // #endregion
   let body: { email?: string; password?: string };
   try {
     body = await request.json();
@@ -41,13 +44,28 @@ export async function POST(request: Request) {
     );
   }
 
-  const supabase = await createClient();
+  let supabase;
+  try {
+    supabase = await createClient();
+  } catch (clientErr: any) {
+    // #region agent log
+    fetch('http://127.0.0.1:7739/ingest/abe32b33-c7b2-4ec4-af97-867fdda097b1',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'d1509e'},body:JSON.stringify({sessionId:'d1509e',location:'api/auth/signup/route.ts:createClient-catch',message:'createClient threw',data:{err:String(clientErr),stack:clientErr?.stack?.slice(0,500)},timestamp:Date.now(),hypothesisId:'B'})}).catch(()=>{});
+    // #endregion
+    throw clientErr;
+  }
   const origin = new URL(request.url).origin;
+  // #region agent log
+  fetch('http://127.0.0.1:7739/ingest/abe32b33-c7b2-4ec4-af97-867fdda097b1',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'d1509e'},body:JSON.stringify({sessionId:'d1509e',location:'api/auth/signup/route.ts:pre-signUp',message:'About to call signUp',data:{email,origin},timestamp:Date.now(),hypothesisId:'A'})}).catch(()=>{});
+  // #endregion
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { emailRedirectTo: origin },
+    options: { emailRedirectTo: `${origin}/auth/callback` },
   });
+
+  // #region agent log
+  fetch('http://127.0.0.1:7739/ingest/abe32b33-c7b2-4ec4-af97-867fdda097b1',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'d1509e'},body:JSON.stringify({sessionId:'d1509e',location:'api/auth/signup/route.ts:post-signUp',message:'signUp result',data:{hasError:!!error,errorMessage:error?.message,errorStatus:error?.status,errorName:error?.name,hasData:!!data,userId:data?.user?.id,identities:data?.user?.identities?.length},timestamp:Date.now(),hypothesisId:'A,D'})}).catch(()=>{});
+  // #endregion
 
   if (error) {
     const msg = error.message?.toLowerCase() ?? "";
@@ -74,6 +92,9 @@ export async function POST(request: Request) {
         { status: 409 }
       );
     }
+    // #region agent log
+    fetch('http://127.0.0.1:7739/ingest/abe32b33-c7b2-4ec4-af97-867fdda097b1',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'d1509e'},body:JSON.stringify({sessionId:'d1509e',location:'api/auth/signup/route.ts:500-fallthrough',message:'Unmatched error falling to 500',data:{msg,errorMessage:error.message,errorStatus:error.status,errorName:error.name},timestamp:Date.now(),hypothesisId:'A,D'})}).catch(()=>{});
+    // #endregion
     return NextResponse.json(
       {
         ok: false,

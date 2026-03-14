@@ -52,7 +52,7 @@ export async function GET(request: Request) {
       !!domainUser.username &&
       !!domainUser.profile_picture_url;
 
-    return NextResponse.json(
+    const res = NextResponse.json(
       {
         ok: true,
         data: {
@@ -69,6 +69,18 @@ export async function GET(request: Request) {
       },
       { status: 200 }
     );
+
+    if (is_profile_complete) {
+      res.cookies.set("profile_complete", "1", {
+        path: "/",
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 60 * 60 * 24 * 365,
+      });
+    }
+
+    return res;
   } catch (err) {
     if (err instanceof AuthError && err.status === 401) {
       return NextResponse.json(

@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useRef, useEffect, useState } from "react";
 
 export type NavUser = { username: string; profile_picture_url: string | null; role: string };
 
-export function NavbarAuth({ user }: { user: NavUser | null }) {
+export function NavbarAuth({ user, needsProfile }: { user: NavUser | null; needsProfile?: boolean }) {
   const router = useRouter();
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -26,11 +27,23 @@ export function NavbarAuth({ user }: { user: NavUser | null }) {
     router.refresh();
   }
 
+  if (needsProfile)
+    return (
+      <div className="flex shrink-0 items-center gap-2">
+        <Link
+          href="/profile/setup"
+          className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white shadow-button transition-all hover:bg-accent-hover hover:shadow-button-hover"
+        >
+          Complete&nbsp;Profile
+        </Link>
+      </div>
+    );
+
   if (!user)
     return (
       <div className="flex shrink-0 items-center gap-2">
         <Link
-          href="/login"
+          href={pathname && pathname !== "/" ? `/login?redirect=${encodeURIComponent(pathname)}` : "/login"}
           className="rounded-lg px-3.5 py-2 text-sm font-medium text-white/70 transition-all hover:bg-white/10 hover:text-white"
         >
           Log&nbsp;in

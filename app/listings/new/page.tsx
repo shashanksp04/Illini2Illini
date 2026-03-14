@@ -62,6 +62,7 @@ export default function NewListingPage() {
   const [exactAddress, setExactAddress] = useState("");
   const [nearbyLandmark, setNearbyLandmark] = useState("");
   const [totalBedrooms, setTotalBedrooms] = useState("");
+  const [totalBathrooms, setTotalBathrooms] = useState("");
   const [roomType, setRoomType] = useState<"PRIVATE_ROOM" | "ENTIRE_UNIT" | "">("");
   const [furnished, setFurnished] = useState(false);
   const [utilitiesIncluded, setUtilitiesIncluded] = useState(false);
@@ -122,6 +123,7 @@ export default function NewListingPage() {
           exact_address: exactAddress,
           nearby_landmark: nearbyLandmark,
           total_bedrooms: Number(totalBedrooms),
+          total_bathrooms: Number(totalBathrooms),
           room_type: roomType,
           furnished,
           utilities_included: utilitiesIncluded,
@@ -252,7 +254,7 @@ export default function NewListingPage() {
                   className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2 text-sm text-gray-700 placeholder-gray-500 transition-all duration-200 focus:border-accent focus:bg-white focus:shadow-input-focus focus:outline-none"
                 />
               </div>
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-4 sm:grid-cols-3">
                 <div className="space-y-1">
                   <label
                     htmlFor="monthly_rent"
@@ -275,17 +277,45 @@ export default function NewListingPage() {
                     htmlFor="total_bedrooms"
                     className="block text-sm font-medium text-gray-800"
                   >
-                    Total bedrooms
+                    Bedrooms
                   </label>
-                  <input
+                  <select
                     id="total_bedrooms"
-                    type="number"
-                    min={1}
                     required
                     value={totalBedrooms}
                     onChange={(e) => setTotalBedrooms(e.target.value)}
-                    className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2 text-sm text-gray-700 placeholder-gray-500 transition-all duration-200 focus:border-accent focus:bg-white focus:shadow-input-focus focus:outline-none"
-                  />
+                    className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2 text-sm text-gray-700 transition-all duration-200 focus:border-accent focus:bg-white focus:shadow-input-focus focus:outline-none"
+                  >
+                    <option value="">Select</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                  </select>
+                </div>
+                <div className="space-y-1">
+                  <label
+                    htmlFor="total_bathrooms"
+                    className="block text-sm font-medium text-gray-800"
+                  >
+                    Bathrooms
+                  </label>
+                  <select
+                    id="total_bathrooms"
+                    required
+                    value={totalBathrooms}
+                    onChange={(e) => setTotalBathrooms(e.target.value)}
+                    className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2 text-sm text-gray-700 transition-all duration-200 focus:border-accent focus:bg-white focus:shadow-input-focus focus:outline-none"
+                  >
+                    <option value="">Select</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                  </select>
                 </div>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -456,6 +486,7 @@ export default function NewListingPage() {
                 <textarea
                   id="description"
                   required
+                  placeholder="Describe the space, amenities, move-in details, etc. Include which utilities are covered (e.g. water, electric, internet)."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   className="min-h-[96px] w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2 text-sm text-gray-700 placeholder-gray-500 transition-all duration-200 focus:border-accent focus:bg-white focus:shadow-input-focus focus:outline-none"

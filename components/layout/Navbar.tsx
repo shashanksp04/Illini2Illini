@@ -6,17 +6,19 @@ import { SearchBar } from "@/components/ui/SearchBar";
 import type { NavUser } from "./NavbarAuth";
 import { NavbarAuth } from "./NavbarAuth";
 
-type NavbarProps = { user: NavUser | null };
+type NavbarProps = { user: NavUser | null; needsProfile?: boolean };
 
-export function Navbar({ user }: NavbarProps) {
+export function Navbar({ user, needsProfile }: NavbarProps) {
   const pathname = usePathname();
   const showSearch = pathname === "/" || pathname === "/listings";
 
   return (
     <header className="sticky top-0 z-40 border-b border-white/10 bg-brand/95 text-white backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-5 px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="shrink-0 text-lg font-bold tracking-tight text-white transition-opacity hover:opacity-80">
-          Illini2Illini
+        <Link href="/" className="shrink-0 text-lg font-bold tracking-tight transition-opacity hover:opacity-80">
+          <span className="text-white">Illini</span>
+          <span className="text-accent">2</span>
+          <span className="text-white">Illini</span>
         </Link>
 
         <Link
@@ -38,7 +40,7 @@ export function Navbar({ user }: NavbarProps) {
           )}
         </div>
 
-        <NavbarAuth user={user} />
+        <NavbarAuth user={user} needsProfile={needsProfile} />
       </div>
     </header>
   );

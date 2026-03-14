@@ -77,6 +77,7 @@ model Listing {
   exact_address      String
   nearby_landmark    String           @db.VarChar(80)
   total_bedrooms     Int
+  total_bathrooms    Int              @default(1)
   room_type          RoomType
   furnished          Boolean
   utilities_included Boolean

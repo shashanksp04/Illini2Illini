@@ -29,6 +29,9 @@ export async function GET(_request: Request, context: RouteContext) {
 
     try {
       const { authUserId } = await requireVerified();
+      // #region agent log
+      fetch('http://127.0.0.1:7739/ingest/abe32b33-c7b2-4ec4-af97-867fdda097b1',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'d1509e'},body:JSON.stringify({sessionId:'d1509e',location:'api/listings/[id]/route.ts:verified',message:'User is verified',data:{authUserId},timestamp:Date.now(),hypothesisId:'cookie-forwarding'})}).catch(()=>{});
+      // #endregion
       const domainUser = await prisma.user.findUnique({
         where: { auth_user_id: authUserId },
         select: { id: true, role: true, is_banned: true },
@@ -42,6 +45,9 @@ export async function GET(_request: Request, context: RouteContext) {
       }
       isVerified = true;
     } catch (err) {
+      // #region agent log
+      fetch('http://127.0.0.1:7739/ingest/abe32b33-c7b2-4ec4-af97-867fdda097b1',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'d1509e'},body:JSON.stringify({sessionId:'d1509e',location:'api/listings/[id]/route.ts:auth-failed',message:'Auth check failed',data:{isAuthError:err instanceof AuthError,errMsg:err instanceof Error ? err.message : String(err)},timestamp:Date.now(),hypothesisId:'cookie-forwarding'})}).catch(()=>{});
+      // #endregion
       if (!(err instanceof AuthError)) {
         return NextResponse.json(
           {

@@ -1,6 +1,6 @@
-Below is your **updated `PROJECT_CONTEXT.md`**, preserving the exact structure and wording from  wherever unchanged, and only updating the sections that are now outdated given that `UI_SPEC.md` is finalized .
+Below is your **updated `PROJECT_CONTEXT.md`**, preserving the exact structure and wording from wherever unchanged, and only updating the sections that are now outdated.
 
-No sections were rewritten unnecessarily. Only the **Project Stage**, **UI role clarity**, and related references were updated.
+No sections were rewritten unnecessarily. This version reflects that **MVP is complete** and all implementation has been shipped.
 
 ---
 
@@ -70,7 +70,7 @@ The MVP scope is finalized and locked in this file.
 
 No features outside this scope should be added without explicit instruction.
 
-Reference: 
+Reference: `docs/PRODUCT_SPEC.md`
 
 ---
 
@@ -88,7 +88,7 @@ Contains:
 * system architecture
 * integration details
 
-Reference: 
+Reference: `docs/BUILD_SPEC.md`
 
 Used primarily for implementation.
 
@@ -120,7 +120,7 @@ It must:
 * Not alter business rules
 * Not redefine backend behavior
 
-Reference: 
+Reference: `docs/UI_SPEC.md`
 
 ---
 
@@ -138,7 +138,7 @@ Contains:
 
 Tasks must be clear and executable.
 
-Reference: 
+Reference: `docs/TASKS.md`
 
 ---
 
@@ -159,7 +159,7 @@ Prevents loss of decision context.
 
 ChatGPT must refer to this file to maintain consistency with prior decisions.
 
-Reference: 
+Reference: `docs/DECISIONS.md`
 
 ---
 
@@ -183,7 +183,7 @@ ChatGPT must use this file to:
 * avoid adding unnecessary features
 * enforce launch discipline
 
-Reference: 
+Reference: `docs/MVP_DEFINITION.md`
 
 ---
 
@@ -259,31 +259,33 @@ Expansion beyond UIUC is NOT part of MVP planning.
 
 Stage:
 
-MVP Scope Finalized
-Build Specification Finalized
-Decision Log Finalized
-Tasks Defined
-UI / Visual Design Finalized
-Implementation Phase (Coding Begins)
+MVP Complete (Shipped)
 
-The following are complete and locked:
+The following are complete:
 
-* product_spec.md 
-* build_spec.md 
-* decisions.md 
-* tasks.md 
-* mvp_definition.md 
-* ui_spec.md 
+* product_spec.md — finalized and locked
+* build_spec.md — finalized and locked
+* decisions.md — finalized and locked
+* tasks.md — implementation executed
+* mvp_definition.md — finalized and locked
+* ui_spec.md — finalized and locked
+* Implementation — all MVP features built and deployed
+
+What has been built:
+
+* Authentication: @illinois.edu signup, email verification, login, logout, profile completion
+* Listings: create, edit, soft delete, mark as taken, browse, filter, search, visibility rules
+* Contact flow: email reveal for verified users, safety disclaimer
+* Admin: user management, listing moderation, reports
+* Full UI per UI_SPEC.md: listings pages, profile, admin panels, auth flows
 
 The immediate focus is:
 
-* Executing implementation according to BUILD_SPEC.md
-* Following TASKS.md sequentially
-* Strictly adhering to UI_SPEC.md visual system
-* Maintaining alignment across Product → Build → UI layers
-* Shipping MVP without scope expansion
+* Post-launch maintenance and bug fixes
+* User feedback and iteration within MVP scope
+* Post-MVP features only when explicitly instructed
 
-ChatGPT must prioritize execution discipline and implementation correctness.
+ChatGPT must maintain consistency with the shipped product and flag any Post-MVP suggestions accordingly.
 
 ---
 
@@ -293,7 +295,7 @@ ChatGPT must prioritize execution discipline and implementation correctness.
 
 Primary objective:
 
-Ship a working MVP.
+Ship a working MVP. (Achieved.)
 
 Do NOT:
 
@@ -309,7 +311,7 @@ Unless explicitly instructed.
 
 MVP boundary is defined in:
 
-
+`docs/MVP_DEFINITION.md`
 
 ---
 
@@ -355,7 +357,7 @@ Not:
 
 Tech decisions live in:
 
-
+`docs/BUILD_SPEC.md`, `docs/DECISIONS.md`
 
 Once stack is selected, avoid suggesting changes without strong justification.
 
@@ -365,7 +367,7 @@ UI decisions must not contradict architectural decisions.
 
 UI implementation must strictly follow:
 
-
+`docs/UI_SPEC.md`
 
 ---
 
@@ -373,7 +375,7 @@ UI implementation must strictly follow:
 
 The UIUC Short-Term Housing Resources document:
 
-
+`resources/UIUC Short-Term Housing Resources.pdf`
 
 Purpose:
 
@@ -403,7 +405,7 @@ ChatGPT must act as:
 * Product strategist
 * Technical architect
 * Startup advisor
-* Execution enforcer (implementation phase)
+* Post-MVP advisor (implementation complete)
 
 ChatGPT must:
 

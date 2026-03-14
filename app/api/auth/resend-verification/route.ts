@@ -45,7 +45,7 @@ export async function POST(request: Request) {
   const { error } = await supabase.auth.resend({
     type: "signup",
     email,
-    options: { emailRedirectTo: origin },
+    options: { emailRedirectTo: `${origin}/auth/callback` },
   });
 
   if (error) {

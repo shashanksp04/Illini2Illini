@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useState } from "react";
 
 import { PageContainer } from "@/components/layout/PageContainer";
@@ -9,6 +9,7 @@ import { AuthCard } from "@/components/auth/AuthCard";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -29,7 +30,10 @@ export default function LoginPage() {
         setError(json.error?.message ?? "Unable to log in. Please check your credentials and try again.");
         return;
       }
-      router.push("/listings");
+      const redirect = searchParams.get("redirect");
+      const dest = redirect && redirect.startsWith("/") ? redirect : "/listings";
+      router.push(dest);
+      router.refresh();
     } catch {
       setError("Unable to log in. Please try again.");
     } finally {

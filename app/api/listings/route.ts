@@ -45,6 +45,8 @@ export async function GET(request: Request) {
     const endDate = parseDate(params.get("end_date"));
     const furnished = parseBoolean(params.get("furnished"));
     const utilitiesIncluded = parseBoolean(params.get("utilities_included"));
+    const totalBedrooms = parseNumber(params.get("total_bedrooms"));
+    const totalBathrooms = parseNumber(params.get("total_bathrooms"));
     const pageNum = parseNumber(params.get("page"));
     const pageSizeNum = parseNumber(params.get("page_size"));
     const sort = params.get("sort") ?? undefined;
@@ -56,6 +58,8 @@ export async function GET(request: Request) {
       endDate === "invalid" ||
       furnished === "invalid" ||
       utilitiesIncluded === "invalid" ||
+      totalBedrooms === "invalid" ||
+      totalBathrooms === "invalid" ||
       pageNum === "invalid" ||
       pageSizeNum === "invalid"
     ) {
@@ -83,6 +87,9 @@ export async function GET(request: Request) {
       typeof pageSizeNum === "number" && pageSizeNum > 0 ? Math.min(pageSizeNum, 100) : 20;
     const effectivePageSize = basePageSize + 1;
 
+    const includeTakenParam = params.get("include_taken");
+    const includeTaken = includeTakenParam === "true";
+
     const filters: ListingFilters = {
       min_rent: minRent as number | undefined,
       max_rent: maxRent as number | undefined,
@@ -92,10 +99,13 @@ export async function GET(request: Request) {
       furnished: furnished as boolean | undefined,
       utilities_included: utilitiesIncluded as boolean | undefined,
       lease_type: (params.get("lease_type") ?? undefined) as any,
+      total_bedrooms: totalBedrooms as number | undefined,
+      total_bathrooms: totalBathrooms as number | undefined,
       keyword: params.get("keyword") ?? undefined,
       sort: sort as any,
       page: basePage,
       page_size: effectivePageSize,
+      include_taken: isVerified && viewer?.role === "ADMIN" && includeTaken ? true : undefined,
     };
 
     let isVerified = false;
@@ -174,6 +184,7 @@ export async function POST(request: Request) {
       exact_address: String(body.exact_address ?? ""),
       nearby_landmark: String(body.nearby_landmark ?? ""),
       total_bedrooms: Number(body.total_bedrooms),
+      total_bathrooms: Number(body.total_bathrooms),
       room_type: body.room_type,
       furnished: Boolean(body.furnished),
       utilities_included: Boolean(body.utilities_included),
@@ -184,6 +195,7 @@ export async function POST(request: Request) {
     if (
       Number.isNaN(payload.monthly_rent) ||
       Number.isNaN(payload.total_bedrooms) ||
+      Number.isNaN(payload.total_bathrooms) ||
       Number.isNaN(payload.start_date.getTime()) ||
       Number.isNaN(payload.end_date.getTime())
     ) {

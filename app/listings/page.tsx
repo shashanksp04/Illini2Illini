@@ -1,8 +1,11 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
+import { createClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/prisma";
 import { getApiBaseUrl } from "@/lib/api-base-url";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { FilterBar } from "@/components/listings/FilterBar";
-import { ListingCard, type PublicListingItem } from "@/components/listings/ListingCard";
+import { ListingCard, type ListingCardItem } from "@/components/listings/ListingCard";
 import { SearchBar } from "@/components/ui/SearchBar";
 
 type SearchParams = { [key: string]: string | string[] | undefined };
@@ -18,12 +21,16 @@ function buildListingsUrl(base: string, params: SearchParams): string {
   set("end_date", typeof params.end_date === "string" ? params.end_date : undefined);
   set("lease_type", typeof params.lease_type === "string" ? params.lease_type : undefined);
   set("room_type", typeof params.room_type === "string" ? params.room_type : undefined);
+  set("total_bedrooms", typeof params.total_bedrooms === "string" ? params.total_bedrooms : undefined);
+  set("total_bathrooms", typeof params.total_bathrooms === "string" ? params.total_bathrooms : undefined);
   set("keyword", typeof params.keyword === "string" ? params.keyword : undefined);
   set("sort", typeof params.sort === "string" ? params.sort : "newest");
   const furnished = typeof params.furnished === "string" ? params.furnished : undefined;
   if (furnished === "true" || furnished === "false") q.set("furnished", furnished);
   const util = typeof params.utilities_included === "string" ? params.utilities_included : undefined;
   if (util === "true" || util === "false") q.set("utilities_included", util);
+  const includeTaken = typeof params.include_taken === "string" ? params.include_taken : undefined;
+  if (includeTaken === "true") q.set("include_taken", "true");
   const page = typeof params.page === "string" ? params.page : "1";
   if (page !== "1") q.set("page", page);
   const query = q.toString();
@@ -37,11 +44,14 @@ function getFilterValues(params: SearchParams) {
     start_date: typeof params.start_date === "string" ? params.start_date : "",
     end_date: typeof params.end_date === "string" ? params.end_date : "",
     room_type: typeof params.room_type === "string" ? params.room_type : "",
+    total_bedrooms: typeof params.total_bedrooms === "string" ? params.total_bedrooms : "",
+    total_bathrooms: typeof params.total_bathrooms === "string" ? params.total_bathrooms : "",
     furnished: typeof params.furnished === "string" ? params.furnished : "",
     utilities_included: typeof params.utilities_included === "string" ? params.utilities_included : "",
     lease_type: typeof params.lease_type === "string" ? params.lease_type : "",
     sort: typeof params.sort === "string" ? params.sort : "newest",
     keyword: typeof params.keyword === "string" ? params.keyword : "",
+    include_taken: typeof params.include_taken === "string" ? params.include_taken : "",
   };
 }
 
@@ -50,18 +60,45 @@ export default async function ListingsPage({ searchParams }: { searchParams: Pro
   const base = await getApiBaseUrl();
   const url = buildListingsUrl(base, params);
 
-  let items: PublicListingItem[] = [];
+  let isAdmin = false;
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase.auth.getUser();
+    if (data?.user?.id) {
+      const user = await prisma.user.findUnique({
+        where: { auth_user_id: data.user.id },
+        select: { role: true },
+      });
+      isAdmin = user?.role === "ADMIN";
+    }
+  } catch {
+    // Ignore; isAdmin stays false
+  }
+
+  let items: ListingCardItem[] = [];
   let hasMore = false;
   let page = 1;
   let error: string | null = null;
 
   try {
-    const res = await fetch(url, { cache: "no-store" });
+    const cookieStore = await cookies();
+    const cookieHeader = cookieStore.getAll().map(c => `${c.name}=${c.value}`).join('; ');
+    const res = await fetch(url, { cache: "no-store", headers: { Cookie: cookieHeader } });
     const json = await res.json();
     if (!res.ok) {
       error = json?.error?.message ?? "Failed to load listings.";
     } else if (json.ok && json.data) {
-      items = json.data.items ?? [];
+      const rawItems: any[] = json.data.items ?? [];
+      items = rawItems.map((item) => {
+        const firstPhoto = Array.isArray(item.photos) && item.photos.length > 0
+          ? item.photos[0]?.image_url
+          : undefined;
+        return {
+          ...item,
+          image_url: firstPhoto ?? item.thumbnail_url ?? item.image_url ?? null,
+          owner_profile_picture_url: item.owner_profile_picture_url ?? null,
+        } as ListingCardItem;
+      });
       hasMore = json.data.has_more === true;
       page = Number(json.data.page) || 1;
     }
@@ -78,7 +115,7 @@ export default async function ListingsPage({ searchParams }: { searchParams: Pro
       </div>
 
       <div className="space-y-6 md:space-y-8">
-        <FilterBar values={filterValues} />
+        <FilterBar values={filterValues} isAdmin={isAdmin} />
 
         <header>
           <h1 className="text-2xl font-bold tracking-tight text-brand md:text-3xl">Browse listings</h1>

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/prisma";
 import { ALLOWED_SIGNUP_DOMAIN } from "@/lib/supabase/constants";
 
 function isAllowedEmail(email: string): boolean {
@@ -42,7 +43,7 @@ export async function POST(request: Request) {
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data: signInData, error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
     return NextResponse.json(
@@ -57,8 +58,34 @@ export async function POST(request: Request) {
     );
   }
 
-  return NextResponse.json(
+  const res = NextResponse.json(
     { ok: true, data: { session: true } },
     { status: 200 }
   );
+
+  const authUserId = signInData.user?.id;
+  if (authUserId) {
+    const profile = await prisma.user.findUnique({
+      where: { auth_user_id: authUserId },
+      select: { first_name: true, last_name: true, username: true, profile_picture_url: true },
+    });
+    const isComplete =
+      profile &&
+      !!profile.first_name &&
+      !!profile.last_name &&
+      !!profile.username &&
+      !!profile.profile_picture_url;
+
+    if (isComplete) {
+      res.cookies.set("profile_complete", "1", {
+        path: "/",
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 60 * 60 * 24 * 365,
+      });
+    }
+  }
+
+  return res;
 }

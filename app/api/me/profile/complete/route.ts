@@ -150,24 +150,55 @@ export async function POST(request: Request) {
         },
       });
     } else {
-      await prisma.user.create({
-        data: {
-          auth_user_id: authUserId,
-          email,
-          first_name,
-          last_name,
-          username,
-          profile_picture_url,
-          role: "USER",
-          is_banned: false,
-        },
+      // #region agent log
+      fetch('http://127.0.0.1:7739/ingest/abe32b33-c7b2-4ec4-af97-867fdda097b1',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'d1509e'},body:JSON.stringify({sessionId:'d1509e',location:'api/me/profile/complete/route.ts:else-branch',message:'No user by auth_user_id, checking email',data:{authUserId,email},timestamp:Date.now(),hypothesisId:'email-conflict'})}).catch(()=>{});
+      // #endregion
+      const existingByEmail = await prisma.user.findUnique({
+        where: { email },
       });
+
+      if (existingByEmail) {
+        // #region agent log
+        fetch('http://127.0.0.1:7739/ingest/abe32b33-c7b2-4ec4-af97-867fdda097b1',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'d1509e'},body:JSON.stringify({sessionId:'d1509e',location:'api/me/profile/complete/route.ts:stale-row-found',message:'Stale row found by email, updating auth_user_id',data:{oldAuthUserId:existingByEmail.auth_user_id,newAuthUserId:authUserId,email},timestamp:Date.now(),hypothesisId:'email-conflict'})}).catch(()=>{});
+        // #endregion
+        await prisma.user.update({
+          where: { email },
+          data: {
+            auth_user_id: authUserId,
+            first_name,
+            last_name,
+            username: existingByEmail.username || username,
+            profile_picture_url,
+          },
+        });
+      } else {
+        await prisma.user.create({
+          data: {
+            auth_user_id: authUserId,
+            email,
+            first_name,
+            last_name,
+            username,
+            profile_picture_url,
+            role: "USER",
+            is_banned: false,
+          },
+        });
+      }
     }
 
-    return NextResponse.json(
+    const res = NextResponse.json(
       { ok: true, data: { is_profile_complete: true } },
       { status: 200 }
     );
+    res.cookies.set("profile_complete", "1", {
+      path: "/",
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 60 * 60 * 24 * 365,
+    });
+    return res;
   } catch (err) {
     if (err instanceof AuthError) {
       if (err.status === 401) {
