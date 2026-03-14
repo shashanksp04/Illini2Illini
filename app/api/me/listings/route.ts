@@ -3,6 +3,16 @@ import { NextResponse } from "next/server";
 import { AuthError, requireAuth } from "@/lib/auth/helpers";
 import { prisma } from "@/lib/prisma";
 
+type ListingWithPhotos = Awaited<
+  ReturnType<
+    typeof prisma.listing.findMany<{
+      where: { owner_id: string };
+      orderBy: { created_at: "desc" };
+      include: { photos: true };
+    }>
+  >
+>[number];
+
 export async function GET() {
   try {
     const { authUserId } = await requireAuth();
@@ -33,7 +43,7 @@ export async function GET() {
       },
     });
 
-    const items = listings.map((listing) => ({
+    const items = listings.map((listing: ListingWithPhotos) => ({
       id: listing.id,
       title: listing.title,
       status: listing.status,

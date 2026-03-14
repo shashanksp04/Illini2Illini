@@ -247,6 +247,7 @@ export type VerifiedListing = {
   created_at: Date;
   updated_at: Date;
   photos: {
+    id: string;
     image_url: string;
     display_order: number;
   }[];
@@ -407,6 +408,7 @@ function mapVerifiedListing(
       .slice()
       .sort((a, b) => a.display_order - b.display_order)
       .map((photo) => ({
+        id: photo.id,
         image_url: photo.image_url,
         display_order: photo.display_order,
       })),

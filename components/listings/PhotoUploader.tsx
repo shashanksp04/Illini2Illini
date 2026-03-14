@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export type ListingPhoto = {
+  id?: string;
   image_url: string;
   display_order: number;
 };
@@ -17,7 +18,12 @@ export function PhotoUploader({ listingId, initialPhotos = [], onChange }: Photo
   const [photos, setPhotos] = useState<ListingPhoto[]>(initialPhotos);
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [deletingPhotoId, setDeletingPhotoId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setPhotos(initialPhotos);
+  }, [initialPhotos]);
 
   function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
     setSelectedFiles(event.target.files);
@@ -57,6 +63,30 @@ export function PhotoUploader({ listingId, initialPhotos = [], onChange }: Photo
       setError("Failed to upload photos. Please try again.");
     } finally {
       setUploading(false);
+    }
+  }
+
+  async function handleDelete(photoId: string) {
+    setError(null);
+    setDeletingPhotoId(photoId);
+    try {
+      const res = await fetch(`/api/listings/${listingId}/photos/${photoId}`, {
+        method: "DELETE",
+      });
+      const json = (await res.json()) as { ok?: boolean; data?: { photos: ListingPhoto[] }; error?: { message?: string } };
+      if (!res.ok || !json.ok) {
+        setError(json?.error?.message ?? "Failed to delete photo. Please try again.");
+        return;
+      }
+      const nextPhotos = (json.data?.photos ?? []) as ListingPhoto[];
+      setPhotos(nextPhotos);
+      if (onChange) {
+        onChange(nextPhotos);
+      }
+    } catch {
+      setError("Failed to delete photo. Please try again.");
+    } finally {
+      setDeletingPhotoId(null);
     }
   }
 
@@ -117,7 +147,7 @@ export function PhotoUploader({ listingId, initialPhotos = [], onChange }: Photo
           <div className="grid grid-cols-4 gap-2">
             {photos.map((photo) => (
               <div
-                key={`${photo.image_url}-${photo.display_order}`}
+                key={photo.id ?? `${photo.image_url}-${photo.display_order}`}
                 className="group relative overflow-hidden rounded-xl bg-gray-100 shadow-card"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -127,6 +157,17 @@ export function PhotoUploader({ listingId, initialPhotos = [], onChange }: Photo
                   className="aspect-square w-full object-cover"
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-200 rounded-xl" />
+                {photo.id && (
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(photo.id!)}
+                    disabled={photos.length <= 1 || deletingPhotoId !== null}
+                    aria-label="Delete photo"
+                    className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-red-500/90 text-white shadow-sm transition-all duration-200 hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-1"
+                  >
+                    <span className="text-sm font-bold leading-none" aria-hidden>&times;</span>
+                  </button>
+                )}
               </div>
             ))}
             {photos.length < 8 && (

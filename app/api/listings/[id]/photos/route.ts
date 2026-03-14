@@ -8,6 +8,7 @@ import {
 } from "@/lib/auth/helpers";
 import { prisma } from "@/lib/prisma";
 import { createServiceRoleClient } from "@/lib/supabase/server";
+import { Prisma } from "@prisma/client";
 import {
   ALLOWED_IMAGE_MIME_TYPES,
   BUCKET_LISTING_PHOTOS,
@@ -176,7 +177,7 @@ export async function POST(request: Request, context: RouteContext) {
 
     let displayOrder = existingPhotos[existingPhotos.length - 1]?.display_order ?? 0;
 
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       for (const url of uploadedUrls) {
         displayOrder += 1;
         await tx.listingPhoto.create({
@@ -191,7 +192,7 @@ export async function POST(request: Request, context: RouteContext) {
 
     const allPhotos = await prisma.listingPhoto.findMany({
       where: { listing_id: id },
-      select: { image_url: true, display_order: true },
+      select: { id: true, image_url: true, display_order: true },
       orderBy: { display_order: "asc" },
     });
 

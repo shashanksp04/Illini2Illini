@@ -1,5 +1,6 @@
 import { Inter } from "next/font/google";
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import "@/lib/env";
 import "./globals.css";
 import { createClient } from "@/lib/supabase/server";
@@ -42,6 +43,7 @@ export default async function RootLayout({
       <body className="font-sans antialiased min-h-screen flex flex-col bg-gray-50">
         <Navbar user={navUser} needsProfile={needsProfile} />
         <main className="flex-1 flex flex-col">{children}</main>
+        <Analytics />
       </body>
     </html>
   );
