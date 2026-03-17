@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
@@ -111,7 +112,9 @@ export default async function ListingsPage({ searchParams }: { searchParams: Pro
   return (
     <PageContainer>
       <div className="md:hidden">
-        <SearchBar className="w-full" />
+        <Suspense fallback={<div className="h-10 w-full rounded-xl bg-gray-100 animate-pulse" />}>
+          <SearchBar className="w-full" />
+        </Suspense>
       </div>
 
       <div className="space-y-6 md:space-y-8">

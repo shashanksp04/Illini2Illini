@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Suspense } from "react";
 import { usePathname } from "next/navigation";
 import { SearchBar } from "@/components/ui/SearchBar";
 import type { NavUser } from "./NavbarAuth";
@@ -35,7 +36,9 @@ export function Navbar({ user, needsProfile }: NavbarProps) {
         <div className="flex min-w-0 flex-1 justify-center">
           {showSearch && (
             <div className="hidden w-full max-w-md md:block">
-              <SearchBar variant="navbar" className="w-full" />
+              <Suspense fallback={<div className="h-10 w-full max-w-xs rounded-xl bg-white/10 animate-pulse" />}>
+                <SearchBar variant="navbar" className="w-full" />
+              </Suspense>
             </div>
           )}
         </div>
