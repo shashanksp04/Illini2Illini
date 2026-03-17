@@ -1,6 +1,5 @@
 import { Inter } from "next/font/google";
 import type { Metadata } from "next";
-import { PHASE_PRODUCTION_BUILD } from "next/constants";
 import { Analytics } from "@vercel/analytics/next";
 import "@/lib/env";
 import "./globals.css";
@@ -26,7 +25,7 @@ export default async function RootLayout({
   let navUser: { username: string; profile_picture_url: string | null; role: string } | null = null;
   let needsProfile = false;
 
-  if (process.env.NEXT_PHASE !== PHASE_PRODUCTION_BUILD) {
+  try {
     const supabase = await createClient();
     const { data } = await supabase.auth.getUser();
     if (data?.user?.id) {
@@ -40,6 +39,8 @@ export default async function RootLayout({
         needsProfile = true;
       }
     }
+  } catch {
+    // Fall back to logged-out state if auth/DB fails (e.g. during build)
   }
 
   return (
