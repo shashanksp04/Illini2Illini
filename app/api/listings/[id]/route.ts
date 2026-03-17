@@ -12,6 +12,7 @@ import {
   ListingError,
   type ListingOwner,
   type ListingOwnerOrAdmin,
+  type UpdateListingPayload,
   type VerifiedViewer,
 } from "@/lib/listings/helpers";
 import { prisma } from "@/lib/prisma";
@@ -115,11 +116,30 @@ export async function PUT(request: Request, context: RouteContext) {
       );
     }
 
-    const payload = body as any;
+    const raw = body as Record<string, unknown>;
     const listingOwner: ListingOwner = { id: domainUser.id };
 
+    const normalized: UpdateListingPayload = {};
+    if (raw.title !== undefined) normalized.title = String(raw.title);
+    if (raw.monthly_rent !== undefined) normalized.monthly_rent = Number(raw.monthly_rent);
+    if (raw.lease_type !== undefined) normalized.lease_type = raw.lease_type as "SUBLEASE" | "LEASE_TAKEOVER";
+    if (raw.start_date !== undefined) normalized.start_date = new Date(raw.start_date as string);
+    if (raw.end_date !== undefined) normalized.end_date = new Date(raw.end_date as string);
+    if (raw.exact_address !== undefined) normalized.exact_address = String(raw.exact_address);
+    if (raw.nearby_landmark !== undefined) normalized.nearby_landmark = String(raw.nearby_landmark);
+    if (raw.total_bedrooms !== undefined) normalized.total_bedrooms = Number(raw.total_bedrooms);
+    if (raw.total_bathrooms !== undefined) normalized.total_bathrooms = Number(raw.total_bathrooms);
+    if (raw.room_type !== undefined) normalized.room_type = raw.room_type as "PRIVATE_ROOM" | "ENTIRE_UNIT";
+    if (raw.furnished !== undefined) normalized.furnished = Boolean(raw.furnished);
+    if (raw.utilities_included !== undefined) normalized.utilities_included = Boolean(raw.utilities_included);
+    if (raw.gender_preference !== undefined) {
+      const g = raw.gender_preference as string;
+      normalized.gender_preference = (g === "" || g == null ? "ANY" : g) as "MALE" | "FEMALE" | "ANY";
+    }
+    if (raw.description !== undefined) normalized.description = String(raw.description);
+
     const { updateListing } = await import("@/lib/listings/helpers");
-    await updateListing(listingOwner, id, payload);
+    await updateListing(listingOwner, id, normalized);
 
     return NextResponse.json(
       { ok: true, data: { updated: true } },

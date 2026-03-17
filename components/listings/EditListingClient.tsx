@@ -202,7 +202,7 @@ export function EditListingClient({ id }: { id: string }) {
           room_type: roomType,
           furnished,
           utilities_included: utilitiesIncluded,
-          gender_preference: genderPreference,
+          gender_preference: genderPreference || "ANY",
           description,
         }),
       });
