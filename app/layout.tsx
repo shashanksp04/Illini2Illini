@@ -1,5 +1,6 @@
 import { Inter } from "next/font/google";
 import type { Metadata } from "next";
+import { PHASE_PRODUCTION_BUILD } from "next/constants";
 import { Analytics } from "@vercel/analytics/next";
 import "@/lib/env";
 import "./globals.css";
@@ -24,17 +25,20 @@ export default async function RootLayout({
 }>) {
   let navUser: { username: string; profile_picture_url: string | null; role: string } | null = null;
   let needsProfile = false;
-  const supabase = await createClient();
-  const { data } = await supabase.auth.getUser();
-  if (data?.user?.id) {
-    const user = await prisma.user.findUnique({
-      where: { auth_user_id: data.user.id },
-      select: { username: true, profile_picture_url: true, role: true, first_name: true, last_name: true },
-    });
-    if (user && user.first_name && user.last_name && user.username && user.profile_picture_url) {
-      navUser = { username: user.username, profile_picture_url: user.profile_picture_url, role: user.role };
-    } else {
-      needsProfile = true;
+
+  if (process.env.NEXT_PHASE !== PHASE_PRODUCTION_BUILD) {
+    const supabase = await createClient();
+    const { data } = await supabase.auth.getUser();
+    if (data?.user?.id) {
+      const user = await prisma.user.findUnique({
+        where: { auth_user_id: data.user.id },
+        select: { username: true, profile_picture_url: true, role: true, first_name: true, last_name: true },
+      });
+      if (user && user.first_name && user.last_name && user.username && user.profile_picture_url) {
+        navUser = { username: user.username, profile_picture_url: user.profile_picture_url, role: user.role };
+      } else {
+        needsProfile = true;
+      }
     }
   }
 
