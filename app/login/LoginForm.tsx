@@ -50,6 +50,12 @@ export function LoginForm() {
           </p>
         </div>
 
+        {searchParams.get("reset") === "success" && (
+          <div className="rounded-xl border border-green-200 bg-green-50 px-4 py-3">
+            <p className="text-sm text-green-700">Password reset successful. Sign in with your new password.</p>
+          </div>
+        )}
+
         {error && (
           <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3">
             <p className="text-sm text-red-600">{error}</p>
@@ -82,6 +88,11 @@ export function LoginForm() {
               onChange={(e) => setPassword(e.target.value)}
               className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition-all focus:border-accent focus:bg-white focus:outline-none focus:shadow-input-focus"
             />
+            <div className="text-right">
+              <Link href="/forgot-password" className="text-sm text-accent hover:text-accent-hover">
+                Forgot password?
+              </Link>
+            </div>
           </div>
 
           <button
