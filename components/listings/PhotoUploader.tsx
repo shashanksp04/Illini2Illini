@@ -38,26 +38,30 @@ export function PhotoUploader({ listingId, initialPhotos = [], onChange }: Photo
     setError(null);
     setUploading(true);
     try {
-      const formData = new FormData();
-      Array.from(selectedFiles).forEach((file) => {
-        formData.append("files", file);
-      });
-      const res = await fetch(`/api/listings/${listingId}/photos`, {
-        method: "POST",
-        body: formData,
-      });
-      const json = (await res.json()) as any;
-      if (!res.ok || !json.ok) {
-        const message =
-          json?.error?.message ?? "Failed to upload photos. Please try again.";
-        setError(message);
-        return;
+      const files = Array.from(selectedFiles);
+      let currentPhotos = [...photos];
+
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append("file", file);
+        const res = await fetch(`/api/listings/${listingId}/photos`, {
+          method: "POST",
+          body: formData,
+        });
+        const json = (await res.json()) as { ok?: boolean; data?: { photos: ListingPhoto[] }; error?: { message?: string } };
+        if (!res.ok || !json.ok) {
+          const message =
+            json?.error?.message ?? "Failed to upload photos. Please try again.";
+          setError(message);
+          return;
+        }
+        currentPhotos = (json.data?.photos ?? []) as ListingPhoto[];
+        setPhotos(currentPhotos);
+        if (onChange) {
+          onChange(currentPhotos);
+        }
       }
-      const nextPhotos = (json.data?.photos ?? []) as ListingPhoto[];
-      setPhotos(nextPhotos);
-      if (onChange) {
-        onChange(nextPhotos);
-      }
+
       setSelectedFiles(null);
     } catch {
       setError("Failed to upload photos. Please try again.");
