@@ -47,4 +47,6 @@ export const env = {
       ? dbPlaceholder
       : process.env.DATABASE_URL!,
   cronSecret: process.env.CRON_SECRET ?? "",
+  /** Optional. When set, auth redirects (e.g. forgot password) use this URL. Use for production. */
+  appUrl: process.env.NEXT_PUBLIC_APP_URL?.trim() || undefined,
 } as const;

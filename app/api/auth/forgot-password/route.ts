@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { env } from "@/lib/env";
 import { ALLOWED_SIGNUP_DOMAIN } from "@/lib/supabase/constants";
 
 function isAllowedEmail(email: string): boolean {
@@ -42,9 +43,9 @@ export async function POST(request: Request) {
 
   try {
     const supabase = await createClient();
-    const origin = new URL(request.url).origin;
+    const baseUrl = env.appUrl ?? new URL(request.url).origin;
     await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${origin}/auth/callback?next=/reset-password`,
+      redirectTo: `${baseUrl}/auth/callback?next=/reset-password`,
     });
   } catch {
     // Swallow errors to avoid email enumeration; return generic success
