@@ -177,7 +177,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 DATABASE_URL=
 CRON_SECRET=
-# Optional. Set to https://illini2-illini.vercel.app for production auth redirects.
+# Optional. Set to https://www.illini2illini.app/ for production auth redirects.
 NEXT_PUBLIC_APP_URL=
 ```
 
@@ -188,8 +188,8 @@ NEXT_PUBLIC_APP_URL=
 If the forgot-password flow returns 500 from Supabase (`unexpected_failure`), check:
 
 1. **Redirect URLs** – Supabase Dashboard → Authentication → URL Configuration:
-   - Add `https://illini2-illini.vercel.app/auth/callback` to Redirect URLs
-   - Set Site URL to `https://illini2-illini.vercel.app`
+   - Add `https://www.illini2illini.app/auth/callback` to Redirect URLs
+   - Set Site URL to `https://www.illini2illini.app/`
 
 2. **SMTP / Email** – Project Settings → Auth → SMTP Settings:
    - If using custom SMTP, verify credentials
