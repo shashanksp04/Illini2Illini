@@ -191,11 +191,11 @@ Reference: `docs/MVP_DEFINITION.md`
 
 ## Core Concept
 
-A UIUC-only, verified-student housing marketplace focused exclusively on short-term leases and subleases.
+**Find Student Housing at UIUC** — a UIUC-only, verified-student marketplace focused exclusively on short-term leases and subleases.
 
 The platform connects:
 
-* Students who need short-term housing
+* Students who need housing at UIUC (including subleases and lease takeovers)
 * Students who want to sublease or transfer their lease
 
 The platform is:
@@ -234,7 +234,7 @@ These systems are:
 
 This has been validated in the external research document:
 
-UIUC Short-Term Housing Resources 
+UIUC student housing resources (reference PDF)
 
 ---
 
@@ -376,7 +376,7 @@ UI implementation must strictly follow:
 
 # 7. External Research Usage Policy
 
-The UIUC Short-Term Housing Resources document:
+The UIUC student housing resources document (reference PDF):
 
 `resources/UIUC Short-Term Housing Resources.pdf`
 

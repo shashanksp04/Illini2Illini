@@ -12,7 +12,7 @@ No features outside this scope are required for launch.
 
 # 1️⃣ Core Objective
 
-Launch a functional, UIUC-only short-term housing marketplace where:
+Launch **Find Student Housing at UIUC**: a functional, UIUC-only marketplace where:
 
 * Verified UIUC students can post structured short-term lease listings.
 * Students can browse and filter listings.

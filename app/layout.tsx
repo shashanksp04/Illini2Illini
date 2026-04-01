@@ -14,7 +14,8 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "Illini2Illini",
-  description: "UIUC short-term housing marketplace",
+  description:
+    "Find Student Housing at UIUC — subleases, lease takeovers, and full-year housing from verified @illinois.edu students.",
 };
 
 export default async function RootLayout({

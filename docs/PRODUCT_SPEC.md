@@ -6,11 +6,11 @@
 
 ## What This Product Is
 
-A UIUC-only, verified-student housing marketplace focused exclusively on short-term leases and subleases.
+**Find Student Housing at UIUC** — a UIUC-only, verified-student marketplace focused exclusively on short-term leases and subleases.
 
 The platform connects:
 
-* Students who need short-term housing
+* Students who need housing at UIUC (including subleases and lease takeovers)
 * Students who want to sublease or transfer their lease
 
 The platform does NOT:

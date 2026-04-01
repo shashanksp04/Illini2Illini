@@ -17,13 +17,13 @@ export default function Home() {
             </span>
 
             <h1 className="mt-7 text-4xl font-extrabold leading-[1.1] tracking-tight text-brand sm:text-5xl md:text-6xl">
-              Find Short&#8209;Term
+              Find Student Housing
               <br />
-              Housing at UIUC
+              at UIUC
             </h1>
 
             <p className="mx-auto mt-5 max-w-md text-base leading-relaxed text-gray-500 sm:text-lg">
-              The student&#8209;only marketplace for subleases and lease takeovers. Browse, filter, and connect directly with fellow Illini.
+              Find subleases, lease takeovers, and full-year housing from verified UIUC students. Browse, filter, and connect directly.
             </p>
 
             <div className="mt-9">

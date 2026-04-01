@@ -1,6 +1,6 @@
 # UI_SPEC.md
 
-UIUC Housing Marketplace — UI System Specification
+Find Student Housing at UIUC — UI System Specification
 
 ---
 
@@ -493,9 +493,9 @@ Centered content.
 
 Title
 
-“Find Short-Term Housing at UIUC”
+“Find Student Housing at UIUC”
 
-Subheadline.
+Subheadline: “Find subleases, lease takeovers, and full-year housing from verified UIUC students. Browse, filter, and connect directly.”
 
 Search bar.
 

@@ -1,13 +1,13 @@
 # Illini2Illini
 
-> The verified short-term housing marketplace for UIUC students.
+> Find Student Housing at UIUC — the verified student marketplace for subleases and lease takeovers.
 > Built by students. For students.
 
 ---
 
 ## 🏫 What Is Illini2Illini?
 
-Illini2Illini is a University of Illinois Urbana-Champaign exclusive housing marketplace designed specifically for short-term leases and subleases.
+Find Student Housing at UIUC: Illini2Illini is a University of Illinois Urbana-Champaign exclusive marketplace for short-term leases and subleases.
 
 It solves a simple but frustrating problem:
 
@@ -21,13 +21,13 @@ Arrive for one semester.
 And the current ecosystem?
 Scattered across Facebook groups, Reddit threads, and leasing portals.
 
-Illini2Illini brings structure, verification, and clarity to short-term housing.
+Illini2Illini brings structure, verification, and clarity to finding student housing at UIUC.
 
 ---
 
 ## ✨ Why It Exists
 
-The existing short-term housing experience at UIUC is:
+The existing experience of finding student housing at UIUC is:
 
 * Fragmented
 * Unstructured
@@ -61,7 +61,7 @@ This dramatically reduces scams and anonymous spam.
 
 ---
 
-## 🏠 Structured Short-Term Listings
+## 🏠 Structured student housing listings
 
 Every listing includes:
 
@@ -104,7 +104,7 @@ This protects privacy while encouraging signups.
 
 ## 🔎 Powerful Filtering
 
-Built specifically for short-term student needs.
+Built specifically for student housing needs at UIUC (subleases, lease takeovers, and semester-style timelines).
 
 Filter by:
 

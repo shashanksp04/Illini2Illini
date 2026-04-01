@@ -14,7 +14,7 @@ It is mandatory to follow this file strictly.
 
 We are building:
 
-A **UIUC-only, verified-student short-term housing marketplace**.
+**Find Student Housing at UIUC** — a UIUC-only, verified-student marketplace for subleases and lease takeovers.
 
 The platform:
 
