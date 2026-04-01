@@ -57,9 +57,10 @@ model User {
   created_at        DateTime @default(now())
   updated_at        DateTime @default(now()) @updatedAt
 
-  listings      Listing[]
-  reports       Report[]       @relation("UserReports")
+  listings       Listing[]
+  reports        Report[]       @relation("UserReports")
   contact_events ContactEvent[]
+  listing_views  ListingView[]
 
   @@map("users")
 }
@@ -92,6 +93,7 @@ model Listing {
   photos  ListingPhoto[]
   reports Report[]
   contact_events ContactEvent[]
+  listing_views  ListingView[]
 
   @@index([status, created_at])
   @@index([monthly_rent])
@@ -142,5 +144,21 @@ model ContactEvent {
   viewer  User    @relation(fields: [viewer_user_id], references: [id])
 
   @@map("contact_events")
+}
+
+// listing_views
+
+model ListingView {
+  id              String   @id @default(uuid()) @db.Uuid
+  listing_id      String   @db.Uuid
+  viewer_user_id  String?  @db.Uuid
+  created_at      DateTime @default(now())
+
+  listing Listing @relation(fields: [listing_id], references: [id])
+  viewer  User?   @relation(fields: [viewer_user_id], references: [id])
+
+  @@index([listing_id])
+  @@index([viewer_user_id])
+  @@map("listing_views")
 }
 

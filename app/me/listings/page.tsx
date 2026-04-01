@@ -26,6 +26,8 @@ type ListingItem = {
   monthly_rent: number;
   start_date: string;
   end_date: string;
+  view_count: number;
+  contact_viewer_count: number;
   photos: { image_url: string; display_order: number }[];
 };
 
@@ -130,7 +132,13 @@ export default function MyListingsPage() {
           }
           return;
         }
-        const items = (json.data?.items ?? []) as ListingItem[];
+        const raw = (json.data?.items ?? []) as ListingItem[];
+        const items = raw.map((row) => ({
+          ...row,
+          view_count: typeof row.view_count === "number" ? row.view_count : 0,
+          contact_viewer_count:
+            typeof row.contact_viewer_count === "number" ? row.contact_viewer_count : 0,
+        }));
         if (!cancelled) setItems(items);
       } catch {
         if (!cancelled) setActionError("Failed to load listings.");
@@ -155,8 +163,15 @@ export default function MyListingsPage() {
         setActionError(json?.error?.message ?? "Failed to load listings.");
         return;
       }
-      const items = (json.data?.items ?? []) as ListingItem[];
-      setItems(items);
+      const raw = (json.data?.items ?? []) as ListingItem[];
+      setItems(
+        raw.map((row) => ({
+          ...row,
+          view_count: typeof row.view_count === "number" ? row.view_count : 0,
+          contact_viewer_count:
+            typeof row.contact_viewer_count === "number" ? row.contact_viewer_count : 0,
+        }))
+      );
     } catch {
       setActionError("Failed to load listings.");
     } finally {
@@ -334,6 +349,15 @@ export default function MyListingsPage() {
                           </p>
                         </div>
                         <StatusBadge status={listing.status} />
+                      </div>
+                      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
+                        <span className="tabular-nums" title="Times your listing detail was opened">
+                          <span className="font-medium text-gray-700">{listing.view_count}</span> views
+                        </span>
+                        <span className="tabular-nums" title="Distinct users who revealed your contact email">
+                          <span className="font-medium text-gray-700">{listing.contact_viewer_count}</span>{" "}
+                          contact views
+                        </span>
                       </div>
                     </div>
                     <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-100">

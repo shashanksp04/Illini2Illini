@@ -37,6 +37,19 @@ export async function POST(_request: Request, context: RouteContext) {
       );
     }
 
+    if (domainUser.id === listing.owner_id) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: {
+            code: "CANNOT_CONTACT_SELF",
+            message: "You cannot use contact reveal on your own listing.",
+          },
+        },
+        { status: 403 }
+      );
+    }
+
     const owner = listing.owner;
     if (!owner?.email) {
       return NextResponse.json(

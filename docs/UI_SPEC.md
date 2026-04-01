@@ -572,6 +572,11 @@ Below:
 
 User listings grid.
 
+Each listing card shows:
+
+* **Views** — total listing detail loads counted for that listing (non-owner).
+* **Contact views** — distinct users who revealed seller email via the contact flow.
+
 ---
 
 ## Listing Status Badges

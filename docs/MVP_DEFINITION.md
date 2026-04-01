@@ -178,6 +178,7 @@ Users can:
 * Edit their listing
 * Soft delete their listing
 * Mark listing as taken
+* See per-listing **views** and **contact views** (distinct email reveals) on the My listings dashboard
 
 System behavior:
 
@@ -225,6 +226,7 @@ The MVP is complete when:
   * Create listing
   * Edit/delete listing
   * Mark listing as taken
+  * See listing views and contact-viewer counts on My listings
 
 * A visitor can:
 

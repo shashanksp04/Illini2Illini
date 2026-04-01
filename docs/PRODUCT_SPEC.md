@@ -210,6 +210,7 @@ Users can:
 * Edit listing
 * Soft delete listing
 * Mark listing as taken
+* See listing **views** and **contact views** (how many distinct users revealed email) on their dashboard
 
 System behavior:
 

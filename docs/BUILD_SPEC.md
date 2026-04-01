@@ -22,7 +22,7 @@ Defines **HOW** to build the product specified in `PRODUCT_SPEC.md`, within MVP 
 * **Integration wrappers**: storage, search, auth checks centralized in helpers.
 * **Portable keys**: domain `users.id` is internal; store `auth_user_id` to decouple auth provider.
 * **Upgradeable search**: one search function; swap ILIKE → FTS later without UI change.
-* **Event pattern**: `contact_events` table establishes future notification/messaging event model.
+* **Event pattern**: `contact_events` (reveal audit) and `listing_views` (detail-load audit for seller metrics) support analytics-style counts without a separate analytics stack.
 
 ---
 
@@ -172,6 +172,17 @@ Constraint:
 * `viewer_user_id` fk → users.id
 * `created_at` timestamp
 
+### listing_views
+
+* `id` uuid pk
+* `listing_id` fk → listings.id
+* `viewer_user_id` fk → users.id **nullable** (anonymous listing detail loads)
+* `created_at` timestamp
+
+Indexes: `listing_id`, `viewer_user_id`
+
+Purpose: one row per successful `GET /api/listings/:id` response when the requester is not the listing owner; powers **view_count** for the seller on `GET /api/me/listings`.
+
 ---
 
 ## 6. Core Helpers (Migration-Friendly Interfaces)
@@ -197,6 +208,7 @@ These helpers are the “stable contract” so future migrations are painless:
 * `markTaken(user, listingId)`
 * `softDeleteListing(userOrAdmin, listingId)`
 * `expireListingsJob() -> { expiredCount }`
+* `recordListingView({ listingId, viewerUserId })` — inserts `listing_views` for ACTIVE listings; skips when the viewer is the owner (see `lib/listings/views.ts`)
 
 ### Storage helpers
 
@@ -471,6 +483,8 @@ Response (public):
 
 Public endpoint; returns **public detail** unless viewer is verified (then return verified detail).
 
+Side effect (implemented): after a successful response for an **ACTIVE** listing, the server records a **listing view** unless the authenticated domain user is the listing owner (owner preview/edit flows must not increment views). Logged-out viewers are recorded with `viewer_user_id` null.
+
 Response (public detail):
 
 * same as preview + possibly a “login to view more” flag
@@ -585,8 +599,29 @@ Response:
 
 #### `GET /api/me/listings`
 
-Auth: required
-Returns all listings for current user including status badges.
+Auth: required (profile complete expected for management flows)
+Returns all listings for the current user including status badges, plus per-listing metrics:
+
+* `view_count` — number of rows in `listing_views` for that listing (total detail loads by non-owners).
+* `contact_viewer_count` — number of **distinct** `viewer_user_id` values in `contact_events` for that listing (multiple reveals by the same user still count once).
+
+Example item fields:
+
+```json
+{
+  "id": "...",
+  "title": "...",
+  "status": "ACTIVE",
+  "monthly_rent": 750,
+  "start_date": "...",
+  "end_date": "...",
+  "created_at": "...",
+  "updated_at": "...",
+  "view_count": 42,
+  "contact_viewer_count": 5,
+  "photos": [ { "image_url": "...", "display_order": 0 } ]
+}
+```
 
 ---
 
@@ -599,7 +634,8 @@ Auth: required + verified + profile complete + not banned
 Behavior:
 
 * Returns seller email
-* Writes a row into `contact_events`
+* Writes a row into `contact_events` when the caller is **not** the listing owner
+* If the caller **is** the owner, returns **403** with code `CANNOT_CONTACT_SELF` and does **not** write `contact_events`
 * Does NOT reveal anything to public users
 
 Response:

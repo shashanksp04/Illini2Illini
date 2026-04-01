@@ -157,6 +157,14 @@ Date:
 
 ---
 
+Decision: Include listing_views Table for Seller Metrics
+Reason: Records each non-owner successful listing detail load (`GET /api/listings/:id`) so sellers see **view** totals on My Listings without client-side beacons; optional `viewer_user_id` preserves attribution for logged-in viewers while still counting anonymous traffic.
+
+Date:
+2026-03-31
+
+---
+
 Decision: Use Vercel Cron for Daily Listing Expiration
 Reason: 
 Minimal operational overhead and simplest scheduled execution model aligned with MVP speed and monolith deployment.

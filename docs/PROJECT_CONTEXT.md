@@ -275,6 +275,7 @@ What has been built:
 
 * Authentication: @illinois.edu signup, **OTP email verification** (in-app code entry; no confirmation URL required), login, logout, **OTP password reset** (request code → verify → set new password; no reset link), profile completion
 * Listings: create, edit, soft delete, mark as taken, browse, filter, search, visibility rules, **Open to negotiation** (`open_to_negotiation`) on create/edit with prominent viewer-facing badge
+* Seller metrics on **My listings** (`/me/listings`): **views** (count of non-owner listing detail loads via `listing_views`) and **contact views** (distinct users who completed email reveal via `contact_events`); owners cannot reveal their own contact (403 `CANNOT_CONTACT_SELF`)
 * Contact flow: email reveal for verified users, safety disclaimer
 * Admin: user management, listing moderation, reports
 * Full UI per UI_SPEC.md: listings pages, profile, admin panels, auth flows

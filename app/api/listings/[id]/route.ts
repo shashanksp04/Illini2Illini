@@ -15,6 +15,7 @@ import {
   type UpdateListingPayload,
   type VerifiedViewer,
 } from "@/lib/listings/helpers";
+import { recordListingView } from "@/lib/listings/views";
 import { prisma } from "@/lib/prisma";
 
 type RouteContext = {
@@ -69,6 +70,7 @@ export async function GET(_request: Request, context: RouteContext) {
           { status: 404 }
         );
       }
+      void recordListingView({ listingId: id, viewerUserId: viewer.id }).catch(() => {});
       return NextResponse.json(
         { ok: true, data: { listing } },
         { status: 200 }
@@ -83,6 +85,7 @@ export async function GET(_request: Request, context: RouteContext) {
       );
     }
 
+    void recordListingView({ listingId: id, viewerUserId: null }).catch(() => {});
     return NextResponse.json(
       { ok: true, data: { listing, requires_login_for_details: true } },
       { status: 200 }

@@ -64,6 +64,7 @@ Acceptance:
   - [ ] listing_photos
   - [ ] reports
   - [ ] contact_events
+  - [ ] listing_views (seller view counts; nullable viewer_user_id for anonymous views)
   - [ ] enums per BUILD_SPEC
 
 Acceptance:
@@ -176,6 +177,7 @@ Acceptance:
 - [ ] GET /api/listings/:id
   - [ ] public returns limited detail + requires_login_for_details = true
   - [ ] verified returns full detail
+  - [ ] records `listing_views` on success for ACTIVE listings (skip owner)
 - [ ] POST /api/listings
   - [ ] requires verified + profile complete + not banned
   - [ ] enforce max 3 ACTIVE listings/user (403 ACTIVE_LIMIT_REACHED)
@@ -193,6 +195,7 @@ Acceptance:
   - [ ] owner-only soft delete sets DELETED
 - [ ] GET /api/me/listings
   - [ ] return all user listings with status
+  - [ ] include `view_count` and `contact_viewer_count` per listing
 
 Acceptance:
 - Public never receives photos/description/exact_address/real name/profile pic.
@@ -202,12 +205,13 @@ Acceptance:
 - [ ] POST /api/listings/:id/reveal-contact
   - [ ] verified + profile complete + not banned
   - [ ] returns seller_email
-  - [ ] writes contact_events row
+  - [ ] writes contact_events row when caller is not the listing owner
+  - [ ] 403 `CANNOT_CONTACT_SELF` for owner (no contact_events row)
   - [ ] shows safety disclaimer in UI (see UI tasks)
 
 Acceptance:
 - Email is NOT leaked anywhere else.
-- Contact reveal always creates contact_events row.
+- Contact reveal creates a `contact_events` row for non-owner viewers only.
 
 ## 4.5 Reports
 - [ ] POST /api/reports
@@ -290,6 +294,7 @@ Acceptance:
 - [ ] Edit listing page (including ability to change **Open to negotiation**)
 - [ ] My listings page:
   - [ ] status badges (ACTIVE/TAKEN/EXPIRED/DELETED)
+  - [ ] per-card **views** and **contact views** (from `GET /api/me/listings`)
   - [ ] actions: edit, mark taken, delete
 
 Acceptance:
