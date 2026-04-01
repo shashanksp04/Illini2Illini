@@ -132,6 +132,7 @@ export async function PUT(request: Request, context: RouteContext) {
     if (raw.room_type !== undefined) normalized.room_type = raw.room_type as "PRIVATE_ROOM" | "ENTIRE_UNIT";
     if (raw.furnished !== undefined) normalized.furnished = Boolean(raw.furnished);
     if (raw.utilities_included !== undefined) normalized.utilities_included = Boolean(raw.utilities_included);
+    if (raw.open_to_negotiation !== undefined) normalized.open_to_negotiation = Boolean(raw.open_to_negotiation);
     if (raw.gender_preference !== undefined) {
       const g = raw.gender_preference as string;
       normalized.gender_preference = (g === "" || g == null ? "ANY" : g) as "MALE" | "FEMALE" | "ANY";

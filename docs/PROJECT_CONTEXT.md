@@ -274,7 +274,7 @@ The following are complete:
 What has been built:
 
 * Authentication: @illinois.edu signup, **OTP email verification** (in-app code entry; no confirmation URL required), login, logout, **OTP password reset** (request code → verify → set new password; no reset link), profile completion
-* Listings: create, edit, soft delete, mark as taken, browse, filter, search, visibility rules
+* Listings: create, edit, soft delete, mark as taken, browse, filter, search, visibility rules, **Open to negotiation** (`open_to_negotiation`) on create/edit with prominent viewer-facing badge
 * Contact flow: email reveal for verified users, safety disclaimer
 * Admin: user management, listing moderation, reports
 * Full UI per UI_SPEC.md: listings pages, profile, admin panels, auth flows

@@ -55,6 +55,7 @@ export interface CreateListingPayload {
   room_type: RoomType;
   furnished: boolean;
   utilities_included: boolean;
+  open_to_negotiation: boolean;
   gender_preference: GenderPreference;
   description: string;
 }
@@ -75,6 +76,7 @@ function validateCreatePayload(payload: CreateListingPayload): void {
     payload.room_type == null ||
     payload.furnished == null ||
     payload.utilities_included == null ||
+    payload.open_to_negotiation == null ||
     payload.gender_preference == null ||
     payload.description == null
   ) {
@@ -221,6 +223,7 @@ export type PublicListing = {
   total_bathrooms: number;
   furnished: boolean;
   utilities_included: boolean;
+  open_to_negotiation: boolean;
   owner_username: string;
   thumbnail_url: string | null;
 };
@@ -241,6 +244,7 @@ export type VerifiedListing = {
   room_type: RoomType;
   furnished: boolean;
   utilities_included: boolean;
+  open_to_negotiation: boolean;
   gender_preference: GenderPreference;
   description: string;
   status: ListingStatus;
@@ -377,6 +381,7 @@ function mapPublicListing(row: ListingModel & { owner: User; photos?: ListingPho
     total_bathrooms: row.total_bathrooms,
     furnished: row.furnished,
     utilities_included: row.utilities_included,
+    open_to_negotiation: row.open_to_negotiation,
     owner_username: row.owner.username,
     thumbnail_url: sorted?.[0]?.image_url ?? null,
   };
@@ -399,6 +404,7 @@ function mapVerifiedListing(
     room_type: row.room_type,
     furnished: row.furnished,
     utilities_included: row.utilities_included,
+    open_to_negotiation: row.open_to_negotiation,
     gender_preference: row.gender_preference,
     description: row.description,
     status: row.status,
@@ -537,6 +543,7 @@ export async function createListing(
       room_type: payload.room_type,
       furnished: payload.furnished,
       utilities_included: payload.utilities_included,
+      open_to_negotiation: payload.open_to_negotiation,
       gender_preference: payload.gender_preference,
       description: payload.description,
       status: "ACTIVE",
@@ -585,6 +592,7 @@ export async function updateListing(
       ...(payload.room_type !== undefined && { room_type: payload.room_type }),
       ...(payload.furnished !== undefined && { furnished: payload.furnished }),
       ...(payload.utilities_included !== undefined && { utilities_included: payload.utilities_included }),
+      ...(payload.open_to_negotiation !== undefined && { open_to_negotiation: payload.open_to_negotiation }),
       ...(payload.gender_preference !== undefined && { gender_preference: payload.gender_preference }),
       ...(payload.description !== undefined && { description: payload.description }),
     },

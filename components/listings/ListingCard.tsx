@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { NegotiableBadge } from "@/components/listings/NegotiableBadge";
+
 export type PublicListingItem = {
   id: string;
   title: string;
@@ -13,6 +15,7 @@ export type PublicListingItem = {
   total_bathrooms?: number;
   furnished: boolean;
   utilities_included: boolean;
+  open_to_negotiation?: boolean;
   owner_username: string;
   thumbnail_url?: string | null;
 };
@@ -106,6 +109,9 @@ export function ListingCard({ listing }: { listing: ListingCardItem }) {
         <p className="text-xs text-gray-400">{dateRange}</p>
 
         <div className="flex flex-wrap gap-1.5">
+          {listing.open_to_negotiation === true && (
+            <NegotiableBadge size="compact" />
+          )}
           {(listing.total_bedrooms != null || listing.total_bathrooms != null) && (
             <span className="rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-600 ring-1 ring-indigo-100">
               {listing.total_bedrooms ?? "?"}B/{listing.total_bathrooms ?? "?"}Ba

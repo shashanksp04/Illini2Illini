@@ -382,6 +382,12 @@ Rounded badge
 
 Muted background.
 
+**Open to negotiation** (when `open_to_negotiation` is true):
+
+Use a separate, high-emphasis treatment (e.g. solid emerald fill, bold text, ring/shadow) so it does not look like the muted metadata chips above. On the listing detail page, place near the rent when possible.
+
+Shared via `NegotiableBadge` (same component on grid cards and detail).
+
 ---
 
 ## Seller Row
@@ -422,7 +428,7 @@ Sidebar: col-span-4
 Order:
 
 Title
-Rent
+Rent (and **Open to negotiation** badge when applicable, visually tied to price)
 Landmark
 Date range
 Photo gallery
@@ -721,6 +727,7 @@ Navbar
 SearchBar
 FilterBar
 ListingCard
+NegotiableBadge (for “Open to negotiation”; use wherever listing rent flexibility is shown)
 SellerCard
 AuthCard
 PageContainer

@@ -179,3 +179,17 @@ Date:
 2026-03-31
 
 ---
+
+Decision: Listing Field `open_to_negotiation` (Open to negotiation)
+
+Reason:
+
+* Lets sellers signal price flexibility, which can improve conversion.
+* Stored as a boolean on `listings`, set at create time and editable later.
+* Shown to all viewers (including public preview) when true, using a distinct **NegotiableBadge** treatment so it does not blend in with other metadata chips.
+
+Date:
+
+2026-03-31
+
+---

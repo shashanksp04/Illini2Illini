@@ -66,6 +66,7 @@ export default function NewListingPage() {
   const [roomType, setRoomType] = useState<"PRIVATE_ROOM" | "ENTIRE_UNIT" | "">("");
   const [furnished, setFurnished] = useState(false);
   const [utilitiesIncluded, setUtilitiesIncluded] = useState(false);
+  const [openToNegotiation, setOpenToNegotiation] = useState(false);
   const [genderPreference, setGenderPreference] = useState<"MALE" | "FEMALE" | "ANY" | "">("");
   const [description, setDescription] = useState("");
 
@@ -127,6 +128,7 @@ export default function NewListingPage() {
           room_type: roomType,
           furnished,
           utilities_included: utilitiesIncluded,
+          open_to_negotiation: openToNegotiation,
           gender_preference: genderPreference,
           description,
         }),
@@ -471,6 +473,15 @@ export default function NewListingPage() {
                     className="h-4 w-4 rounded border-gray-200 text-accent focus:ring-accent"
                   />
                   Utilities included
+                </label>
+                <label className="inline-flex items-center gap-2 text-sm text-gray-600">
+                  <input
+                    type="checkbox"
+                    checked={openToNegotiation}
+                    onChange={(e) => setOpenToNegotiation(e.target.checked)}
+                    className="h-4 w-4 rounded border-gray-200 text-accent focus:ring-accent"
+                  />
+                  Open to negotiation
                 </label>
               </div>
             </FormSection>

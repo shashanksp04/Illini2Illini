@@ -130,6 +130,7 @@ Defines **HOW** to build the product specified in `PRODUCT_SPEC.md`, within MVP 
 * `room_type` enum
 * `furnished` boolean
 * `utilities_included` boolean
+* `open_to_negotiation` boolean default false (seller open to negotiating rent)
 * `gender_preference` enum
 * `description` varchar(1000)
 * `status` enum default ACTIVE
@@ -225,6 +226,7 @@ Return only:
 * `room_type`
 * `furnished`
 * `utilities_included`
+* `open_to_negotiation`
 * `owner_username`
 
 Do NOT return:
@@ -502,6 +504,7 @@ Body:
   "room_type": "PRIVATE_ROOM",
   "furnished": true,
   "utilities_included": false,
+  "open_to_negotiation": true,
   "gender_preference": "ANY",
   "description": "..."
 }

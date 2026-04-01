@@ -32,6 +32,7 @@ type VerifiedListingForEdit = {
   room_type: "PRIVATE_ROOM" | "ENTIRE_UNIT";
   furnished: boolean;
   utilities_included: boolean;
+  open_to_negotiation: boolean;
   gender_preference: "MALE" | "FEMALE" | "ANY";
   description: string;
   photos?: ListingPhoto[];
@@ -85,6 +86,7 @@ export function EditListingClient({ id }: { id: string }) {
   const [roomType, setRoomType] = useState<"PRIVATE_ROOM" | "ENTIRE_UNIT" | "">("");
   const [furnished, setFurnished] = useState(false);
   const [utilitiesIncluded, setUtilitiesIncluded] = useState(false);
+  const [openToNegotiation, setOpenToNegotiation] = useState(false);
   const [genderPreference, setGenderPreference] = useState<"MALE" | "FEMALE" | "ANY" | "">("");
   const [description, setDescription] = useState("");
   const [photos, setPhotos] = useState<ListingPhoto[]>([]);
@@ -166,6 +168,7 @@ export function EditListingClient({ id }: { id: string }) {
           setRoomType(l.room_type);
           setFurnished(l.furnished);
           setUtilitiesIncluded(l.utilities_included);
+          setOpenToNegotiation(l.open_to_negotiation);
           setGenderPreference(l.gender_preference);
           setDescription(l.description);
           setPhotos((l.photos ?? []) as ListingPhoto[]);
@@ -202,6 +205,7 @@ export function EditListingClient({ id }: { id: string }) {
           room_type: roomType,
           furnished,
           utilities_included: utilitiesIncluded,
+          open_to_negotiation: openToNegotiation,
           gender_preference: genderPreference || "ANY",
           description,
         }),
@@ -504,6 +508,15 @@ export function EditListingClient({ id }: { id: string }) {
                   className="h-4 w-4 rounded border-gray-200 text-accent focus:ring-accent"
                 />
                 Utilities included
+              </label>
+              <label className="inline-flex items-center gap-2 text-sm text-gray-600">
+                <input
+                  type="checkbox"
+                  checked={openToNegotiation}
+                  onChange={(e) => setOpenToNegotiation(e.target.checked)}
+                  className="h-4 w-4 rounded border-gray-200 text-accent focus:ring-accent"
+                />
+                Open to negotiation
               </label>
             </div>
           </FormSection>

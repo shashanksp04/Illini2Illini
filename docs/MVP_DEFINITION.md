@@ -77,6 +77,7 @@ Listings must include the following required fields:
 * Private room OR entire unit
 * Furnished (yes/no)
 * Utilities included (yes/no)
+* Open to negotiation (yes/no)
 * Gender preference:
 
   * Male
@@ -103,6 +104,7 @@ Expired or deleted listings do not count toward the limit.
 * Private room vs entire unit
 * Furnished
 * Utilities included
+* Open to negotiation (when applicable)
 * Username
 
 They cannot see:

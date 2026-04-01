@@ -279,14 +279,15 @@ Acceptance:
 - [ ] Verified listing detail page:
   - [ ] render photos, description, exact address
   - [ ] show poster real name + profile picture + verified badge
+  - [ ] show **Open to negotiation** prominently when `open_to_negotiation` is true (distinct from other chips)
 
 Acceptance:
 - Verified sees full detail only when verified + logged in.
 
 ## 5.5 Create/edit listings
-- [ ] Create listing page (all required fields)
+- [ ] Create listing page (all required fields, including **Open to negotiation**)
 - [ ] Photo upload step (min 1, max 8)
-- [ ] Edit listing page
+- [ ] Edit listing page (including ability to change **Open to negotiation**)
 - [ ] My listings page:
   - [ ] status badges (ACTIVE/TAKEN/EXPIRED/DELETED)
   - [ ] actions: edit, mark taken, delete

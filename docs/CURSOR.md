@@ -446,6 +446,8 @@ ListingCard must be reused on:
 * Dashboard
 * Admin view
 
+NegotiableBadge must be used for the **Open to negotiation** state on listing cards and listing detail (do not duplicate ad hoc styles).
+
 AuthCard must be reused for:
 
 * Login

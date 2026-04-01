@@ -79,9 +79,10 @@ model Listing {
   total_bedrooms     Int
   total_bathrooms    Int              @default(1)
   room_type          RoomType
-  furnished          Boolean
-  utilities_included Boolean
-  gender_preference  GenderPreference
+  furnished            Boolean
+  utilities_included   Boolean
+  open_to_negotiation  Boolean          @default(false)
+  gender_preference    GenderPreference
   description        String           @db.VarChar(1000)
   status             ListingStatus    @default(ACTIVE)
   created_at         DateTime         @default(now())

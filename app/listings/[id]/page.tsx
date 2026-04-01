@@ -6,6 +6,7 @@ import { getApiBaseUrl } from "@/lib/api-base-url";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { SellerCard } from "@/components/listings/SellerCard";
 import { PhotoCarousel } from "@/components/listings/PhotoCarousel";
+import { NegotiableBadge } from "@/components/listings/NegotiableBadge";
 
 type PublicListingDetail = {
   id: string;
@@ -20,6 +21,7 @@ type PublicListingDetail = {
   total_bathrooms?: number;
   furnished: boolean;
   utilities_included: boolean;
+  open_to_negotiation: boolean;
   owner_username: string;
   thumbnail_url?: string | null;
 };
@@ -100,9 +102,12 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
           <div className="rounded-2xl border border-gray-200/60 bg-white p-6 shadow-card sm:p-8">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <h1 className="text-2xl font-bold tracking-tight text-brand md:text-3xl">{l.title}</h1>
-              <span className="shrink-0 rounded-xl bg-brand px-4 py-1.5 text-xl font-bold tabular-nums text-white shadow-lg">
-                ${l.monthly_rent}<span className="text-sm font-medium opacity-60">/mo</span>
-              </span>
+              <div className="flex shrink-0 flex-col items-stretch gap-2 sm:items-end">
+                <span className="rounded-xl bg-brand px-4 py-1.5 text-center text-xl font-bold tabular-nums text-white shadow-lg sm:text-right">
+                  ${l.monthly_rent}<span className="text-sm font-medium opacity-60">/mo</span>
+                </span>
+                {l.open_to_negotiation ? <NegotiableBadge /> : null}
+              </div>
             </div>
 
             <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500">

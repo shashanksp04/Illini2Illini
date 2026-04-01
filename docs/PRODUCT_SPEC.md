@@ -116,6 +116,7 @@ Unit Details:
 * Private room OR entire unit
 * Furnished (yes/no)
 * Utilities included (yes/no)
+* Open to negotiation (yes/no; whether the seller is willing to negotiate rent)
 * Gender preference (Male / Female / Any)
 
 Description:
@@ -141,6 +142,7 @@ Public users can see:
 * Private vs entire
 * Furnished
 * Utilities included
+* Open to negotiation (when true, shown prominently on cards and detail)
 * Username
 
 Public users cannot see:

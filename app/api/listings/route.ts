@@ -188,6 +188,7 @@ export async function POST(request: Request) {
       room_type: body.room_type,
       furnished: Boolean(body.furnished),
       utilities_included: Boolean(body.utilities_included),
+      open_to_negotiation: Boolean(body.open_to_negotiation),
       gender_preference: body.gender_preference,
       description: String(body.description ?? ""),
     };
