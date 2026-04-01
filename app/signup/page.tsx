@@ -32,6 +32,11 @@ export default function SignupPage() {
         setError((!json.ok && json.error?.message) || "Unable to create account. Please try again.");
         return;
       }
+      try {
+        sessionStorage.setItem("signup_email", email.trim());
+      } catch {
+        // ignore
+      }
       router.push(`/verify-email?email=${encodeURIComponent(email)}`);
     } catch {
       setError("Unable to create account. Please try again.");

@@ -283,7 +283,7 @@ Permissions:
 
 (Condensed version for clarity; detailed logic already defined above.)
 
-Signup → Verify Email → Complete Profile → Access Dashboard
+Signup → Verify Email (OTP code) → Complete Profile → Access Dashboard
 Create Listing → Validate → Save → Status = Active
 Browse (Public) → Limited View
 Browse (Logged-In) → Full View

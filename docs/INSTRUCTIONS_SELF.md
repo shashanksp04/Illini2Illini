@@ -19,24 +19,13 @@ I'm done finalizing my Build_Spec.md, Tasks.md and Decision.md file. Now before 
 
 When implementing the Email Verification page (UI tasks):
 
-Current backend uses emailRedirectTo = request.origin
+The shipped flow is **OTP in-app**, not “click link then land on home.” After signup, users go to **`/verify-email`**, enter the **one-time code** from email, and **`POST /api/auth/verify-email/verify`** establishes the Supabase session (cookies via SSR).
 
-That means users will land on the app root after clicking the verification link
+Ensure:
 
-The landing page must correctly detect and handle a “just verified” state
+* Session is available immediately after a successful verify (same-origin fetch + cookie handling).
+* Gating updates: unverified users stay blocked from protected actions until `email_confirmed_at` is set.
+* Clear UX feedback on success (then redirect, e.g. to `/listings`; middleware may send new users to `/profile/setup` if the profile is incomplete).
+* No requirement for the **landing page** to detect a “just verified” return from an email link—that pattern is obsolete for this product.
 
-We must ensure:
-
-Proper session refresh
-
-Correct gating removal
-
-Clear UX feedback (“Email verified successfully”)
-
-No redirect loop back to verification instructions
-
-We will explicitly revisit this during:
-
-TASKS 5.2 — Email verification page UX
-
-I’ll proactively bring this up again when we reach UI implementation.
+**verify-email page OTP UX** (code field, resend, error states for invalid/expired codes) is the right place to refine polish.

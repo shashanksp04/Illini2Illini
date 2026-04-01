@@ -1,15 +1,16 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 
 import { PageContainer } from "@/components/layout/PageContainer";
 import { AuthCard } from "@/components/auth/AuthCard";
 
 export default function ForgotPasswordPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -26,7 +27,6 @@ export default function ForgotPasswordPage() {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setStatus(null);
     setError(null);
     if (!email) {
       setError("Email is required.");
@@ -34,20 +34,26 @@ export default function ForgotPasswordPage() {
     }
     setSubmitting(true);
     try {
-      const res = await fetch("/api/auth/forgot-password", {
+      const res = await fetch("/api/auth/reset-password/request", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
       const json = (await res.json()) as { ok?: boolean; error?: { message?: string } };
       if (!res.ok || !json.ok) {
-        const message = json.error?.message ?? "Unable to send reset email. Please try again.";
+        const message = json.error?.message ?? "Unable to send code. Please try again.";
         setError(message);
         return;
       }
-      setStatus("If an account exists, you'll receive an email. Check your inbox.");
+      try {
+        sessionStorage.setItem("reset_password_email", email.trim());
+      } catch {
+        // ignore
+      }
+      const q = encodeURIComponent(email.trim());
+      router.push(`/forgot-password/verify?email=${q}`);
     } catch {
-      setError("Unable to send reset email. Please try again.");
+      setError("Unable to send code. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -67,8 +73,8 @@ export default function ForgotPasswordPage() {
               </div>
               <h1 className="text-2xl font-bold text-brand">Reset your password</h1>
               <p className="text-sm text-gray-500">
-                Enter your <span className="font-medium">@illinois.edu</span> email and we&apos;ll send you a link to
-                reset your password.
+                Enter your <span className="font-medium">@illinois.edu</span> email and we&apos;ll send you a
+                verification code to reset your password.
               </p>
             </div>
 
@@ -96,18 +102,12 @@ export default function ForgotPasswordPage() {
                   <p className="text-sm text-red-600">{error}</p>
                 </div>
               )}
-              {status && (
-                <div className="rounded-xl bg-green-50 px-3 py-2">
-                  <p className="text-sm text-green-600">{status}</p>
-                </div>
-              )}
-
               <button
                 type="submit"
                 disabled={submitting}
                 className="w-full inline-flex items-center justify-center rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-white shadow-button transition-all duration-200 hover:bg-accent-hover hover:shadow-button-hover disabled:opacity-70 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:ring-offset-2"
               >
-                {submitting ? "Sending..." : status ? "Resend reset email" : "Send reset email"}
+                {submitting ? "Sending…" : "Send code"}
               </button>
             </form>
 

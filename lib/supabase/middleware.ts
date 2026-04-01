@@ -7,6 +7,7 @@ const PROFILE_GATE_BYPASS = new Set([
   "/signup",
   "/verify-email",
   "/forgot-password",
+  "/forgot-password/verify",
   "/reset-password",
   "/auth/callback",
 ]);

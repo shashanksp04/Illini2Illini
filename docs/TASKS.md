@@ -149,6 +149,7 @@ Acceptance:
 - [ ] POST /api/auth/login
 - [ ] POST /api/auth/logout
 - [ ] POST /api/auth/resend-verification
+- Shipped additions (OTP): `POST /api/auth/verify-email/verify`, `POST /api/auth/reset-password/request`, `POST /api/auth/reset-password/verify`, `POST /api/auth/reset-password/update` — see `BUILD_SPEC.md` §8.1.
 
 Acceptance:
 - Signup/login/logout all functional.

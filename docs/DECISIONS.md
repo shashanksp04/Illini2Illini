@@ -165,3 +165,17 @@ Date:
 2026-02-28
 
 ---
+
+Decision: Email Verification and Password Reset via In-App OTP (Supabase `verifyOtp`)
+
+Reason:
+
+* Avoids reliance on confirmation/reset **links** in email (reduces prefetch and “link clicked before user” issues).
+* Aligns with Supabase Auth: `verifyOtp` with `type: "signup"` for signup confirmation and `type: "email"` for password-reset OTP after `signInWithOtp`.
+* Password change after reset remains server-gated with `requireAuth` + `updateUser({ password })`.
+
+Date:
+
+2026-03-31
+
+---

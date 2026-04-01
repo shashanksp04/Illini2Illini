@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { env } from "@/lib/env";
 import { ALLOWED_SIGNUP_DOMAIN } from "@/lib/supabase/constants";
 
 function isAllowedEmail(email: string): boolean {
@@ -43,18 +42,15 @@ export async function POST(request: Request) {
 
   try {
     const supabase = await createClient();
-    const baseUrl = env.appUrl ?? new URL(request.url).origin;
-    const redirectTo = `${baseUrl}/auth/callback?next=/reset-password`;
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo,
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { shouldCreateUser: false },
     });
     if (error) {
-      // Log server-side for debugging; do not expose to client (avoids email enumeration)
-      console.error("[forgot-password] Supabase error:", error.message, { code: error.name, redirectTo });
+      console.error("[reset-password/request] Supabase error:", error.message, { code: error.name });
     }
   } catch (err) {
-    // Log server-side for debugging; do not expose to client
-    console.error("[forgot-password] Unexpected error:", err);
+    console.error("[reset-password/request] Unexpected error:", err);
   }
 
   return NextResponse.json(

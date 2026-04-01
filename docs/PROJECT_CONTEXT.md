@@ -273,11 +273,13 @@ The following are complete:
 
 What has been built:
 
-* Authentication: @illinois.edu signup, email verification, login, logout, profile completion
+* Authentication: @illinois.edu signup, **OTP email verification** (in-app code entry; no confirmation URL required), login, logout, **OTP password reset** (request code → verify → set new password; no reset link), profile completion
 * Listings: create, edit, soft delete, mark as taken, browse, filter, search, visibility rules
 * Contact flow: email reveal for verified users, safety disclaimer
 * Admin: user management, listing moderation, reports
 * Full UI per UI_SPEC.md: listings pages, profile, admin panels, auth flows
+
+**Email OTP flows (Supabase):** New accounts verify by entering a code on `/verify-email` after signup (and can resend the code). Forgot password uses `/forgot-password` → `/forgot-password/verify` → `/reset-password`. Server routes live under `/api/auth/reset-password/request|verify|update` and `/api/auth/verify-email/verify`, with `requireAuth` on password update. Supabase Auth email templates should expose the one-time code (e.g. `{{ .Token }}`) so users receive a numeric OTP, not only a link.
 
 The immediate focus is:
 

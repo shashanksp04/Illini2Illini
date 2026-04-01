@@ -43,7 +43,7 @@ Defines **HOW** to build the product specified in `PRODUCT_SPEC.md`, within MVP 
 
 ### Auth
 
-* **Supabase Auth** (email/password + email verification)
+* **Supabase Auth** (email/password + email verification and password reset completed in-app via **OTP** and `verifyOtp` in route handlers—not only magic links)
 
 ### Storage
 
@@ -272,7 +272,7 @@ All endpoints are **Next.js Route Handlers** under `/app/api/**/route.ts`.
 
 #### `POST /api/auth/signup`
 
-Creates Supabase Auth user and triggers verification email.
+Creates Supabase Auth user and triggers a **signup confirmation** email (include `{{ .Token }}` in the Supabase email template so users receive a one-time code). The user completes verification by entering that code on `/verify-email` via `POST /api/auth/verify-email/verify`. **`emailRedirectTo` is not used** for completing verification in-app.
 
 Body:
 
@@ -315,11 +315,59 @@ Response:
 
 #### `POST /api/auth/resend-verification`
 
+Resends the **signup confirmation** OTP email (`type: "signup"`). No redirect URL is required for the in-app OTP flow.
+
 Body:
 
 ```json
 { "email": "netid@illinois.edu" }
 ```
+
+#### `POST /api/auth/verify-email/verify`
+
+Verifies the signup confirmation code and establishes a session (SSR cookies).
+
+Body:
+
+```json
+{ "email": "netid@illinois.edu", "token": "123456" }
+```
+
+* Server: `verifyOtp({ email, token, type: "signup" })`
+
+#### `POST /api/auth/reset-password/request`
+
+Starts password reset: sends an email OTP (`signInWithOtp` with `shouldCreateUser: false`). Same `@illinois.edu` rules as other auth routes; response is generic success to avoid email enumeration.
+
+Body:
+
+```json
+{ "email": "netid@illinois.edu" }
+```
+
+#### `POST /api/auth/reset-password/verify`
+
+Verifies the reset OTP and establishes a session.
+
+Body:
+
+```json
+{ "email": "netid@illinois.edu", "token": "123456" }
+```
+
+* Server: `verifyOtp({ email, token, type: "email" })`
+
+#### `POST /api/auth/reset-password/update`
+
+Sets a new password for the **current session** only (`requireAuth` + `updateUser({ password })`).
+
+Body:
+
+```json
+{ "password": "..." }
+```
+
+**Note:** `/auth/callback` remains available for OAuth/PKCE flows where applicable. Signup confirmation and password-reset **completion** no longer depend on users clicking links in email.
 
 ---
 

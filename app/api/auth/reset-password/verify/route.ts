@@ -8,7 +8,7 @@ function isAllowedEmail(email: string): boolean {
 }
 
 export async function POST(request: Request) {
-  let body: { email?: string };
+  let body: { email?: string; token?: string };
   try {
     body = await request.json();
   } catch {
@@ -19,6 +19,8 @@ export async function POST(request: Request) {
   }
 
   const email = typeof body.email === "string" ? body.email.trim() : "";
+  const rawToken = typeof body.token === "string" ? body.token.trim() : "";
+  const token = rawToken.replace(/\s/g, "");
 
   if (!email) {
     return NextResponse.json(
@@ -40,28 +42,29 @@ export async function POST(request: Request) {
     );
   }
 
+  if (!token || token.length < 6) {
+    return NextResponse.json(
+      { ok: false, error: { code: "VALIDATION_ERROR", message: "Enter the verification code from your email." } },
+      { status: 400 }
+    );
+  }
+
   const supabase = await createClient();
-  const { error } = await supabase.auth.resend({
-    type: "signup",
+  const { data, error } = await supabase.auth.verifyOtp({
     email,
+    token,
+    type: "email",
   });
 
-  if (error) {
-    const msg = error.message?.toLowerCase() ?? "";
-    if (
-      msg.includes("rate") ||
-      msg.includes("limit") ||
-      msg.includes("already") ||
-      msg.includes("confirmed") ||
-      msg.includes("not found") ||
-      msg.includes("resend")
-    ) {
+  if (error || !data?.session) {
+    const msg = error?.message?.toLowerCase() ?? "";
+    if (msg.includes("expired") || msg.includes("otp_expired")) {
       return NextResponse.json(
         {
           ok: false,
           error: {
-            code: "RESEND_NOT_ALLOWED",
-            message: "Verification email could not be sent. Try again later or contact support.",
+            code: "OTP_EXPIRED",
+            message: "This code has expired. Request a new one.",
           },
         },
         { status: 400 }
@@ -70,14 +73,14 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         ok: false,
-        error: { code: "SERVER_ERROR", message: "Something went wrong. Please try again." },
+        error: {
+          code: "OTP_INVALID",
+          message: "Invalid code. Check the email and try again.",
+        },
       },
-      { status: 500 }
+      { status: 400 }
     );
   }
 
-  return NextResponse.json(
-    { ok: true, data: { sent: true } },
-    { status: 200 }
-  );
+  return NextResponse.json({ ok: true, data: { verified: true } }, { status: 200 });
 }

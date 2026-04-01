@@ -53,14 +53,9 @@ export async function POST(request: Request) {
     // #endregion
     throw clientErr;
   }
-  const origin = new URL(request.url).origin;
-  // #region agent log
-  fetch('http://127.0.0.1:7739/ingest/abe32b33-c7b2-4ec4-af97-867fdda097b1',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'d1509e'},body:JSON.stringify({sessionId:'d1509e',location:'api/auth/signup/route.ts:pre-signUp',message:'About to call signUp',data:{email,origin},timestamp:Date.now(),hypothesisId:'A'})}).catch(()=>{});
-  // #endregion
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { emailRedirectTo: `${origin}/auth/callback` },
   });
 
   // #region agent log

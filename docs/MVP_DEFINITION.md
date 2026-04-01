@@ -32,7 +32,7 @@ It is strictly a connection platform.
 Users must:
 
 * Sign up using an `@illinois.edu` email.
-* Verify email before gaining access to full platform features.
+* Verify email (one-time code on `/verify-email`) before gaining access to full platform features.
 * Create a profile with:
 
   * First name

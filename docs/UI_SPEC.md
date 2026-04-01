@@ -520,7 +520,10 @@ Pages:
 
 Login
 Signup
-Email verification
+Email verification (enter OTP on `/verify-email`)
+Forgot password (`/forgot-password`)
+Forgot password — enter OTP (`/forgot-password/verify`)
+Reset password (`/reset-password`, after OTP session)
 Profile setup
 
 ---

@@ -1,14 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { FormEvent, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { FormEvent, Suspense, useEffect, useState } from "react";
 
 import { PageContainer } from "@/components/layout/PageContainer";
 import { AuthCard } from "@/components/auth/AuthCard";
 
-export default function VerifyEmailPage() {
+function ForgotPasswordVerifyContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const emailFromQuery = searchParams.get("email")?.trim() ?? "";
+
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -17,30 +20,25 @@ export default function VerifyEmailPage() {
   const [status, setStatus] = useState<string | null>(null);
 
   useEffect(() => {
+    if (emailFromQuery) {
+      setEmail(emailFromQuery);
+      return;
+    }
     try {
-      const params = new URLSearchParams(window.location.search);
-      const fromQuery = params.get("email")?.trim() ?? "";
-      if (fromQuery) {
-        setEmail(fromQuery);
-        return;
-      }
-      const stored = sessionStorage.getItem("signup_email");
+      const stored = sessionStorage.getItem("reset_password_email");
       if (stored) setEmail(stored);
     } catch {
       // ignore
     }
-  }, []);
+  }, [emailFromQuery]);
 
-  async function handleResend() {
-    if (!email) {
-      setError("Enter your email to resend the code.");
-      return;
-    }
+  async function requestCode() {
+    if (!email) return;
     setStatus(null);
     setError(null);
     setResending(true);
     try {
-      const res = await fetch("/api/auth/resend-verification", {
+      const res = await fetch("/api/auth/reset-password/request", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -50,7 +48,7 @@ export default function VerifyEmailPage() {
         setError(json.error?.message ?? "Unable to resend code. Please try again.");
         return;
       }
-      setStatus("If an account exists with this email, a new code was sent.");
+      setStatus("If an account exists, a new code was sent.");
     } catch {
       setError("Unable to resend code. Please try again.");
     } finally {
@@ -63,7 +61,7 @@ export default function VerifyEmailPage() {
     setError(null);
     setStatus(null);
     if (!email) {
-      setError("Email is required.");
+      setError("Email is missing. Go back and enter your email.");
       return;
     }
     const code = otp.replace(/\s/g, "");
@@ -73,7 +71,7 @@ export default function VerifyEmailPage() {
     }
     setSubmitting(true);
     try {
-      const res = await fetch("/api/auth/verify-email/verify", {
+      const res = await fetch("/api/auth/reset-password/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, token: code }),
@@ -88,12 +86,11 @@ export default function VerifyEmailPage() {
         return;
       }
       try {
-        sessionStorage.removeItem("signup_email");
+        sessionStorage.removeItem("reset_password_email");
       } catch {
         // ignore
       }
-      router.replace("/listings");
-      router.refresh();
+      router.replace("/reset-password");
     } catch {
       setError("Unable to verify code. Please try again.");
     } finally {
@@ -111,35 +108,16 @@ export default function VerifyEmailPage() {
                 className="flex h-12 w-12 items-center justify-center rounded-full bg-accent-light text-accent text-xl shadow-glow"
                 aria-hidden
               >
-                &#9993;
+                &#128273;
               </div>
-              <h1 className="text-2xl font-bold text-brand">Verify your email</h1>
+              <h1 className="text-2xl font-bold text-brand">Enter verification code</h1>
               <p className="text-sm text-gray-500">
-                We sent a verification code to{" "}
-                <span className="font-medium text-gray-700">{email || "your @illinois.edu address"}</span>. Enter it
+                We sent a code to <span className="font-medium text-gray-700">{email || "your email"}</span>. Enter it
                 below to continue.
               </p>
             </div>
 
             <form className="space-y-4" onSubmit={handleSubmit}>
-              <div className="space-y-1.5">
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                  Email
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="netid@illinois.edu"
-                  className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2.5 text-sm text-gray-700 placeholder-gray-400 focus:border-accent focus:bg-white focus:outline-none focus:shadow-input-focus transition-all duration-200"
-                />
-                <p className="text-xs text-gray-500">
-                  Use the same <span className="font-medium">@illinois.edu</span> address you signed up with.
-                </p>
-              </div>
-
               <div className="space-y-1.5">
                 <label htmlFor="otp" className="block text-sm font-medium text-gray-700">
                   6-digit code
@@ -181,18 +159,21 @@ export default function VerifyEmailPage() {
               <button
                 type="button"
                 disabled={resending || !email}
-                onClick={() => void handleResend()}
+                onClick={() => void requestCode()}
                 className="text-sm font-medium text-accent hover:text-accent-hover disabled:opacity-50"
               >
                 {resending ? "Sending…" : "Resend code"}
               </button>
-              <Link href="/signup" className="text-center text-sm text-gray-500 hover:text-gray-700 sm:text-right">
-                Wrong email? Sign up again
+              <Link
+                href="/forgot-password"
+                className="text-center text-sm text-gray-500 hover:text-gray-700 sm:text-right"
+              >
+                Use a different email
               </Link>
             </div>
 
             <p className="text-center text-sm text-gray-500">
-              Already verified?{" "}
+              Remember your password?{" "}
               <Link href="/login" className="font-medium text-accent hover:text-accent-hover transition-colors duration-200">
                 Sign in
               </Link>
@@ -201,5 +182,21 @@ export default function VerifyEmailPage() {
         </AuthCard>
       </div>
     </PageContainer>
+  );
+}
+
+export default function ForgotPasswordVerifyPage() {
+  return (
+    <Suspense
+      fallback={
+        <PageContainer>
+          <div className="flex justify-center py-12">
+            <div className="h-10 w-48 animate-pulse rounded-xl bg-gray-200" />
+          </div>
+        </PageContainer>
+      }
+    >
+      <ForgotPasswordVerifyContent />
+    </Suspense>
   );
 }

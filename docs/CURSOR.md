@@ -79,8 +79,8 @@ You must NOT:
 
 ## Documentation
 
-* Files in `/docs` are locked specifications
-* Do NOT modify any files inside `/docs`
+* Files in `/docs` are canonical specifications; treat them as source of truth for product and build.
+* Do not change `/docs` casually or drift from shipped behavior. **Do** update them when explicitly aligning documentation with the product (e.g. after feature changes or when the user requests spec maintenance).
 
 ---
 
