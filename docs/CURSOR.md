@@ -371,7 +371,8 @@ You must reuse the following components wherever possible:
 * ListingCard
 * SellerCard
 * SearchBar
-* FilterBar
+* FilterBar (Verified browse on `/listings`)
+* CommunityFilterBar (Community browse on `/listings`)
 * AuthCard
 * FormSection
 
@@ -445,6 +446,8 @@ ListingCard must be reused on:
 * Browse page
 * Dashboard
 * Admin view
+
+Browse `/listings` pagination: reuse the shared **Previous** / **Next** pattern (see `UI_SPEC.md`); do not add a second pagination pattern per tab.
 
 NegotiableBadge must be used for the **Open to negotiation** state on listing cards and listing detail (do not duplicate ad hoc styles).
 

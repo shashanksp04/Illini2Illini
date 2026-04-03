@@ -274,7 +274,9 @@ Search moves below navbar.
 
 # 9. Filter System
 
-Used on Browse Listings page.
+## Verified (Illini2Illini) tab
+
+Uses the full **FilterBar** on Browse Listings (`/listings`).
 
 Desktop:
 
@@ -296,7 +298,7 @@ Style:
 
 ---
 
-## Mobile Filters
+## Verified tab: Mobile Filters
 
 Filters collapse into:
 
@@ -311,6 +313,18 @@ Clear button
 
 ---
 
+## Community (Reddit) tab
+
+Uses a separate **CommunityFilterBar** (not the Verified FilterBar): **min rent**, **max rent**, and **bedrooms** (same bedroom options as Verified: Any, 1–4, 5+). Submitting applies filters via GET to `/listings` with `tab=community` and `page=1`; **Clear** resets to `/listings?tab=community`.
+
+The bar includes a short **disclaimer** (muted text): Community posts are parsed from Reddit; if rent or bedrooms were not extracted, the original post may still contain them (e.g. in a screenshot or non-plain text). When filters are active, listings that **match** parsed fields are ordered **before** listings with **missing** rent or bedroom values for the active filters; within those groups, ordering follows the global Community rules below.
+
+Mobile: same pattern as Verified—a **Filters** control opens a bottom drawer with Apply / Clear.
+
+Community cards use a distinct minimal layout (title, rent, bedrooms, optional thumbnail, Reddit badge).
+
+---
+
 # 10. Listing Grid
 
 Grid layout:
@@ -322,6 +336,16 @@ grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6
 Cards must align evenly.
 
 Images must have fixed aspect ratio.
+
+## Pagination (Browse `/listings`)
+
+On **Verified** and **Community** tabs, when there is a previous or next page of results, show a centered row below the grid:
+
+* **Previous** and **Next** as bordered buttons (same family as secondary actions elsewhere on the page); inactive direction is visibly disabled (not a link).
+* Current page label: **Page {n}** between the buttons.
+* Wrap in a `<nav>` with an accessible label (e.g. “Listing results pagination”).
+
+Pagination must preserve the active tab and query string: Verified listings keep filter/sort/keyword params across pages; Community keeps `?tab=community`, `?page=`, and active Community filters (`min_rent`, `max_rent`, `total_bedrooms` as applicable).
 
 ---
 
@@ -730,7 +754,8 @@ All pages must reuse these core components:
 
 Navbar
 SearchBar
-FilterBar
+FilterBar (Verified browse)
+CommunityFilterBar (Community browse)
 ListingCard
 NegotiableBadge (for “Open to negotiation”; use wherever listing rent flexibility is shown)
 SellerCard

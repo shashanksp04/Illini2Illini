@@ -1,0 +1,41 @@
+# Illini2Illini — fields and requirements for posting a listing
+# Format: name | expected answer type | notes (optional)
+# Source: app/listings/new/page.tsx, lib/listings/helpers.ts (validateCreatePayload), app/api/me/route.ts, lib/storage/constants.ts
+
+--- Prerequisites (before the Create listing form; not on the listing form itself) ---
+
+login_with_uiuc_account | authentication | required to open /listings/new
+email_verified | yes (verified state) | UIUC email must be verified; otherwise user is sent to verify-email
+profile_first_name | text | required for is_profile_complete (collected on /profile/setup)
+profile_last_name | text | required for is_profile_complete
+profile_username | text | required for is_profile_complete
+profile_picture | image upload | required for is_profile_complete (URL stored after upload)
+account_not_banned | yes (not restricted) | banned users cannot create listings
+
+--- Business rule (server; not a form field) ---
+
+active_listings_limit | integer cap | maximum 3 ACTIVE listings per user; POST returns ACTIVE_LIMIT_REACHED if at limit
+
+--- Step 1 of 2: Listing details (POST /api/listings body keys) ---
+
+title | short text | max 100 characters (server)
+monthly_rent | currency / positive integer | USD per month; integer >= 1 (server); UI: number input min 0 then coerced
+lease_type | enum | SUBLEASE or LEASE_TAKEOVER
+start_date | date | ISO date string parsed server-side
+end_date | date | must be strictly after start_date (server)
+exact_address | free text | full street address as entered
+nearby_landmark | short text | max 80 characters (server)
+total_bedrooms | integer choice | positive integer; UI options 1–6
+total_bathrooms | integer choice | positive integer; UI options 1–5
+room_type | enum | PRIVATE_ROOM or ENTIRE_UNIT
+furnished | yes/no | boolean; checkbox default false
+utilities_included | yes/no | boolean; checkbox default false
+open_to_negotiation | yes/no | boolean; checkbox default false
+gender_preference | enum | ANY, FEMALE, or MALE (UI: select includes empty and Any)
+description | long text | max 1000 characters (server); amenities, utilities detail, move-in notes
+
+--- Step 2 of 2: Photos (after listing is created; /api/listings/:id/photos) ---
+
+listing_photos | image file(s) | at least 1 required to finish flow (UI disables Finish until >= 1); max 8 photos per listing
+photo_formats | MIME types | JPEG, PNG, or WEBP only (server)
+photo_max_size | file size | 5 MB per image (server: MAX_LISTING_PHOTO_SIZE_BYTES)

@@ -8,6 +8,8 @@ This document acts as the stopping boundary for MVP development.
 
 No features outside this scope are required for launch.
 
+**Note:** After MVP launch, the product added **Community (Reddit)** aggregated listings and a daily JSON import (`tools/reddit-import/`), plus **browse pagination** (Previous/Next on `/listings` for Verified and Community) and **Community rent/bedroom filters** on `/listings?tab=community`. That work is documented in `docs/PROJECT_CONTEXT.md`, `docs/BUILD_SPEC.md`, `docs/PRODUCT_SPEC.md`, `docs/DECISIONS.md`, and `docs/UI_SPEC.md` and does not change the original MVP completion criteria above.
+
 ---
 
 # 1️⃣ Core Objective

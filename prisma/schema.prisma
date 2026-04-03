@@ -42,6 +42,10 @@ enum ReportStatus {
   RESOLVED
 }
 
+enum ExternalListingSource {
+  REDDIT
+}
+
 // users
 
 model User {
@@ -160,5 +164,39 @@ model ListingView {
   @@index([listing_id])
   @@index([viewer_user_id])
   @@map("listing_views")
+}
+
+// External aggregated listings (e.g. Reddit); not platform-verified posts.
+
+model RedditListing {
+  id                  String               @id @default(uuid()) @db.Uuid
+  external_id         String               @unique
+  source              ExternalListingSource @default(REDDIT)
+  title               String
+  description         String               @db.Text
+  monthly_rent        Int?
+  lease_type          LeaseType?
+  start_date          DateTime?            @db.Date
+  end_date            DateTime?            @db.Date
+  room_type           RoomType?
+  furnished           Boolean?
+  utilities_included  Boolean?
+  open_to_negotiation Boolean?
+  gender_preference   GenderPreference?
+  nearby_landmark     String?              @db.VarChar(500)
+  total_bedrooms      Int?
+  total_bathrooms     Int?
+  exact_address       String?              @db.Text
+  external_url        String
+  source_created_at   DateTime
+  raw_text            String?              @db.Text
+  /** Reddit-hosted image URLs in display order (may be empty). */
+  image_urls          String[]             @default([])
+  exclude             Boolean              @default(false)
+  created_at          DateTime             @default(now())
+  updated_at          DateTime             @default(now()) @updatedAt
+
+  @@index([exclude, source_created_at])
+  @@map("reddit_listings")
 }
 

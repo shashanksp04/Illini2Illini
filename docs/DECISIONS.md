@@ -165,6 +165,68 @@ Date:
 
 ---
 
+Decision: Community (Reddit) listings in a separate table
+
+Reason:
+
+* Keeps Reddit-sourced posts out of the verified `listings` feed and preserves a clear trust model (verified vs external).
+* No `owner_id`; contact is via **external Reddit URL**, not email reveal.
+
+Date:
+2026-04-03
+
+---
+
+Decision: Reddit JSON import is insert-only for existing `external_id`
+
+Reason:
+
+* Daily runs add **new** submissions without re-writing rows already stored.
+* Avoids overwriting data if the extract or pipeline changes; tradeoff: corrections to existing posts require manual DB edit or a future “force update” mode.
+
+Date:
+2026-04-03
+
+---
+
+Decision: Browse listings pagination via URL + shared Prev/Next on both tabs
+
+Reason:
+
+* `GET /api/listings` and `GET /api/reddit-listings` already expose `page`, `page_size` (max 100), and `has_more`.
+* The `/listings` route uses server-rendered **Previous** / **Next** links so pagination works without client state; `listingsHrefForPage` keeps Verified filters and Community `tab` in sync with `?page=`.
+
+Date:
+2026-04-03
+
+---
+
+Decision: Community browse lists rows with images before rows without (then by recency)
+
+Reason:
+
+* Improves grid preview when many Reddit posts lack images.
+* Sort is applied in the **paginated** `GET /api/reddit-listings` query (not client-side) so ordering stays correct across pages.
+* When rent/bedroom filters are active, **match tier** (parsed fields vs filters) sorts **before** the image/recency tie-break within each tier.
+
+Date:
+2026-04-03
+
+---
+
+Decision: Community tab rent/bedroom filters preserve unparsed rows at the end of the sort
+
+Reason:
+
+* Reddit import may leave `monthly_rent` or `total_bedrooms` null when text parsing fails; the original post may still contain that information (e.g. in an image).
+* Users can filter by rent and bedrooms while still seeing those listings, ordered after rows whose parsed fields match the active filters.
+* Same query params as Verified browse (`min_rent`, `max_rent`, `total_bedrooms`) keep URL state consistent when switching tabs.
+
+Date:
+2026-04-03
+
+---
+
 Decision: Use Vercel Cron for Daily Listing Expiration
 Reason: 
 Minimal operational overhead and simplest scheduled execution model aligned with MVP speed and monolith deployment.

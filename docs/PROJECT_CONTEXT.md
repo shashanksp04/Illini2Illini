@@ -280,6 +280,16 @@ What has been built:
 * Admin: user management, listing moderation, reports
 * Full UI per UI_SPEC.md: listings pages, profile, admin panels, auth flows
 
+**Community (Reddit) listings (post-MVP shipped feature):**
+
+* Separate Postgres table `reddit_listings` (not mixed with verified `listings`); keyed by Reddit **`external_id`** (submission id).
+* Browse page (`/listings`) has tabs: **Verified (Illini2Illini)** vs **Community (Reddit)** (`?tab=community`). Community detail lives at **`/community/[id]`** (DB UUID).
+* **Browse pagination:** Both tabs use the same **Previous** / **Next** controls below the grid (server-driven via `GET /api/listings` and `GET /api/reddit-listings`). Default page size is **20**; the URL uses `?page=` (and `tab=community` on the Community tab). Active Verified filters and sort are preserved when changing pages; Community preserves `min_rent`, `max_rent`, and `total_bedrooms` when paginating.
+* **Community filters:** The Community tab has a dedicated **CommunityFilterBar** (rent min/max + bedrooms). Filtering and sort semantics are implemented in `GET /api/reddit-listings` (see `docs/BUILD_SPEC.md`).
+* **Community browse order:** With **no** Community filters, listings that include at least one imported image appear before listings without images (then by recency within each group). With **active** rent/bedroom filters, rows whose **parsed** fields match the filters are ordered before rows with **missing** rent or bedroom for those filters; then image preference; then recency.
+* Visibility: logged-out users see only title, monthly rent, and bedroom count on cards/detail; full fields + Reddit image URLs require verified login; contact is **“View on Reddit”** (external link), not email reveal.
+* **Daily JSON import:** operational tooling under [`tools/reddit-import/`](../tools/reddit-import/) — run `npm run reddit-import` (see [`tools/reddit-import/README.md`](../tools/reddit-import/README.md)). Import **inserts only** new `external_id` values; rows already in the DB are **skipped** (not updated). Sample / reference JSON: [`docs/reddit-related/reddit_listings.json`](reddit-related/reddit_listings.json); product notes: [`docs/reddit-related/reddit_extract_Feature.md`](reddit-related/reddit_extract_Feature.md).
+
 **Email OTP flows (Supabase):** New accounts verify by entering a code on `/verify-email` after signup (and can resend the code). Forgot password uses `/forgot-password` → `/forgot-password/verify` → `/reset-password`. Server routes live under `/api/auth/reset-password/request|verify|update` and `/api/auth/verify-email/verify`, with `requireAuth` on password update. Supabase Auth email templates should expose the one-time code (e.g. `{{ .Token }}`) so users receive a numeric OTP, not only a link.
 
 The immediate focus is:

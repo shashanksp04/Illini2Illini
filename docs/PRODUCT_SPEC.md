@@ -186,7 +186,25 @@ Includes:
 * Sort by newest
 * Sort by price (low to high)
 
+**Pagination:** Browse results load in pages (default **20** per page). On `/listings`, users move between pages with **Previous** and **Next** below the grid on both the Verified and Community tabs; the URL uses `?page=`, and Verified filters/search/sort carry across pages; Community rent/bedroom filter params carry across pages when set.
+
 No map view.
+
+---
+
+## Feature: Community (Reddit) listings (aggregated)
+
+The browse experience includes a separate **Community (Reddit)** tab (verified **Illini2Illini** listings remain the default tab).
+
+* Data is loaded from a dedicated API backed by the `reddit_listings` table (not user-owned `listings`).
+* **Public / logged-out:** may see title, monthly rent, bedroom count, and optional image thumbnail on cards; detail pages lock further fields until the user is logged in with a verified @illinois.edu account.
+* **Contact:** there is no “Contact seller” for Reddit rows; the product action is **open the post on Reddit** (external link).
+* **Trust:** UI distinguishes verified platform listings from Reddit-sourced community listings.
+* **Pagination:** Uses the same browse **Previous** / **Next** pattern as Verified; URL includes `tab=community` and `page` as needed.
+* **Filters (Community tab):** Users can narrow by **monthly rent** (min/max) and **bedrooms** (query params align with Verified: `min_rent`, `max_rent`, `total_bedrooms`; bedroom `5` means five or more). Rows where rent or bedroom was **not parsed** into the database still appear when relevant filters are set, but are ordered **after** rows whose parsed values **match** the filters; rows with parsed values **outside** the range are excluded. The UI explains that parsing misses do not mean the information is absent from the original Reddit post.
+* **Browse order (Community only):** When rent/bedroom filters are active, **match tier** (parsed fields satisfy active filters) comes first, then **thumbnail preference** (listings with at least one image before those without), then **source recency**. When no Community filters are set, order is **images first**, then recency (same as before).
+
+Operational: new rows are added via a **daily JSON import** (see `tools/reddit-import/README.md`). Imports add **only new** Reddit submission ids; existing ids in the database are not overwritten by subsequent runs.
 
 ---
 

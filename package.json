@@ -12,7 +12,9 @@
     "start": "next start",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "reddit-import": "tsx tools/reddit-import/src/import.ts",
+    "import-reddit-listings": "tsx scripts/import-reddit-listings.ts"
   },
   "dependencies": {
     "@prisma/client": "6.19.2",
@@ -36,6 +38,7 @@
     "prettier": "3.4.2",
     "prisma": "6.19.2",
     "tailwindcss": "4.2.1",
+    "tsx": "^4.21.0",
     "typescript": "5.7.2"
   }
 }

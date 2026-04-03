@@ -11,7 +11,8 @@ type NavbarProps = { user: NavUser | null; needsProfile?: boolean };
 
 export function Navbar({ user, needsProfile }: NavbarProps) {
   const pathname = usePathname();
-  const showSearch = pathname === "/" || pathname === "/listings";
+  const showSearch = pathname === "/" || pathname === "/listings" || pathname.startsWith("/community");
+  const browseActive = pathname === "/listings" || pathname.startsWith("/community");
 
   return (
     <header className="sticky top-0 z-40 border-b border-white/10 bg-brand/95 text-white backdrop-blur-xl">
@@ -25,9 +26,7 @@ export function Navbar({ user, needsProfile }: NavbarProps) {
         <Link
           href="/listings"
           className={`hidden shrink-0 rounded-md px-3 py-1.5 text-sm font-medium transition-all sm:block ${
-            pathname === "/listings"
-              ? "bg-white/15 text-white"
-              : "text-white/60 hover:bg-white/10 hover:text-white"
+            browseActive ? "bg-white/15 text-white" : "text-white/60 hover:bg-white/10 hover:text-white"
           }`}
         >
           Browse

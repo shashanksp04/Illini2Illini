@@ -253,6 +253,8 @@ Acceptance:
 - [ ] Browse listings page:
   - [ ] show public preview fields only
   - [ ] filter UI + keyword search + sorting
+  - [x] Community tab: rent/bedroom filters (`CommunityFilterBar`; `GET /api/reddit-listings` query params)
+  - [x] pagination: Previous/Next below grid (Verified + Community tabs; `?page=`)
 - [ ] Listing detail page (public):
   - [ ] show limited view
   - [ ] “Login to see photos / description / address” gating
@@ -383,3 +385,13 @@ Acceptance:
 (Use this section to log what’s done, dates, and links to PRs.)
 
 - YYYY-MM-DD — Task — Notes/PR
+
+---
+
+# 10) Community (Reddit) data import (operational)
+
+Not part of the original MVP task list; shipped as a separate feature. **How to run** the daily JSON import:
+
+- Read [`tools/reddit-import/README.md`](../tools/reddit-import/README.md) from repo root.
+- Commands: `npm run reddit-import` (default file `tools/reddit-import/json/latest.json` or `--file`), `npm run import-reddit-listings` (defaults to `docs/reddit-related/reddit_listings.json`).
+- Import behavior: **inserts only** new `external_id` values; existing database rows are **not** updated.

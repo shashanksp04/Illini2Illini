@@ -100,6 +100,7 @@ Defines **HOW** to build the product specified in `PRODUCT_SPEC.md`, within MVP 
 * `RoomType`: `PRIVATE_ROOM | ENTIRE_UNIT`
 * `GenderPreference`: `MALE | FEMALE | ANY`
 * `ReportStatus`: `OPEN | RESOLVED`
+* `ExternalListingSource`: `REDDIT` (external aggregated posts)
 
 ### users
 
@@ -183,6 +184,25 @@ Indexes: `listing_id`, `viewer_user_id`
 
 Purpose: one row per successful `GET /api/listings/:id` response when the requester is not the listing owner; powers **view_count** for the seller on `GET /api/me/listings`.
 
+### reddit_listings
+
+Separate from platform `listings`. Stores Reddit-sourced rows ingested via JSON import (`tools/reddit-import/`). Not owned by a `users` row.
+
+* `id` uuid pk
+* `external_id` text **unique** (Reddit submission id)
+* `source` enum `ExternalListingSource` (default `REDDIT`)
+* `title`, `description` (text)
+* Nullable structured fields aligned with extract: `monthly_rent`, `lease_type`, `start_date`, `end_date`, `room_type`, `furnished`, `utilities_included`, `open_to_negotiation`, `gender_preference`, `nearby_landmark`, `total_bedrooms`, `total_bathrooms`, `exact_address`
+* `external_url` text (Reddit post URL)
+* `source_created_at` timestamp (from source post)
+* `raw_text` text optional
+* `image_urls` text array (Reddit CDN URLs; may be empty)
+* `exclude` boolean default false (hide from Community API when true)
+
+Index: `(exclude, source_created_at)` for listing queries.
+
+**Operational import:** `lib/reddit-import/import-rows.ts` — **insert-only** for new `external_id`; existing ids are skipped (no update). CLI: `npm run reddit-import`, `npm run import-reddit-listings`. See `tools/reddit-import/README.md`.
+
 ---
 
 ## 6. Core Helpers (Migration-Friendly Interfaces)
@@ -209,6 +229,11 @@ These helpers are the “stable contract” so future migrations are painless:
 * `softDeleteListing(userOrAdmin, listingId)`
 * `expireListingsJob() -> { expiredCount }`
 * `recordListingView({ listingId, viewerUserId })` — inserts `listing_views` for ACTIVE listings; skips when the viewer is the owner (see `lib/listings/views.ts`)
+
+### Reddit listing helpers
+
+* `getRedditListingsMinimal({ page, pageSize, min_rent?, max_rent?, total_bedrooms? })` — public list fields for Community tab (`lib/reddit-listings/helpers.ts`). Optional filters match query params on `GET /api/reddit-listings`. **Where:** rows with `exclude = false`; rent/bedroom filters include rows with **null** `monthly_rent` or `total_bedrooms` when that dimension is filtered (so unparsed values remain visible). **Order:** sort tier `0` when every **active** filter is satisfied by non-null parsed values; tier `1` when a filtered dimension is null (unparsed); then rows with at least one `image_urls` entry before rows without; then `source_created_at` descending (all in SQL so pagination is global).
+* `getRedditListingPublic(id)` / `getRedditListingVerified(id)` — anonymous vs verified detail shaping for `GET /api/reddit-listings/:id`
 
 ### Storage helpers
 
@@ -259,6 +284,12 @@ Return all listing fields plus:
 * `owner_profile_picture_url`
 * `owner_username`
 * `verified_badge = true`
+
+### Reddit (Community) listings — visibility
+
+**Public / anonymous:** list and detail return only `id`, `title`, `monthly_rent`, `total_bedrooms`, optional `thumbnail_url` (first image); detail includes `requires_login_for_details: true`.
+
+**Verified session:** full row including `description`, dates, enums, `image_urls` / gallery, `external_url` for “View on Reddit”. No seller email or `contact_events`.
 
 ---
 
@@ -479,6 +510,8 @@ Response (public):
 { "ok": true, "data": { "items": [ ...publicPreview ], "page": 1, "has_more": true } }
 ```
 
+**Browse UI (`/listings` Verified tab):** The page’s **Previous** / **Next** controls pass `page` (and existing filter/sort/keyword query params). Default `page_size` is **20** when omitted.
+
 #### `GET /api/listings/:id`
 
 Public endpoint; returns **public detail** unless viewer is verified (then return verified detail).
@@ -498,6 +531,20 @@ Response (verified detail):
 ```json
 { "ok": true, "data": { "listing": { ...verifiedDetail } } }
 ```
+
+#### `GET /api/reddit-listings`
+
+Public. Paginated **Community** tab source.
+
+**Query:** `page`, `page_size` (max **100**; default **20** when omitted), optional `min_rent`, `max_rent`, `total_bedrooms` (integer **1–5**; **5** means five or more bedrooms, same as Verified listings). If both `min_rent` and `max_rent` are set, `min_rent` must not exceed `max_rent` (else **400**).
+
+Returns minimal card fields per item (`id`, `title`, `monthly_rent`, `total_bedrooms`, `thumbnail_url`); only rows with `exclude = false`. **Filter logic:** when rent bounds are set, rows with **null** `monthly_rent` remain included; when a bedroom value is set, rows with **null** `total_bedrooms` remain included; parsed rent outside the range or parsed bedroom count that does not match the selection are **excluded**. **Sort:** match tier (all active filters satisfied by parsed fields) before incomplete/unparsed-for-filter rows; then listings with images first (non-empty `image_urls`), then listings without; then `source_created_at` descending.
+
+**Browse UI (`/listings`):** The Community tab is driven by this endpoint (and the Verified tab by `GET /api/listings` above). The page renders **Previous** / **Next** links that update `?page=` while preserving `tab=community`, Community filter params, or existing Verified query params as applicable. Default `page_size` is **20** when omitted.
+
+#### `GET /api/reddit-listings/:id`
+
+Public cookie-aware endpoint. Anonymous: minimal detail + `requires_login_for_details: true`. Verified @illinois.edu session: full detail including `images` / `external_url` (no email contact).
 
 #### `POST /api/listings`
 
