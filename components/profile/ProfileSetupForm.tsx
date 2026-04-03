@@ -81,6 +81,7 @@ export function ProfileSetupForm() {
           if (!cancelled) {
             setGate({ kind: "completeRedirect" });
             router.replace("/listings");
+            router.refresh();
           }
           return;
         }
@@ -166,6 +167,7 @@ export function ProfileSetupForm() {
         } else if (code === "PROFILE_ALREADY_COMPLETE") {
           setFormError("Profile already complete.");
           router.replace("/listings");
+          router.refresh();
         } else if (code === "VALIDATION_ERROR") {
           setFormError(message ?? "Please check your inputs and try again.");
         } else if (code === "UNAUTHORIZED") {
@@ -178,6 +180,7 @@ export function ProfileSetupForm() {
         return;
       }
       router.push("/listings");
+      router.refresh();
     } catch {
       setFormError("Unable to complete profile. Please try again.");
     } finally {
