@@ -1,9 +1,8 @@
 # Illini2Illini
 
-**Find Student Housing**  
-**at UIUC**
-
-Find subleases, lease takeovers, and full-year housing from verified UIUC students. Browse, filter, and connect directly.
+> **Find Student Housing at UIUC**
+>
+> Find subleases, lease takeovers, and full-year housing from verified UIUC students. Browse, filter, and connect directly.
 
 ---
 
@@ -89,16 +88,6 @@ Alongside verified Illini2Illini posts, the browse page includes a **Community**
 * **Browse:** `/listings` — switch between **Verified (Illini2Illini)** and **Community (Reddit)**. Detail pages for Community items use the route **`/community/[id]`** (internal id).
 * **Trust:** Community posts are third-party content; the UI labels them accordingly. Contact is **View on Reddit** (external link), not in-app email reveal.
 * **Visibility:** Logged-out users see title, monthly rent, and bedroom count. Verified `@illinois.edu` users see full fields and image URLs where available.
-
-**Importing JSON (operators):** Housing posts are loaded from daily export JSON. From the repo root:
-
-```bash
-npm run reddit-import
-```
-
-See [`tools/reddit-import/README.md`](tools/reddit-import/README.md) for file paths and flags. The job is **insert-only**: rows with an `external_id` already in the database are skipped, not updated.
-
-More detail: [`docs/PROJECT_CONTEXT.md`](docs/PROJECT_CONTEXT.md) and [`docs/PRODUCT_SPEC.md`](docs/PRODUCT_SPEC.md).
 
 ---
 
