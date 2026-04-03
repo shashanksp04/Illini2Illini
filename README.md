@@ -1,13 +1,15 @@
 # Illini2Illini
 
-> Find Student Housing at UIUC — the verified student marketplace for subleases and lease takeovers.
-> Built by students. For students.
+**Find Student Housing**  
+**at UIUC**
+
+Find subleases, lease takeovers, and full-year housing from verified UIUC students. Browse, filter, and connect directly.
 
 ---
 
 ## 🏫 What Is Illini2Illini?
 
-Find Student Housing at UIUC: Illini2Illini is a University of Illinois Urbana-Champaign exclusive marketplace for short-term leases and subleases.
+Illini2Illini is the University of Illinois Urbana-Champaign marketplace for **subleases, lease takeovers, and full-year housing** from **verified UIUC students** — structured listings you can browse, filter, and use to connect with sellers.
 
 It solves a simple but frustrating problem:
 
@@ -80,6 +82,26 @@ Listings automatically expire based on availability dates to keep the marketplac
 
 ---
 
+## 🌐 Community (Reddit) listings
+
+Alongside verified Illini2Illini posts, the browse page includes a **Community** tab with housing threads aggregated from Reddit (e.g. r/UIUC). These live in a separate database table (`reddit_listings`) and are **not** mixed with seller-verified `listings`.
+
+* **Browse:** `/listings` — switch between **Verified (Illini2Illini)** and **Community (Reddit)**. Detail pages for Community items use the route **`/community/[id]`** (internal id).
+* **Trust:** Community posts are third-party content; the UI labels them accordingly. Contact is **View on Reddit** (external link), not in-app email reveal.
+* **Visibility:** Logged-out users see title, monthly rent, and bedroom count. Verified `@illinois.edu` users see full fields and image URLs where available.
+
+**Importing JSON (operators):** Housing posts are loaded from daily export JSON. From the repo root:
+
+```bash
+npm run reddit-import
+```
+
+See [`tools/reddit-import/README.md`](tools/reddit-import/README.md) for file paths and flags. The job is **insert-only**: rows with an `external_id` already in the database are skipped, not updated.
+
+More detail: [`docs/PROJECT_CONTEXT.md`](docs/PROJECT_CONTEXT.md) and [`docs/PRODUCT_SPEC.md`](docs/PRODUCT_SPEC.md).
+
+---
+
 ## 👀 Smart Visibility Model
 
 Illini2Illini uses a hybrid visibility system.
@@ -104,7 +126,7 @@ This protects privacy while encouraging signups.
 
 ## 🔎 Powerful Filtering
 
-Built specifically for student housing needs at UIUC (subleases, lease takeovers, and semester-style timelines).
+Built specifically for student housing needs at UIUC (subleases, lease takeovers, full-year housing, and semester-style timelines).
 
 Filter by:
 
@@ -225,6 +247,8 @@ Not:
 
 MVP launched.
 Core marketplace functionality complete.
+
+A **Community (Reddit)** browse tab and JSON import pipeline shipped post-MVP; verified seller listings and rules above remain the primary product.
 
 Focused on:
 
