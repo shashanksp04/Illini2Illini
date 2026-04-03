@@ -400,6 +400,11 @@ export default function NewListingPage() {
             </FormSection>
 
             <FormSection title="Location">
+              <p className="text-sm text-gray-500 leading-relaxed">
+                For privacy, your exact address is only shown to signed-in users with a verified{" "}
+                <span className="font-medium text-gray-600">@illinois.edu</span> account. Logged-out
+                visitors only see your nearby landmark.
+              </p>
               <div className="space-y-1">
                 <label
                   htmlFor="exact_address"
