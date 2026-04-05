@@ -1,6 +1,6 @@
 /**
  * Daily Reddit JSON import CLI.
- * Usage: npx tsx tools/reddit-import/src/import.ts [--file path] [--log-dir path] [--no-log-file]
+ * Usage: npx tsx tools/reddit-import/src/import.ts [--file path] [--log-dir path] [--no-log-file] [--update-fields]
  */
 
 import { readFileSync } from "fs";
@@ -16,6 +16,7 @@ function parseArgs(argv: string[]) {
   let file: string | null = null;
   let logDir: string | null = null;
   let noLogFile = false;
+  let updateFields = false;
 
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
@@ -25,6 +26,8 @@ function parseArgs(argv: string[]) {
       logDir = argv[++i];
     } else if (a === "--no-log-file") {
       noLogFile = true;
+    } else if (a === "--update-fields") {
+      updateFields = true;
     }
   }
 
@@ -32,13 +35,16 @@ function parseArgs(argv: string[]) {
   const resolvedFile = file ?? defaultJson;
   const resolvedLogDir = noLogFile ? null : logDir ?? path.join(process.cwd(), "tools", "reddit-import", "logs");
 
-  return { file: resolvedFile, logDir: resolvedLogDir };
+  return { file: resolvedFile, logDir: resolvedLogDir, updateFields };
 }
 
 async function main() {
-  const { file, logDir } = parseArgs(process.argv);
+  const { file, logDir, updateFields } = parseArgs(process.argv);
   const logger = new RunLogger(logDir);
 
+  if (updateFields) {
+    logger.info("--update-fields: rows already in the database will be overwritten from JSON");
+  }
   logger.info(`Reading ${file}`);
   const raw = JSON.parse(readFileSync(file, "utf8")) as unknown;
   if (!Array.isArray(raw)) {
@@ -48,7 +54,7 @@ async function main() {
   const rows = raw as RedditJsonRow[];
   logger.info(`Parsed ${rows.length} row(s)`);
 
-  const summary = await importRedditListingRows(rows, file, { dedupeInFile: true });
+  const summary = await importRedditListingRows(rows, file, { dedupeInFile: true, updateExisting: updateFields });
 
   for (const r of summary.results) {
     const extra = r.detail ? ` ${r.detail}` : "";
@@ -57,7 +63,7 @@ async function main() {
 
   logger.info("---");
   logger.info(
-    `Summary: inserted=${summary.inserted} skipped_already_in_database=${summary.skipped_already_in_database} skipped_duplicate_in_file=${summary.skipped_duplicate_in_file} errors=${summary.errors} rows_with_exclude_true=${summary.rows_with_exclude_true} duration_ms=${summary.duration_ms}`
+    `Summary: inserted=${summary.inserted} updated=${summary.updated} skipped_already_in_database=${summary.skipped_already_in_database} skipped_duplicate_in_file=${summary.skipped_duplicate_in_file} errors=${summary.errors} rows_with_exclude_true=${summary.rows_with_exclude_true} duration_ms=${summary.duration_ms}`
   );
   logger.info(`Input: ${summary.input_path}`);
   const logPath = logger.getLogFilePath();

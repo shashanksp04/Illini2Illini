@@ -30,6 +30,7 @@ export type RedditJsonRow = {
 
 export type ImportRecordOutcome =
   | "inserted"
+  | "updated"
   | "skipped_already_in_database"
   | "skipped_duplicate_in_file"
   | "error";
@@ -44,6 +45,8 @@ export type ImportRunSummary = {
   input_path: string;
   total_rows_in_file: number;
   inserted: number;
+  /** Existing rows refreshed from JSON when `updateExisting` is true. */
+  updated: number;
   /** `external_id` already in DB; row not modified. */
   skipped_already_in_database: number;
   skipped_duplicate_in_file: number;
@@ -94,20 +97,23 @@ export function redditJsonRowToPrismaData(row: RedditJsonRow) {
 }
 
 /**
- * Inserts new Reddit listings only. If `external_id` already exists, the row is skipped (no update).
+ * Inserts new Reddit listings. If `external_id` already exists, the row is skipped unless
+ * `updateExisting` is true, in which case the row is updated from JSON (same mapping as insert).
  * First occurrence of each `external_id` in the file wins; later duplicates: skipped_duplicate_in_file.
  */
 export async function importRedditListingRows(
   rows: RedditJsonRow[],
   inputPath: string,
-  options: { dedupeInFile?: boolean } = {}
+  options: { dedupeInFile?: boolean; updateExisting?: boolean } = {}
 ): Promise<ImportRunSummary> {
   const start = Date.now();
   const dedupeInFile = options.dedupeInFile !== false;
+  const updateExisting = options.updateExisting === true;
   const seen = new Set<string>();
   const results: ImportRecordResult[] = [];
 
   let inserted = 0;
+  let updated = 0;
   let skipped_already_in_database = 0;
   let skipped_duplicate_in_file = 0;
   let errors = 0;
@@ -146,12 +152,26 @@ export async function importRedditListingRows(
       });
 
       if (existing) {
-        skipped_already_in_database += 1;
-        results.push({
-          external_id: rawId,
-          outcome: "skipped_already_in_database",
-          detail: "already in database (not updated)",
-        });
+        if (updateExisting) {
+          const { external_id: _omit, ...updateData } = data;
+          await prisma.redditListing.update({
+            where: { external_id: rawId },
+            data: updateData,
+          });
+          updated += 1;
+          results.push({
+            external_id: rawId,
+            outcome: "updated",
+            detail: rowNorm.exclude ? "exclude=true" : undefined,
+          });
+        } else {
+          skipped_already_in_database += 1;
+          results.push({
+            external_id: rawId,
+            outcome: "skipped_already_in_database",
+            detail: "already in database (not updated)",
+          });
+        }
       } else {
         await prisma.redditListing.create({ data });
         inserted += 1;
@@ -178,6 +198,7 @@ export async function importRedditListingRows(
     input_path: inputPath,
     total_rows_in_file: rows.length,
     inserted,
+    updated,
     skipped_already_in_database,
     skipped_duplicate_in_file,
     errors,
