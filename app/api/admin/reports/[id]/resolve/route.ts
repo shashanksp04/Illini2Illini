@@ -46,7 +46,7 @@ export async function POST(
 
     const report = await prisma.report.findUnique({
       where: { id },
-      select: { id: true },
+      select: { id: true, listing_id: true },
     });
 
     if (!report) {
@@ -56,9 +56,28 @@ export async function POST(
       );
     }
 
-    await prisma.report.update({
-      where: { id },
-      data: { status: "RESOLVED" },
+    await prisma.$transaction(async (tx) => {
+      await tx.report.update({
+        where: { id },
+        data: { status: "RESOLVED" },
+      });
+
+      const openCount = await tx.report.count({
+        where: {
+          listing_id: report.listing_id,
+          status: "OPEN",
+        },
+      });
+
+      if (openCount === 0) {
+        await tx.listing.updateMany({
+          where: {
+            id: report.listing_id,
+            status: { not: "DELETED" },
+          },
+          data: { status: "ACTIVE" },
+        });
+      }
     });
 
     return NextResponse.json(

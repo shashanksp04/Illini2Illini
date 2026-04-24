@@ -32,14 +32,44 @@ export async function GET(request: Request) {
         id: true,
         listing_id: true,
         reported_by_user_id: true,
+        reported_by: {
+          select: {
+            username: true,
+          },
+        },
         reason: true,
         status: true,
         created_at: true,
+        listing: {
+          select: {
+            status: true,
+          },
+        },
       },
     });
 
+    const counts = await prisma.report.groupBy({
+      by: ["listing_id"],
+      _count: { listing_id: true },
+    });
+    const countByListingId = new Map(
+      counts.map((entry) => [entry.listing_id, entry._count.listing_id])
+    );
+
+    const items = reports.map((report) => ({
+      id: report.id,
+      listing_id: report.listing_id,
+      reported_by_user_id: report.reported_by_user_id,
+      reported_by_username: report.reported_by.username,
+      reason: report.reason,
+      status: report.status,
+      created_at: report.created_at,
+      listing_status: report.listing.status,
+      report_count: countByListingId.get(report.listing_id) ?? 0,
+    }));
+
     return NextResponse.json(
-      { ok: true, data: { items: reports } },
+      { ok: true, data: { items } },
       { status: 200 }
     );
   } catch (err) {

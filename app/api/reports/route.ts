@@ -84,13 +84,33 @@ export async function POST(request: Request) {
     }
 
     try {
-      const report = await prisma.report.create({
-        data: {
-          listing_id: listingId,
-          reported_by_user_id: domainUser.id,
-          reason,
-          status: "OPEN",
-        },
+      const report = await prisma.$transaction(async (tx) => {
+        const created = await tx.report.create({
+          data: {
+            listing_id: listingId,
+            reported_by_user_id: domainUser.id,
+            reason,
+            status: "OPEN",
+          },
+        });
+
+        const reportCount = await tx.report.count({
+          where: { listing_id: listingId },
+        });
+
+        if (reportCount >= 3) {
+          await tx.listing.updateMany({
+            where: { id: listingId, status: { not: "DELETED" } },
+            data: { status: "DELETED" },
+          });
+        } else {
+          await tx.listing.updateMany({
+            where: { id: listingId, status: "ACTIVE" },
+            data: { status: "TAKEN" },
+          });
+        }
+
+        return created;
       });
 
       return NextResponse.json(

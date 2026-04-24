@@ -67,8 +67,8 @@ export default function VerifyEmailPage() {
       return;
     }
     const code = otp.replace(/\s/g, "");
-    if (code.length < 6) {
-      setError("Enter the 6-digit code from your email.");
+    if (code.length < 8) {
+      setError("Enter the 8-digit code from your email.");
       return;
     }
     setSubmitting(true);
@@ -142,7 +142,7 @@ export default function VerifyEmailPage() {
 
               <div className="space-y-1.5">
                 <label htmlFor="otp" className="block text-sm font-medium text-gray-700">
-                  6-digit code
+                  8-digit code
                 </label>
                 <input
                   id="otp"
@@ -152,7 +152,7 @@ export default function VerifyEmailPage() {
                   maxLength={12}
                   value={otp}
                   onChange={(e) => setOtp(e.target.value.replace(/[^\d\s]/g, ""))}
-                  placeholder="000000"
+                  placeholder="00000000"
                   className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2.5 text-center text-lg tracking-widest text-gray-700 placeholder-gray-400 focus:border-accent focus:bg-white focus:outline-none focus:shadow-input-focus transition-all duration-200"
                 />
               </div>
