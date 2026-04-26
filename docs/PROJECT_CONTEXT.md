@@ -292,6 +292,8 @@ What has been built:
 
 **Email OTP flows (Supabase):** New accounts verify by entering a code on `/verify-email` after signup (and can resend the code). Forgot password uses `/forgot-password` → `/forgot-password/verify` → `/reset-password`. Server routes live under `/api/auth/reset-password/request|verify|update` and `/api/auth/verify-email/verify`, with `requireAuth` on password update. Supabase Auth email templates should expose the one-time code (e.g. `{{ .Token }}`) so users receive a numeric OTP, not only a link.
 
+**Admin report moderation enhancements (post-MVP shipped feature):** Reporting a listing now immediately removes it from public browse visibility by transitioning it out of `ACTIVE`; admin reports now show per-listing `report_count`, `listing_status`, and reporter `username`; admins can either **Mark resolved** or **Delete listing** directly from the reports page. When a listing reaches **3+ unique reports**, it is automatically soft-deleted (`status=DELETED`). Resolving the final open report for a non-deleted listing restores it to `ACTIVE`. The reports UI also includes a **View reason** modal for readable full-length report text (with metadata and listing link) instead of relying only on truncated table text.
+
 The immediate focus is:
 
 * Post-launch maintenance and bug fixes

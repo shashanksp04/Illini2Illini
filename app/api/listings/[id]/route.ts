@@ -15,6 +15,7 @@ import {
   type UpdateListingPayload,
   type VerifiedViewer,
 } from "@/lib/listings/helpers";
+import { parseSeasonArrayInput } from "@/lib/listings/seasons";
 import { recordListingView } from "@/lib/listings/views";
 import { prisma } from "@/lib/prisma";
 
@@ -123,6 +124,16 @@ export async function PUT(request: Request, context: RouteContext) {
     const listingOwner: ListingOwner = { id: domainUser.id };
 
     const normalized: UpdateListingPayload = {};
+    if (raw.seasons !== undefined) {
+      const parsed = parseSeasonArrayInput(raw.seasons);
+      if (!parsed.valid) {
+        return NextResponse.json(
+          { ok: false, error: { code: "VALIDATION_ERROR", message: "Invalid season values." } },
+          { status: 400 }
+        );
+      }
+      normalized.seasons = parsed.seasons;
+    }
     if (raw.title !== undefined) normalized.title = String(raw.title);
     if (raw.monthly_rent !== undefined) normalized.monthly_rent = Number(raw.monthly_rent);
     if (raw.lease_type !== undefined) normalized.lease_type = raw.lease_type as "SUBLEASE" | "LEASE_TAKEOVER";

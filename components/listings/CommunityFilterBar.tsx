@@ -1,18 +1,22 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { MultiSelectDropdown } from "@/components/forms/MultiSelectDropdown";
+import { SEASON_LABELS, SEASON_OPTIONS } from "@/lib/listings/seasons";
 
 export type CommunityFilterBarValues = {
   min_rent: string;
   max_rent: string;
   total_bedrooms: string;
+  season: string[];
 };
 
 const defaultValues: CommunityFilterBarValues = {
   min_rent: "",
   max_rent: "",
   total_bedrooms: "",
+  season: [],
 };
 
 type CommunityFilterBarProps = { values?: Partial<CommunityFilterBarValues> };
@@ -26,6 +30,11 @@ export function CommunityFilterBar({ values = {} }: CommunityFilterBarProps) {
   const [resetCount, setResetCount] = useState(0);
   const merged = { ...defaultValues, ...values };
   const formKey = `${JSON.stringify(merged)}-${resetCount}`;
+  const [selectedSeasons, setSelectedSeasons] = useState<string[]>(merged.season);
+
+  useEffect(() => {
+    setSelectedSeasons(merged.season);
+  }, [formKey, merged.season]);
 
   function handleClear() {
     setResetCount((c) => c + 1);
@@ -75,6 +84,18 @@ export function CommunityFilterBar({ values = {} }: CommunityFilterBarProps) {
           <option value="4">4 Beds</option>
           <option value="5">5+ Beds</option>
         </select>
+        <div className="sm:w-40">
+          <MultiSelectDropdown
+            name="season"
+            placeholder="Seasons"
+            options={SEASON_OPTIONS.map((season) => ({
+              value: season,
+              label: SEASON_LABELS[season],
+            }))}
+            value={selectedSeasons}
+            onChange={setSelectedSeasons}
+          />
+        </div>
       </div>
       <div className="mt-3 flex flex-wrap gap-2">
         <button
@@ -197,6 +218,18 @@ export function CommunityFilterBar({ values = {} }: CommunityFilterBarProps) {
                     <option value="4">4</option>
                     <option value="5">5+</option>
                   </select>
+                </FilterGroup>
+                <FilterGroup label="Season">
+                  <MultiSelectDropdown
+                    name="season"
+                    placeholder="Select seasons"
+                    options={SEASON_OPTIONS.map((season) => ({
+                      value: season,
+                      label: SEASON_LABELS[season],
+                    }))}
+                    value={selectedSeasons}
+                    onChange={setSelectedSeasons}
+                  />
                 </FilterGroup>
               </div>
               <div className="mt-5 flex gap-2">

@@ -8,6 +8,8 @@ import { PhotoUploader, type ListingPhoto } from "@/components/listings/PhotoUpl
 import { PageContainer } from "@/components/layout/PageContainer";
 import { AuthCard } from "@/components/auth/AuthCard";
 import { FormSection } from "@/components/forms/FormSection";
+import { MultiSelectDropdown } from "@/components/forms/MultiSelectDropdown";
+import { SEASON_LABELS, SEASON_OPTIONS } from "@/lib/listings/seasons";
 
 type MeData = {
   email_verified: boolean;
@@ -35,6 +37,7 @@ type VerifiedListingForEdit = {
   open_to_negotiation: boolean;
   gender_preference: "MALE" | "FEMALE" | "ANY";
   description: string;
+  seasons: ("SPRING" | "SUMMER" | "FALL" | "FULL_YEAR")[];
   photos?: ListingPhoto[];
 };
 
@@ -89,6 +92,7 @@ export function EditListingClient({ id }: { id: string }) {
   const [openToNegotiation, setOpenToNegotiation] = useState(false);
   const [genderPreference, setGenderPreference] = useState<"MALE" | "FEMALE" | "ANY" | "">("");
   const [description, setDescription] = useState("");
+  const [seasons, setSeasons] = useState<("SPRING" | "SUMMER" | "FALL" | "FULL_YEAR")[]>([]);
   const [photos, setPhotos] = useState<ListingPhoto[]>([]);
 
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -171,6 +175,7 @@ export function EditListingClient({ id }: { id: string }) {
           setOpenToNegotiation(l.open_to_negotiation);
           setGenderPreference(l.gender_preference);
           setDescription(l.description);
+          setSeasons(l.seasons ?? []);
           setPhotos((l.photos ?? []) as ListingPhoto[]);
         }
       } catch {
@@ -208,6 +213,7 @@ export function EditListingClient({ id }: { id: string }) {
           open_to_negotiation: openToNegotiation,
           gender_preference: genderPreference || "ANY",
           description,
+          seasons,
         }),
       });
       const json = (await res.json()) as any;
@@ -440,6 +446,21 @@ export function EditListingClient({ id }: { id: string }) {
                   className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2.5 text-sm text-gray-700 focus:outline-none focus:border-accent focus:bg-white focus:shadow-input-focus transition-all duration-200"
                 />
               </div>
+            </div>
+            <div className="mt-4 space-y-1">
+              <MultiSelectDropdown
+                label="Seasons"
+                placeholder="Select seasons"
+                options={SEASON_OPTIONS.map((season) => ({
+                  value: season,
+                  label: SEASON_LABELS[season],
+                }))}
+                value={seasons}
+                onChange={(next) =>
+                  setSeasons(next as ("SPRING" | "SUMMER" | "FALL" | "FULL_YEAR")[])
+                }
+              />
+              <p className="text-xs text-gray-500">You can select multiple seasons from the dropdown.</p>
             </div>
           </FormSection>
 

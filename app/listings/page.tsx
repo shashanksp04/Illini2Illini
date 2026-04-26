@@ -13,6 +13,12 @@ import { SearchBar } from "@/components/ui/SearchBar";
 
 type SearchParams = { [key: string]: string | string[] | undefined };
 
+function getParamValues(value: string | string[] | undefined): string[] {
+  if (typeof value === "string") return value.trim() ? [value] : [];
+  if (Array.isArray(value)) return value.map((entry) => entry.trim()).filter((entry) => entry !== "");
+  return [];
+}
+
 function buildListingsUrl(base: string, params: SearchParams): string {
   const q = new URLSearchParams();
   const set = (key: string, value: string | undefined) => {
@@ -28,6 +34,9 @@ function buildListingsUrl(base: string, params: SearchParams): string {
   set("total_bathrooms", typeof params.total_bathrooms === "string" ? params.total_bathrooms : undefined);
   set("keyword", typeof params.keyword === "string" ? params.keyword : undefined);
   set("sort", typeof params.sort === "string" ? params.sort : "newest");
+  for (const season of getParamValues(params.season)) {
+    q.append("season", season);
+  }
   const furnished = typeof params.furnished === "string" ? params.furnished : undefined;
   if (furnished === "true" || furnished === "false") q.set("furnished", furnished);
   const util = typeof params.utilities_included === "string" ? params.utilities_included : undefined;
@@ -48,6 +57,9 @@ function buildRedditListingsUrl(base: string, params: SearchParams): string {
   set("min_rent", typeof params.min_rent === "string" ? params.min_rent : undefined);
   set("max_rent", typeof params.max_rent === "string" ? params.max_rent : undefined);
   set("total_bedrooms", typeof params.total_bedrooms === "string" ? params.total_bedrooms : undefined);
+  for (const season of getParamValues(params.season)) {
+    q.append("season", season);
+  }
   const page = typeof params.page === "string" ? params.page : "1";
   if (page !== "1") q.set("page", page);
   const query = q.toString();
@@ -58,7 +70,8 @@ function hasCommunityListingFilters(params: SearchParams): boolean {
   const min = typeof params.min_rent === "string" && params.min_rent.trim() !== "";
   const max = typeof params.max_rent === "string" && params.max_rent.trim() !== "";
   const beds = typeof params.total_bedrooms === "string" && params.total_bedrooms.trim() !== "";
-  return min || max || beds;
+  const seasons = getParamValues(params.season).length > 0;
+  return min || max || beds || seasons;
 }
 
 /** Preserve filter query params; set or clear `tab` for Community vs Verified. */
@@ -66,7 +79,15 @@ function listingsHrefWithTab(params: SearchParams, tab: "verified" | "community"
   const q = new URLSearchParams();
   for (const [key, val] of Object.entries(params)) {
     if (key === "tab") continue;
-    if (typeof val === "string" && val !== "") q.set(key, val);
+    if (typeof val === "string" && val !== "") {
+      q.set(key, val);
+      continue;
+    }
+    if (Array.isArray(val)) {
+      for (const entry of val) {
+        if (entry !== "") q.append(key, entry);
+      }
+    }
   }
   if (tab === "community") q.set("tab", "community");
   const qs = q.toString();
@@ -79,7 +100,15 @@ function listingsHrefForPage(params: SearchParams, targetPage: number, tab: "ver
   const q = new URLSearchParams();
   for (const [key, val] of Object.entries(params)) {
     if (key === "tab" || key === "page") continue;
-    if (typeof val === "string" && val !== "") q.set(key, val);
+    if (typeof val === "string" && val !== "") {
+      q.set(key, val);
+      continue;
+    }
+    if (Array.isArray(val)) {
+      for (const entry of val) {
+        if (entry !== "") q.append(key, entry);
+      }
+    }
   }
   if (targetPage > 1) q.set("page", String(targetPage));
   if (tab === "community") q.set("tab", "community");
@@ -149,6 +178,7 @@ function getFilterValues(params: SearchParams) {
     sort: typeof params.sort === "string" ? params.sort : "newest",
     keyword: typeof params.keyword === "string" ? params.keyword : "",
     include_taken: typeof params.include_taken === "string" ? params.include_taken : "",
+    season: getParamValues(params.season),
   };
 }
 
@@ -233,6 +263,7 @@ export default async function ListingsPage({ searchParams }: { searchParams: Pro
               min_rent: filterValues.min_rent,
               max_rent: filterValues.max_rent,
               total_bedrooms: filterValues.total_bedrooms,
+              season: filterValues.season,
             }}
           />
         ) : null}

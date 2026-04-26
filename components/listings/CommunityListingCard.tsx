@@ -1,10 +1,12 @@
 import Link from "next/link";
+import { SEASON_LABELS } from "@/lib/listings/seasons";
 
 export type CommunityListingCardItem = {
   id: string;
   title: string;
   monthly_rent: number | null;
   total_bedrooms: number | null;
+  seasons?: ("SPRING" | "SUMMER" | "FALL" | "FULL_YEAR")[];
   thumbnail_url?: string | null;
 };
 
@@ -57,6 +59,15 @@ export function CommunityListingCard({ listing }: { listing: CommunityListingCar
           </h3>
         </div>
         <p className="text-xs font-medium text-indigo-600">{bedrooms}</p>
+        {(listing.seasons ?? []).length > 0 ? (
+          <div className="flex flex-wrap gap-1.5">
+            {(listing.seasons ?? []).map((season) => (
+              <span key={season} className="rounded-full bg-violet-50 px-2 py-0.5 text-xs font-medium text-violet-600 ring-1 ring-violet-100">
+                {SEASON_LABELS[season]}
+              </span>
+            ))}
+          </div>
+        ) : null}
       </div>
     </Link>
   );

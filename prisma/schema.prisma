@@ -37,6 +37,13 @@ enum GenderPreference {
   ANY
 }
 
+enum Season {
+  SPRING
+  SUMMER
+  FALL
+  FULL_YEAR
+}
+
 enum ReportStatus {
   OPEN
   RESOLVED
@@ -77,6 +84,7 @@ model Listing {
   title              String           @db.VarChar(100)
   monthly_rent       Int
   lease_type         LeaseType
+  seasons            Season[]         @default([])
   start_date         DateTime         @db.Date
   end_date           DateTime         @db.Date
   exact_address      String
@@ -190,6 +198,7 @@ model RedditListing {
   external_url        String
   source_created_at   DateTime
   raw_text            String?              @db.Text
+  seasons             Season[]             @default([])
   /** Reddit-hosted image URLs in display order (may be empty). */
   image_urls          String[]             @default([])
   exclude             Boolean              @default(false)

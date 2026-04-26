@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { NegotiableBadge } from "@/components/listings/NegotiableBadge";
+import { SEASON_LABELS } from "@/lib/listings/seasons";
 
 export type PublicListingItem = {
   id: string;
@@ -16,6 +17,7 @@ export type PublicListingItem = {
   furnished: boolean;
   utilities_included: boolean;
   open_to_negotiation?: boolean;
+  seasons?: ("SPRING" | "SUMMER" | "FALL" | "FULL_YEAR")[];
   owner_username: string;
   thumbnail_url?: string | null;
 };
@@ -133,6 +135,11 @@ export function ListingCard({ listing }: { listing: ListingCardItem }) {
           <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${leaseTypeBadgeClass(listing.lease_type)}`}>
             {listing.lease_type === "SUBLEASE" ? "Sublease" : "Lease Takeover"}
           </span>
+          {(listing.seasons ?? []).map((season) => (
+            <span key={season} className="rounded-full bg-violet-50 px-2 py-0.5 text-xs font-medium text-violet-600 ring-1 ring-violet-100">
+              {SEASON_LABELS[season]}
+            </span>
+          ))}
           {hasExplicitStatus && (
             <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusBadgeClass(status)}`}>
               {status}

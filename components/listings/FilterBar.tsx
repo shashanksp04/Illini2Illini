@@ -1,8 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useId } from "react";
+import { useEffect, useId, useState } from "react";
+import { MultiSelectDropdown } from "@/components/forms/MultiSelectDropdown";
+import { SEASON_LABELS, SEASON_OPTIONS } from "@/lib/listings/seasons";
 
 export type FilterBarValues = {
   min_rent: string;
@@ -18,6 +19,7 @@ export type FilterBarValues = {
   sort: string;
   keyword: string;
   include_taken: string;
+  season: string[];
 };
 
 const defaultValues: FilterBarValues = {
@@ -25,6 +27,7 @@ const defaultValues: FilterBarValues = {
   room_type: "", total_bedrooms: "", total_bathrooms: "",
   furnished: "", utilities_included: "",
   lease_type: "", sort: "newest", keyword: "", include_taken: "",
+  season: [],
 };
 
 type FilterBarProps = { values?: Partial<FilterBarValues>; isAdmin?: boolean };
@@ -39,6 +42,11 @@ export function FilterBar({ values = {}, isAdmin = false }: FilterBarProps) {
   const merged = { ...defaultValues, ...values };
   const formId = useId();
   const formKey = `${JSON.stringify(merged)}-${resetCount}`;
+  const [selectedSeasons, setSelectedSeasons] = useState<string[]>(merged.season);
+
+  useEffect(() => {
+    setSelectedSeasons(merged.season);
+  }, [formKey, merged.season]);
 
   function handleClear() {
     setResetCount((c) => c + 1);
@@ -87,6 +95,18 @@ export function FilterBar({ values = {}, isAdmin = false }: FilterBarProps) {
           <option value="SUBLEASE">Sublease</option>
           <option value="LEASE_TAKEOVER">Lease takeover</option>
         </select>
+        <div className="sm:w-40">
+          <MultiSelectDropdown
+            name="season"
+            placeholder="Seasons"
+            options={SEASON_OPTIONS.map((season) => ({
+              value: season,
+              label: SEASON_LABELS[season],
+            }))}
+            value={selectedSeasons}
+            onChange={setSelectedSeasons}
+          />
+        </div>
         <select name="total_bedrooms" defaultValue={merged.total_bedrooms} className={`${inputCls} sm:w-28`} aria-label="Bedrooms">
           <option value="">Beds</option>
           <option value="1">1 Bed</option>
@@ -197,6 +217,18 @@ export function FilterBar({ values = {}, isAdmin = false }: FilterBarProps) {
                 </FilterGroup>
                 <FilterGroup label="Lease type">
                   <select name="lease_type" defaultValue={merged.lease_type} className={inputCls}><option value="">Any</option><option value="SUBLEASE">Sublease</option><option value="LEASE_TAKEOVER">Lease takeover</option></select>
+                </FilterGroup>
+                <FilterGroup label="Season">
+                  <MultiSelectDropdown
+                    name="season"
+                    placeholder="Select seasons"
+                    options={SEASON_OPTIONS.map((season) => ({
+                      value: season,
+                      label: SEASON_LABELS[season],
+                    }))}
+                    value={selectedSeasons}
+                    onChange={setSelectedSeasons}
+                  />
                 </FilterGroup>
                 <FilterGroup label="Bedrooms">
                   <select name="total_bedrooms" defaultValue={merged.total_bedrooms} className={inputCls}><option value="">Any</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5+</option></select>

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { getRedditListingsMinimal } from "@/lib/reddit-listings/helpers";
+import { normalizeSeasonInput } from "@/lib/listings/seasons";
 
 function parseNumber(value: string | null): number | undefined | "invalid" {
   if (value == null) return undefined;
@@ -33,8 +34,19 @@ export async function GET(request: Request) {
     const minRent = parseNumber(params.get("min_rent"));
     const maxRent = parseNumber(params.get("max_rent"));
     const totalBedrooms = parseNumber(params.get("total_bedrooms"));
+    const seasonValues = params
+      .getAll("season")
+      .flatMap((value) => value.split(","))
+      .map((value) => value.trim())
+      .filter((value) => value.length > 0);
+    const parsedSeasons = normalizeSeasonInput(seasonValues);
 
-    if (minRent === "invalid" || maxRent === "invalid" || totalBedrooms === "invalid") {
+    if (
+      minRent === "invalid" ||
+      maxRent === "invalid" ||
+      totalBedrooms === "invalid" ||
+      parsedSeasons.length !== seasonValues.length
+    ) {
       return NextResponse.json(
         {
           ok: false,
@@ -80,6 +92,7 @@ export async function GET(request: Request) {
       ...(typeof minRent === "number" ? { min_rent: minRent } : {}),
       ...(typeof maxRent === "number" ? { max_rent: maxRent } : {}),
       ...(typeof totalBedrooms === "number" ? { total_bedrooms: totalBedrooms } : {}),
+      ...(parsedSeasons.length > 0 ? { seasons: parsedSeasons } : {}),
     });
 
     const items = listings.slice(0, basePageSize);

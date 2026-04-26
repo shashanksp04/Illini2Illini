@@ -7,7 +7,9 @@ import { FormEvent, useEffect, useState } from "react";
 import { PhotoUploader, type ListingPhoto } from "@/components/listings/PhotoUploader";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { AuthCard } from "@/components/auth/AuthCard";
+import { MultiSelectDropdown } from "@/components/forms/MultiSelectDropdown";
 import { FormSection } from "@/components/forms/FormSection";
+import { SEASON_LABELS, SEASON_OPTIONS } from "@/lib/listings/seasons";
 
 type MeData = {
   email: string;
@@ -69,6 +71,7 @@ export default function NewListingPage() {
   const [openToNegotiation, setOpenToNegotiation] = useState(false);
   const [genderPreference, setGenderPreference] = useState<"MALE" | "FEMALE" | "ANY" | "">("");
   const [description, setDescription] = useState("");
+  const [seasons, setSeasons] = useState<("SPRING" | "SUMMER" | "FALL" | "FULL_YEAR")[]>([]);
 
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -131,6 +134,7 @@ export default function NewListingPage() {
           open_to_negotiation: openToNegotiation,
           gender_preference: genderPreference,
           description,
+          seasons,
         }),
       });
       const json = (await res.json()) as any;
@@ -396,6 +400,21 @@ export default function NewListingPage() {
                     className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2 text-sm text-gray-700 transition-all duration-200 focus:border-accent focus:bg-white focus:shadow-input-focus focus:outline-none"
                   />
                 </div>
+              </div>
+              <div className="mt-4 space-y-1">
+                <MultiSelectDropdown
+                  label="Seasons"
+                  placeholder="Select seasons"
+                  options={SEASON_OPTIONS.map((season) => ({
+                    value: season,
+                    label: SEASON_LABELS[season],
+                  }))}
+                  value={seasons}
+                  onChange={(next) =>
+                    setSeasons(next as ("SPRING" | "SUMMER" | "FALL" | "FULL_YEAR")[])
+                  }
+                />
+                <p className="text-xs text-gray-500">You can select multiple seasons from the dropdown.</p>
               </div>
             </FormSection>
 

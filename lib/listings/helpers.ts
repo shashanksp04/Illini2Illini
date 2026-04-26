@@ -6,10 +6,12 @@ import type {
   ListingPhoto as ListingPhotoModel,
   Role,
   RoomType,
+  Season,
   User,
 } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
+import { isSeason, normalizeSeasonInput } from "@/lib/listings/seasons";
 
 // --- Write helpers: error type and payload types ---
 
@@ -58,6 +60,7 @@ export interface CreateListingPayload {
   open_to_negotiation: boolean;
   gender_preference: GenderPreference;
   description: string;
+  seasons: Season[];
 }
 
 export type UpdateListingPayload = Partial<CreateListingPayload>;
@@ -78,7 +81,8 @@ function validateCreatePayload(payload: CreateListingPayload): void {
     payload.utilities_included == null ||
     payload.open_to_negotiation == null ||
     payload.gender_preference == null ||
-    payload.description == null
+    payload.description == null ||
+    payload.seasons == null
   ) {
     throw new ListingError({
       status: 400,
@@ -135,6 +139,20 @@ function validateCreatePayload(payload: CreateListingPayload): void {
       message: "total_bathrooms must be a positive integer.",
     });
   }
+  if (!Array.isArray(payload.seasons) || payload.seasons.length < 1) {
+    throw new ListingError({
+      status: 400,
+      code: "VALIDATION_ERROR",
+      message: "Select at least one season.",
+    });
+  }
+  if (!payload.seasons.every((season) => isSeason(season))) {
+    throw new ListingError({
+      status: 400,
+      code: "VALIDATION_ERROR",
+      message: "Invalid season value.",
+    });
+  }
 }
 
 function validateUpdatePayload(payload: UpdateListingPayload): void {
@@ -187,6 +205,22 @@ function validateUpdatePayload(payload: UpdateListingPayload): void {
       message: "total_bathrooms must be a positive integer.",
     });
   }
+  if (payload.seasons != null) {
+    if (!Array.isArray(payload.seasons) || payload.seasons.length < 1) {
+      throw new ListingError({
+        status: 400,
+        code: "VALIDATION_ERROR",
+        message: "Select at least one season.",
+      });
+    }
+    if (!payload.seasons.every((season) => isSeason(season))) {
+      throw new ListingError({
+        status: 400,
+        code: "VALIDATION_ERROR",
+        message: "Invalid season value.",
+      });
+    }
+  }
 }
 
 export type ListingSort = "newest" | "price_asc";
@@ -203,6 +237,7 @@ export interface ListingFilters {
   total_bedrooms?: number;
   total_bathrooms?: number;
   keyword?: string;
+  seasons?: Season[];
   sort?: ListingSort;
   page?: number;
   page_size?: number;
@@ -224,6 +259,7 @@ export type PublicListing = {
   furnished: boolean;
   utilities_included: boolean;
   open_to_negotiation: boolean;
+  seasons: Season[];
   owner_username: string;
   thumbnail_url: string | null;
 };
@@ -245,6 +281,7 @@ export type VerifiedListing = {
   furnished: boolean;
   utilities_included: boolean;
   open_to_negotiation: boolean;
+  seasons: Season[];
   gender_preference: GenderPreference;
   description: string;
   status: ListingStatus;
@@ -312,6 +349,10 @@ function buildWhereClause(filters: ListingFilters) {
 
   if (filters.lease_type) {
     where.lease_type = filters.lease_type;
+  }
+
+  if (Array.isArray(filters.seasons) && filters.seasons.length > 0) {
+    where.seasons = { hasSome: filters.seasons };
   }
 
   if (typeof filters.total_bedrooms === "number") {
@@ -382,6 +423,7 @@ function mapPublicListing(row: ListingModel & { owner: User; photos?: ListingPho
     furnished: row.furnished,
     utilities_included: row.utilities_included,
     open_to_negotiation: row.open_to_negotiation,
+    seasons: row.seasons,
     owner_username: row.owner.username,
     thumbnail_url: sorted?.[0]?.image_url ?? null,
   };
@@ -405,6 +447,7 @@ function mapVerifiedListing(
     furnished: row.furnished,
     utilities_included: row.utilities_included,
     open_to_negotiation: row.open_to_negotiation,
+    seasons: row.seasons,
     gender_preference: row.gender_preference,
     description: row.description,
     status: row.status,
@@ -544,6 +587,7 @@ export async function createListing(
       furnished: payload.furnished,
       utilities_included: payload.utilities_included,
       open_to_negotiation: payload.open_to_negotiation,
+      seasons: normalizeSeasonInput(payload.seasons),
       gender_preference: payload.gender_preference,
       description: payload.description,
       status: "ACTIVE",
@@ -593,6 +637,7 @@ export async function updateListing(
       ...(payload.furnished !== undefined && { furnished: payload.furnished }),
       ...(payload.utilities_included !== undefined && { utilities_included: payload.utilities_included }),
       ...(payload.open_to_negotiation !== undefined && { open_to_negotiation: payload.open_to_negotiation }),
+      ...(payload.seasons !== undefined && { seasons: normalizeSeasonInput(payload.seasons) }),
       ...(payload.gender_preference !== undefined && { gender_preference: payload.gender_preference }),
       ...(payload.description !== undefined && { description: payload.description }),
     },

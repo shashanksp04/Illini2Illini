@@ -11,6 +11,7 @@ import {
   type ListingOwner,
   type VerifiedViewer,
 } from "@/lib/listings/helpers";
+import { normalizeSeasonInput, parseSeasonArrayInput } from "@/lib/listings/seasons";
 import { prisma } from "@/lib/prisma";
 
 function parseBoolean(value: string | null): boolean | undefined | "invalid" {
@@ -50,6 +51,12 @@ export async function GET(request: Request) {
     const pageNum = parseNumber(params.get("page"));
     const pageSizeNum = parseNumber(params.get("page_size"));
     const sort = params.get("sort") ?? undefined;
+    const seasonValues = params
+      .getAll("season")
+      .flatMap((value) => value.split(","))
+      .map((value) => value.trim())
+      .filter((value) => value.length > 0);
+    const parsedSeasons = normalizeSeasonInput(seasonValues);
 
     if (
       minRent === "invalid" ||
@@ -61,7 +68,8 @@ export async function GET(request: Request) {
       totalBedrooms === "invalid" ||
       totalBathrooms === "invalid" ||
       pageNum === "invalid" ||
-      pageSizeNum === "invalid"
+      pageSizeNum === "invalid" ||
+      parsedSeasons.length !== seasonValues.length
     ) {
       return NextResponse.json(
         {
@@ -131,6 +139,7 @@ export async function GET(request: Request) {
       total_bedrooms: totalBedrooms as number | undefined,
       total_bathrooms: totalBathrooms as number | undefined,
       keyword: params.get("keyword") ?? undefined,
+      seasons: parsedSeasons.length > 0 ? parsedSeasons : undefined,
       sort: sort as any,
       page: basePage,
       page_size: effectivePageSize,
@@ -175,6 +184,14 @@ export async function POST(request: Request) {
       );
     }
 
+    const seasonParse = parseSeasonArrayInput(body.seasons);
+    if (!seasonParse.valid) {
+      return NextResponse.json(
+        { ok: false, error: { code: "VALIDATION_ERROR", message: "Invalid season values." } },
+        { status: 400 }
+      );
+    }
+
     const payload: CreateListingPayload = {
       title: String(body.title ?? ""),
       monthly_rent: Number(body.monthly_rent),
@@ -191,6 +208,7 @@ export async function POST(request: Request) {
       open_to_negotiation: Boolean(body.open_to_negotiation),
       gender_preference: body.gender_preference,
       description: String(body.description ?? ""),
+      seasons: seasonParse.seasons,
     };
 
     if (

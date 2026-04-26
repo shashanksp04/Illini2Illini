@@ -1,4 +1,4 @@
-import { Prisma, type RedditListing as RedditListingRow } from "@prisma/client";
+import { Prisma, type RedditListing as RedditListingRow, type Season } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 
@@ -7,6 +7,7 @@ type RedditListingMinimalRow = {
   title: string;
   monthly_rent: number | null;
   total_bedrooms: number | null;
+  seasons: Season[];
   image_urls: string[];
 };
 
@@ -20,6 +21,7 @@ export type RedditListingMinimal = {
   title: string;
   monthly_rent: number | null;
   total_bedrooms: number | null;
+  seasons: Season[];
   /** First image URL for card preview; null if none. */
   thumbnail_url: string | null;
 };
@@ -48,16 +50,18 @@ export type RedditListingVerifiedDetail = {
   external_url: string;
   source_created_at: string;
   raw_text: string | null;
+  seasons: Season[];
   /** All Reddit image URLs in order (may be empty). */
   images: string[];
 };
 
-function mapMinimal(row: RedditListingRow): RedditListingMinimal {
+function mapMinimal(row: RedditListingRow & { seasons?: Season[] }): RedditListingMinimal {
   return {
     id: row.id,
     title: row.title,
     monthly_rent: row.monthly_rent,
     total_bedrooms: row.total_bedrooms,
+    seasons: row.seasons ?? [],
     thumbnail_url: thumbnailFromRow(row),
   };
 }
@@ -68,6 +72,7 @@ function dateToIsoDate(d: Date | null): string | null {
 }
 
 export function mapRedditListingVerified(row: RedditListingRow): RedditListingVerifiedDetail {
+  const seasons = (row as RedditListingRow & { seasons?: Season[] }).seasons ?? [];
   return {
     id: row.id,
     external_id: row.external_id,
@@ -90,6 +95,7 @@ export function mapRedditListingVerified(row: RedditListingRow): RedditListingVe
     external_url: row.external_url,
     source_created_at: row.source_created_at.toISOString(),
     raw_text: row.raw_text,
+    seasons,
     images: [...row.image_urls],
   };
 }
@@ -101,6 +107,7 @@ export type RedditListingsMinimalFilters = {
   max_rent?: number;
   /** Same semantics as verified listings: 5 means five or more bedrooms. */
   total_bedrooms?: number;
+  seasons?: Season[];
 };
 
 function buildRedditListingsWhereAndSort(filters: RedditListingsMinimalFilters): {
@@ -110,9 +117,15 @@ function buildRedditListingsWhereAndSort(filters: RedditListingsMinimalFilters):
   const minRent = filters.min_rent;
   const maxRent = filters.max_rent;
   const bedN = filters.total_bedrooms;
+  const seasons = filters.seasons;
 
   const rentFilterOn = typeof minRent === "number" || typeof maxRent === "number";
   const bedFilterOn = typeof bedN === "number";
+  const seasonFilterOn = Array.isArray(seasons) && seasons.length > 0;
+  const seasonArraySql =
+    seasonFilterOn && seasons
+      ? Prisma.sql`ARRAY[${Prisma.join(seasons.map((season) => Prisma.sql`${season}::"Season"`))}]::"Season"[]`
+      : Prisma.sql`ARRAY[]::"Season"[]`;
 
   const rentRangeInner =
     typeof minRent === "number" && typeof maxRent === "number"
@@ -134,6 +147,10 @@ function buildRedditListingsWhereAndSort(filters: RedditListingsMinimalFilters):
         : Prisma.sql`AND (total_bedrooms IS NULL OR total_bedrooms = ${bedN})`
       : Prisma.empty;
 
+  const seasonWhereExtra = seasonFilterOn
+    ? Prisma.sql`AND (cardinality(seasons) = 0 OR seasons && ${seasonArraySql})`
+    : Prisma.empty;
+
   const rentComplete =
     rentFilterOn && typeof minRent === "number" && typeof maxRent === "number"
       ? Prisma.sql`(monthly_rent IS NOT NULL AND monthly_rent >= ${minRent} AND monthly_rent <= ${maxRent})`
@@ -150,10 +167,14 @@ function buildRedditListingsWhereAndSort(filters: RedditListingsMinimalFilters):
         : Prisma.sql`(total_bedrooms IS NOT NULL AND total_bedrooms = ${bedN})`
       : Prisma.sql`TRUE`;
 
-  const sortTier = Prisma.sql`CASE WHEN (${rentComplete}) AND (${bedComplete}) THEN 0 ELSE 1 END`;
+  const seasonComplete = seasonFilterOn
+    ? Prisma.sql`(cardinality(seasons) > 0 AND seasons && ${seasonArraySql})`
+    : Prisma.sql`TRUE`;
+
+  const sortTier = Prisma.sql`CASE WHEN (${rentComplete}) AND (${bedComplete}) AND (${seasonComplete}) THEN 0 ELSE 1 END`;
 
   return {
-    whereExtra: Prisma.sql`${rentWhereExtra} ${bedWhereExtra}`,
+    whereExtra: Prisma.sql`${rentWhereExtra} ${bedWhereExtra} ${seasonWhereExtra}`,
     sortTier,
   };
 }
@@ -170,14 +191,16 @@ export async function getRedditListingsMinimal(
   const skip = (page - 1) * pageSize;
 
   const { min_rent, max_rent, total_bedrooms } = options;
+  const { seasons } = options;
   const { whereExtra, sortTier } = buildRedditListingsWhereAndSort({
     min_rent,
     max_rent,
     total_bedrooms,
+    seasons,
   });
 
   const rows = await prisma.$queryRaw<RedditListingMinimalRow[]>(Prisma.sql`
-    SELECT id, title, monthly_rent, total_bedrooms, image_urls
+    SELECT id, title, monthly_rent, total_bedrooms, seasons, image_urls
     FROM reddit_listings
     WHERE exclude = false
     ${whereExtra}
@@ -193,6 +216,7 @@ export async function getRedditListingsMinimal(
     title: r.title,
     monthly_rent: r.monthly_rent,
     total_bedrooms: r.total_bedrooms,
+    seasons: r.seasons,
     thumbnail_url: thumbnailFromRow(r),
   }));
 }
