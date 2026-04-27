@@ -275,6 +275,8 @@ What has been built:
 
 * Authentication: @illinois.edu signup, **OTP email verification** (in-app code entry; no confirmation URL required), login, logout, **OTP password reset** (request code → verify → set new password; no reset link), profile completion
 * Listings: create, edit, soft delete, mark as taken, browse, filter, search, visibility rules, **Open to negotiation** (`open_to_negotiation`) on create/edit with prominent viewer-facing badge
+* Listings season support (verified `listings`): explicit `seasons` (`SPRING|SUMMER|FALL|FULL_YEAR`) on create/edit, season filtering in browse, and season chips on listing cards.
+* Verified listings season backfill (one-time): `scripts/backfill-listing-seasons.ts` is available and has been applied to existing verified rows.
 * Seller metrics on **My listings** (`/me/listings`): **views** (count of non-owner listing detail loads via `listing_views`) and **contact views** (distinct users who completed email reveal via `contact_events`); owners cannot reveal their own contact (403 `CANNOT_CONTACT_SELF`)
 * Contact flow: email reveal for verified users, safety disclaimer
 * Admin: user management, listing moderation, reports
@@ -289,10 +291,25 @@ What has been built:
 * **Community browse order:** With **no** Community filters, listings that include at least one imported image appear before listings without images (then by recency within each group). With **active** rent/bedroom filters, rows whose **parsed** fields match the filters are ordered before rows with **missing** rent or bedroom for those filters; then image preference; then recency.
 * Visibility: logged-out users see only title, monthly rent, and bedroom count on cards/detail; full fields + Reddit image URLs require verified login; contact is **“View on Reddit”** (external link), not email reveal.
 * **Daily JSON import:** operational tooling under [`tools/reddit-import/`](../tools/reddit-import/) — run `npm run reddit-import` (see [`tools/reddit-import/README.md`](../tools/reddit-import/README.md)). Import **inserts only** new `external_id` values; rows already in the DB are **skipped** (not updated). Sample / reference JSON: [`docs/reddit-related/reddit_listings.json`](reddit-related/reddit_listings.json); product notes: [`docs/reddit-related/reddit_extract_Feature.md`](reddit-related/reddit_extract_Feature.md).
+* Community/Reddit season support: `reddit_listings` now include `seasons` (`SPRING|SUMMER|FALL|FULL_YEAR`) with title-based classification and full-year precedence; Community tab includes season filter and community cards render season chips.
+* Reddit listings season backfill (one-time): `scripts/backfill-reddit-listing-seasons.ts` is available and has been applied to existing Reddit rows.
+* Daily import season input support: importer accepts optional input `seasons` from JSON and persists provided values; missing/invalid season values normalize to empty. Import still skips existing `external_id` rows unless update mode is explicitly used.
 
 **Email OTP flows (Supabase):** New accounts verify by entering a code on `/verify-email` after signup (and can resend the code). Forgot password uses `/forgot-password` → `/forgot-password/verify` → `/reset-password`. Server routes live under `/api/auth/reset-password/request|verify|update` and `/api/auth/verify-email/verify`, with `requireAuth` on password update. Supabase Auth email templates should expose the one-time code (e.g. `{{ .Token }}`) so users receive a numeric OTP, not only a link.
 
 **Admin report moderation enhancements (post-MVP shipped feature):** Reporting a listing now immediately removes it from public browse visibility by transitioning it out of `ACTIVE`; admin reports now show per-listing `report_count`, `listing_status`, and reporter `username`; admins can either **Mark resolved** or **Delete listing** directly from the reports page. When a listing reaches **3+ unique reports**, it is automatically soft-deleted (`status=DELETED`). Resolving the final open report for a non-deleted listing restores it to `ACTIVE`. The reports UI also includes a **View reason** modal for readable full-length report text (with metadata and listing link) instead of relying only on truncated table text.
+
+**Verified listing custom aliases (post-MVP shipped feature):**
+
+* Listings support one optional custom alias per listing for sharing links.
+* Canonical listing detail route remains UUID-based (`/listings/<uuid>`) and continues to work as the permanent fallback.
+* Custom alias route format is `/v/<alias>` (safety/routing namespace is explicit and required).
+* Alias management is available on the listing edit page (including previously created listings), with share-link preview.
+* Alias validation enforces normalized lowercase format with letters/numbers/hyphens only (`[a-z0-9-]`), length `3-50`, and collapsed/trimmed hyphens.
+* Reserved aliases are blocked (platform route/system words), and alias uniqueness is enforced both at API validation time and the database layer.
+* Duplicate alias attempts return user-facing conflict guidance (`alias already taken`) with alternative suggestions.
+* Alias changes follow simple mode: when a listing alias is changed, older alias links stop working.
+* Implementation note: schema includes optional `listings.alias` with unique constraint; alias resolution is handled through dedicated alias handlers (`/api/listings/by-alias/[alias]`) and the alias page route (`/v/[alias]`).
 
 The immediate focus is:
 
