@@ -4,6 +4,7 @@ import type {
   Listing as ListingModel,
   ListingStatus,
   ListingPhoto as ListingPhotoModel,
+  Prisma,
   Role,
   RoomType,
   Season,
@@ -17,6 +18,7 @@ import { isSeason, normalizeSeasonInput } from "@/lib/listings/seasons";
 
 export type ListingErrorCode =
   | "ACTIVE_LIMIT_REACHED"
+  | "ALIAS_TAKEN"
   | "NOT_OWNER"
   | "NOT_FOUND"
   | "INVALID_STATE"
@@ -45,6 +47,7 @@ export type ListingOwner = Pick<User, "id">;
 export type ListingOwnerOrAdmin = Pick<User, "id" | "role">;
 
 export interface CreateListingPayload {
+  alias?: string | null;
   title: string;
   monthly_rent: number;
   lease_type: LeaseType;
@@ -64,6 +67,126 @@ export interface CreateListingPayload {
 }
 
 export type UpdateListingPayload = Partial<CreateListingPayload>;
+
+const ALIAS_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+const RESERVED_ALIASES = new Set([
+  "admin",
+  "api",
+  "login",
+  "signup",
+  "listings",
+  "v",
+  "settings",
+  "help",
+  "about",
+  "terms",
+  "privacy",
+  "favicon-ico",
+  "robots-txt",
+  "sitemap-xml",
+  "auth",
+  "logout",
+  "me",
+  "user",
+  "users",
+  "static",
+  "assets",
+  "dashboard",
+  "support",
+  "contact",
+  "null",
+  "undefined",
+  "_next",
+  "new",
+  "edit",
+  "create",
+  "delete",
+  "report",
+  "contact-seller",
+]);
+
+export function normalizeListingAlias(alias: string | null | undefined): string | null | undefined {
+  if (alias === undefined || alias === null) {
+    return alias;
+  }
+
+  const normalized = alias
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9-]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+
+  return normalized.length > 0 ? normalized : null;
+}
+
+function validateAlias(alias: string | null | undefined): void {
+  if (alias === undefined || alias === null) {
+    return;
+  }
+
+  if (alias.length < 3 || alias.length > 50) {
+    throw new ListingError({
+      status: 400,
+      code: "VALIDATION_ERROR",
+      message: "alias must be between 3 and 50 characters.",
+    });
+  }
+
+  if (!ALIAS_PATTERN.test(alias)) {
+    throw new ListingError({
+      status: 400,
+      code: "VALIDATION_ERROR",
+      message: "alias can only include lowercase letters, numbers, and hyphens.",
+    });
+  }
+
+  if (RESERVED_ALIASES.has(alias)) {
+    throw new ListingError({
+      status: 400,
+      code: "VALIDATION_ERROR",
+      message: "This alias is reserved. Please choose a different one.",
+    });
+  }
+}
+
+function isAliasUniqueError(err: unknown): err is Prisma.PrismaClientKnownRequestError {
+  if (!(err instanceof Error) || err.name !== "PrismaClientKnownRequestError") {
+    return false;
+  }
+
+  const prismaError = err as Prisma.PrismaClientKnownRequestError;
+  if (prismaError.code !== "P2002") {
+    return false;
+  }
+
+  const target = prismaError.meta?.target;
+  if (Array.isArray(target)) {
+    return target.includes("alias");
+  }
+  return typeof target === "string" && target.includes("alias");
+}
+
+async function buildAliasTakenMessage(
+  alias: string,
+  excludeListingId?: string
+): Promise<string> {
+  const suggestions = [2, 3, 4, 5, 6].map((suffix) => `${alias}-${suffix}`);
+  const existing = await prisma.listing.findMany({
+    where: {
+      alias: { in: suggestions },
+      ...(excludeListingId ? { id: { not: excludeListingId } } : {}),
+    },
+    select: { alias: true },
+  });
+  const taken = new Set(existing.map((row) => row.alias).filter((value): value is string => value != null));
+  const available = suggestions.filter((candidate) => !taken.has(candidate)).slice(0, 3);
+  if (available.length === 0) {
+    return "Alias is already taken. Try a different alias.";
+  }
+  return `Alias is already taken. Try: ${available.join(", ")}.`;
+}
 
 function validateCreatePayload(payload: CreateListingPayload): void {
   if (
@@ -90,6 +213,8 @@ function validateCreatePayload(payload: CreateListingPayload): void {
       message: "Missing required listing fields.",
     });
   }
+  validateAlias(payload.alias);
+
   if (payload.end_date <= payload.start_date) {
     throw new ListingError({
       status: 400,
@@ -156,6 +281,8 @@ function validateCreatePayload(payload: CreateListingPayload): void {
 }
 
 function validateUpdatePayload(payload: UpdateListingPayload): void {
+  validateAlias(payload.alias);
+
   if (payload.start_date != null && payload.end_date != null && payload.end_date <= payload.start_date) {
     throw new ListingError({
       status: 400,
@@ -247,6 +374,7 @@ export interface ListingFilters {
 
 export type PublicListing = {
   id: string;
+  alias: string | null;
   title: string;
   monthly_rent: number;
   start_date: Date;
@@ -268,6 +396,7 @@ export type PublicListingDetail = PublicListing;
 
 export type VerifiedListing = {
   id: string;
+  alias: string | null;
   title: string;
   monthly_rent: number;
   lease_type: LeaseType;
@@ -411,6 +540,7 @@ function mapPublicListing(row: ListingModel & { owner: User; photos?: ListingPho
   const sorted = row.photos?.slice().sort((a, b) => a.display_order - b.display_order);
   return {
     id: row.id,
+    alias: row.alias,
     title: row.title,
     monthly_rent: row.monthly_rent,
     start_date: row.start_date,
@@ -434,6 +564,7 @@ function mapVerifiedListing(
 ): VerifiedListing {
   return {
     id: row.id,
+    alias: row.alias,
     title: row.title,
     monthly_rent: row.monthly_rent,
     lease_type: row.lease_type,
@@ -527,6 +658,25 @@ export async function getListingPublic(id: string): Promise<PublicListingDetail 
   return mapPublicListing(listing);
 }
 
+export async function getListingPublicByAlias(alias: string): Promise<PublicListingDetail | null> {
+  const listing = await prisma.listing.findFirst({
+    where: {
+      alias,
+      status: "ACTIVE",
+    },
+    include: {
+      owner: true,
+      photos: true,
+    },
+  });
+
+  if (!listing) {
+    return null;
+  }
+
+  return mapPublicListing(listing);
+}
+
 export async function getListingVerified(
   id: string,
   _viewer: VerifiedViewer
@@ -549,13 +699,40 @@ export async function getListingVerified(
   return mapVerifiedListing(listing);
 }
 
+export async function getListingVerifiedByAlias(
+  alias: string,
+  _viewer: VerifiedViewer
+): Promise<VerifiedListingDetail | null> {
+  const listing = await prisma.listing.findFirst({
+    where: {
+      alias,
+      status: "ACTIVE",
+    },
+    include: {
+      owner: true,
+      photos: true,
+    },
+  });
+
+  if (!listing) {
+    return null;
+  }
+
+  return mapVerifiedListing(listing);
+}
+
 // --- Write helpers (TASKS 3.2 PART B) ---
 
 export async function createListing(
   user: ListingOwner,
   payload: CreateListingPayload
 ): Promise<ListingModel> {
-  validateCreatePayload(payload);
+  const normalizedPayload: CreateListingPayload = {
+    ...payload,
+    alias: normalizeListingAlias(payload.alias),
+  };
+
+  validateCreatePayload(normalizedPayload);
 
   const activeCount = await prisma.listing.count({
     where: {
@@ -571,29 +748,41 @@ export async function createListing(
     });
   }
 
-  const listing = await prisma.listing.create({
-    data: {
-      owner_id: user.id,
-      title: payload.title,
-      monthly_rent: payload.monthly_rent,
-      lease_type: payload.lease_type,
-      start_date: payload.start_date,
-      end_date: payload.end_date,
-      exact_address: payload.exact_address,
-      nearby_landmark: payload.nearby_landmark,
-      total_bedrooms: payload.total_bedrooms,
-      total_bathrooms: payload.total_bathrooms,
-      room_type: payload.room_type,
-      furnished: payload.furnished,
-      utilities_included: payload.utilities_included,
-      open_to_negotiation: payload.open_to_negotiation,
-      seasons: normalizeSeasonInput(payload.seasons),
-      gender_preference: payload.gender_preference,
-      description: payload.description,
-      status: "ACTIVE",
-    },
-  });
-  return listing;
+  try {
+    const listing = await prisma.listing.create({
+      data: {
+        owner_id: user.id,
+        alias: normalizedPayload.alias,
+        title: normalizedPayload.title,
+        monthly_rent: normalizedPayload.monthly_rent,
+        lease_type: normalizedPayload.lease_type,
+        start_date: normalizedPayload.start_date,
+        end_date: normalizedPayload.end_date,
+        exact_address: normalizedPayload.exact_address,
+        nearby_landmark: normalizedPayload.nearby_landmark,
+        total_bedrooms: normalizedPayload.total_bedrooms,
+        total_bathrooms: normalizedPayload.total_bathrooms,
+        room_type: normalizedPayload.room_type,
+        furnished: normalizedPayload.furnished,
+        utilities_included: normalizedPayload.utilities_included,
+        open_to_negotiation: normalizedPayload.open_to_negotiation,
+        seasons: normalizeSeasonInput(normalizedPayload.seasons),
+        gender_preference: normalizedPayload.gender_preference,
+        description: normalizedPayload.description,
+        status: "ACTIVE",
+      },
+    });
+    return listing;
+  } catch (err) {
+    if (isAliasUniqueError(err) && normalizedPayload.alias) {
+      throw new ListingError({
+        status: 400,
+        code: "ALIAS_TAKEN",
+        message: await buildAliasTakenMessage(normalizedPayload.alias),
+      });
+    }
+    throw err;
+  }
 }
 
 export async function updateListing(
@@ -601,7 +790,12 @@ export async function updateListing(
   listingId: string,
   payload: UpdateListingPayload
 ): Promise<ListingModel> {
-  validateUpdatePayload(payload);
+  const normalizedPayload: UpdateListingPayload = {
+    ...payload,
+    ...(payload.alias !== undefined ? { alias: normalizeListingAlias(payload.alias) } : {}),
+  };
+
+  validateUpdatePayload(normalizedPayload);
 
   const listing = await prisma.listing.findUnique({
     where: { id: listingId },
@@ -621,28 +815,40 @@ export async function updateListing(
     });
   }
 
-  const updated = await prisma.listing.update({
-    where: { id: listingId },
-    data: {
-      ...(payload.title !== undefined && { title: payload.title }),
-      ...(payload.monthly_rent !== undefined && { monthly_rent: payload.monthly_rent }),
-      ...(payload.lease_type !== undefined && { lease_type: payload.lease_type }),
-      ...(payload.start_date !== undefined && { start_date: payload.start_date }),
-      ...(payload.end_date !== undefined && { end_date: payload.end_date }),
-      ...(payload.exact_address !== undefined && { exact_address: payload.exact_address }),
-      ...(payload.nearby_landmark !== undefined && { nearby_landmark: payload.nearby_landmark }),
-      ...(payload.total_bedrooms !== undefined && { total_bedrooms: payload.total_bedrooms }),
-      ...(payload.total_bathrooms !== undefined && { total_bathrooms: payload.total_bathrooms }),
-      ...(payload.room_type !== undefined && { room_type: payload.room_type }),
-      ...(payload.furnished !== undefined && { furnished: payload.furnished }),
-      ...(payload.utilities_included !== undefined && { utilities_included: payload.utilities_included }),
-      ...(payload.open_to_negotiation !== undefined && { open_to_negotiation: payload.open_to_negotiation }),
-      ...(payload.seasons !== undefined && { seasons: normalizeSeasonInput(payload.seasons) }),
-      ...(payload.gender_preference !== undefined && { gender_preference: payload.gender_preference }),
-      ...(payload.description !== undefined && { description: payload.description }),
-    },
-  });
-  return updated;
+  try {
+    const updated = await prisma.listing.update({
+      where: { id: listingId },
+      data: {
+        ...(normalizedPayload.alias !== undefined && { alias: normalizedPayload.alias }),
+        ...(normalizedPayload.title !== undefined && { title: normalizedPayload.title }),
+        ...(normalizedPayload.monthly_rent !== undefined && { monthly_rent: normalizedPayload.monthly_rent }),
+        ...(normalizedPayload.lease_type !== undefined && { lease_type: normalizedPayload.lease_type }),
+        ...(normalizedPayload.start_date !== undefined && { start_date: normalizedPayload.start_date }),
+        ...(normalizedPayload.end_date !== undefined && { end_date: normalizedPayload.end_date }),
+        ...(normalizedPayload.exact_address !== undefined && { exact_address: normalizedPayload.exact_address }),
+        ...(normalizedPayload.nearby_landmark !== undefined && { nearby_landmark: normalizedPayload.nearby_landmark }),
+        ...(normalizedPayload.total_bedrooms !== undefined && { total_bedrooms: normalizedPayload.total_bedrooms }),
+        ...(normalizedPayload.total_bathrooms !== undefined && { total_bathrooms: normalizedPayload.total_bathrooms }),
+        ...(normalizedPayload.room_type !== undefined && { room_type: normalizedPayload.room_type }),
+        ...(normalizedPayload.furnished !== undefined && { furnished: normalizedPayload.furnished }),
+        ...(normalizedPayload.utilities_included !== undefined && { utilities_included: normalizedPayload.utilities_included }),
+        ...(normalizedPayload.open_to_negotiation !== undefined && { open_to_negotiation: normalizedPayload.open_to_negotiation }),
+        ...(normalizedPayload.seasons !== undefined && { seasons: normalizeSeasonInput(normalizedPayload.seasons) }),
+        ...(normalizedPayload.gender_preference !== undefined && { gender_preference: normalizedPayload.gender_preference }),
+        ...(normalizedPayload.description !== undefined && { description: normalizedPayload.description }),
+      },
+    });
+    return updated;
+  } catch (err) {
+    if (isAliasUniqueError(err) && normalizedPayload.alias) {
+      throw new ListingError({
+        status: 400,
+        code: "ALIAS_TAKEN",
+        message: await buildAliasTakenMessage(normalizedPayload.alias, listingId),
+      });
+    }
+    throw err;
+  }
 }
 
 export async function markTaken(user: ListingOwner, listingId: string): Promise<ListingModel> {

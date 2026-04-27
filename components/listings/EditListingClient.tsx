@@ -23,6 +23,7 @@ type MeResponse =
 
 type VerifiedListingForEdit = {
   id: string;
+  alias: string | null;
   title: string;
   monthly_rent: number;
   lease_type: "SUBLEASE" | "LEASE_TAKEOVER";
@@ -40,6 +41,47 @@ type VerifiedListingForEdit = {
   seasons: ("SPRING" | "SUMMER" | "FALL" | "FULL_YEAR")[];
   photos?: ListingPhoto[];
 };
+
+const ALIAS_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const DEFAULT_APP_URL = "https://www.illini2illini.app";
+const RESERVED_ALIASES = new Set([
+  "admin",
+  "api",
+  "login",
+  "signup",
+  "listings",
+  "v",
+  "settings",
+  "help",
+  "about",
+  "terms",
+  "privacy",
+  "favicon-ico",
+  "robots-txt",
+  "sitemap-xml",
+  "auth",
+  "logout",
+  "me",
+  "user",
+  "users",
+  "static",
+  "assets",
+  "dashboard",
+  "support",
+  "contact",
+  "null",
+  "undefined",
+  "_next",
+]);
+
+function normalizeAliasInput(alias: string): string {
+  return alias
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9-]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+}
 
 type ListingResponse =
   | { ok: true; data: { listing: VerifiedListingForEdit; requires_login_for_details?: boolean } }
@@ -79,6 +121,7 @@ export function EditListingClient({ id }: { id: string }) {
   const [loadError, setLoadError] = useState<string | null>(null);
 
   const [title, setTitle] = useState("");
+  const [alias, setAlias] = useState("");
   const [monthlyRent, setMonthlyRent] = useState("");
   const [leaseType, setLeaseType] = useState<"SUBLEASE" | "LEASE_TAKEOVER" | "">("");
   const [startDate, setStartDate] = useState("");
@@ -97,6 +140,21 @@ export function EditListingClient({ id }: { id: string }) {
 
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const normalizedAlias = normalizeAliasInput(alias);
+  const aliasPath = normalizedAlias.length > 0 ? `/v/${normalizedAlias}` : null;
+  const configuredAppUrl =
+    process.env.NEXT_PUBLIC_APP_URL?.trim().replace(/\/+$/, "") || DEFAULT_APP_URL;
+  const aliasPreview = aliasPath ? `${configuredAppUrl}${aliasPath}` : null;
+  const aliasValidationError =
+    normalizedAlias.length === 0
+      ? null
+      : normalizedAlias.length < 3 || normalizedAlias.length > 50
+        ? "Alias must be 3-50 characters."
+        : !ALIAS_PATTERN.test(normalizedAlias)
+          ? "Alias can only include lowercase letters, numbers, and hyphens."
+          : RESERVED_ALIASES.has(normalizedAlias)
+            ? "This alias is reserved."
+            : null;
 
   useEffect(() => {
     let cancelled = false;
@@ -161,6 +219,7 @@ export function EditListingClient({ id }: { id: string }) {
         const l = data.listing;
         if (!cancelled) {
           setListing(l);
+          setAlias(l.alias ?? "");
           setTitle(l.title);
           setMonthlyRent(String(l.monthly_rent));
           setLeaseType(l.lease_type);
@@ -193,12 +252,17 @@ export function EditListingClient({ id }: { id: string }) {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSubmitError(null);
+    if (aliasValidationError) {
+      setSubmitError(aliasValidationError);
+      return;
+    }
     setSubmitting(true);
     try {
       const res = await fetch(`/api/listings/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          alias,
           title,
           monthly_rent: Number(monthlyRent),
           lease_type: leaseType,
@@ -222,6 +286,8 @@ export function EditListingClient({ id }: { id: string }) {
         const message = json?.error?.message as string | undefined;
         if (code === "NOT_OWNER") {
           setSubmitError("You do not have permission to edit this listing.");
+        } else if (code === "ALIAS_TAKEN") {
+          setSubmitError(message ?? "Alias is already taken. Try a different alias.");
         } else if (code === "VALIDATION_ERROR") {
           setSubmitError(message ?? "Please check your inputs and try again.");
         } else {
@@ -416,6 +482,42 @@ export function EditListingClient({ id }: { id: string }) {
                 </select>
               </div>
             </div>
+          </FormSection>
+
+          <FormSection title="Custom Link Alias">
+            <div className="space-y-1">
+              <label htmlFor="alias" className="block text-sm font-medium text-gray-700">
+                Listing alias (optional)
+              </label>
+              <input
+                id="alias"
+                type="text"
+                value={alias}
+                onChange={(e) => setAlias(e.target.value)}
+                placeholder="e.g. lease-shashank-summer26"
+                className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-3 py-2.5 text-sm text-gray-700 placeholder-gray-500 focus:outline-none focus:border-accent focus:bg-white focus:shadow-input-focus transition-all duration-200"
+              />
+            </div>
+            <p className="text-xs text-gray-500">
+              Use lowercase letters, numbers, and hyphens only. Leave empty to remove a custom alias.
+            </p>
+            <p className="text-xs text-gray-500">
+              For safety and routing, custom links always use the format <span className="font-medium">/v/your-alias</span>.
+            </p>
+            {aliasValidationError && (
+              <p className="text-xs text-red-600">{aliasValidationError}</p>
+            )}
+            {aliasPreview && !aliasValidationError && (
+              <p className="text-xs text-gray-600">
+                Your share link:{" "}
+                <a href={aliasPreview} target="_blank" rel="noreferrer" className="font-medium text-accent hover:underline">
+                  {aliasPreview}
+                </a>
+              </p>
+            )}
+            <p className="text-xs text-amber-700">
+              If you change this alias later, old alias links will stop working.
+            </p>
           </FormSection>
 
           <FormSection title="Dates">

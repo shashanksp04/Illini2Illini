@@ -193,6 +193,7 @@ export async function POST(request: Request) {
     }
 
     const payload: CreateListingPayload = {
+      alias: body.alias == null ? undefined : String(body.alias),
       title: String(body.title ?? ""),
       monthly_rent: Number(body.monthly_rent),
       lease_type: body.lease_type,

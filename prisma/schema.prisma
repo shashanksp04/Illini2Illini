@@ -80,6 +80,7 @@ model User {
 
 model Listing {
   id                 String           @id @default(uuid()) @db.Uuid
+  alias              String?          @db.VarChar(50)
   owner_id           String           @db.Uuid
   title              String           @db.VarChar(100)
   monthly_rent       Int
@@ -108,6 +109,7 @@ model Listing {
   listing_views  ListingView[]
 
   @@index([status, created_at])
+  @@unique([alias])
   @@index([monthly_rent])
   @@index([start_date, end_date])
   @@map("listings")

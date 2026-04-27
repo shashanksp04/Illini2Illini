@@ -1,6 +1,7 @@
-import type { ExternalListingSource, GenderPreference, LeaseType, RoomType } from "@prisma/client";
+import type { ExternalListingSource, GenderPreference, LeaseType, RoomType, Season } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
+import { normalizeSeasonInput } from "@/lib/listings/seasons";
 
 /** JSON row shape (docs/reddit-related/reddit_listings.json). */
 export type RedditJsonRow = {
@@ -26,6 +27,7 @@ export type RedditJsonRow = {
   raw_text: string | null;
   exclude: boolean;
   images?: string[];
+  seasons?: Season[];
 };
 
 export type ImportRecordOutcome =
@@ -70,6 +72,7 @@ function parseSource(value: string): ExternalListingSource {
 }
 
 export function redditJsonRowToPrismaData(row: RedditJsonRow) {
+  const parsedSeasons = normalizeSeasonInput(row.seasons);
   return {
     external_id: row.external_id,
     source: parseSource(row.source),
@@ -92,6 +95,7 @@ export function redditJsonRowToPrismaData(row: RedditJsonRow) {
     source_created_at: new Date(row.created_at),
     raw_text: row.raw_text,
     image_urls: Array.isArray(row.images) ? row.images.filter((u) => typeof u === "string" && u.length > 0) : [],
+    seasons: parsedSeasons,
     exclude: row.exclude,
   };
 }

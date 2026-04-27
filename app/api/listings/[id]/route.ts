@@ -134,6 +134,7 @@ export async function PUT(request: Request, context: RouteContext) {
       }
       normalized.seasons = parsed.seasons;
     }
+    if (raw.alias !== undefined) normalized.alias = raw.alias == null ? null : String(raw.alias);
     if (raw.title !== undefined) normalized.title = String(raw.title);
     if (raw.monthly_rent !== undefined) normalized.monthly_rent = Number(raw.monthly_rent);
     if (raw.lease_type !== undefined) normalized.lease_type = raw.lease_type as "SUBLEASE" | "LEASE_TAKEOVER";
