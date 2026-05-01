@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 import { getApiBaseUrl } from "@/lib/api-base-url";
@@ -238,6 +239,14 @@ export default async function ListingsPage({ searchParams }: { searchParams: Pro
     }
   } catch {
     error = "Failed to load listings.";
+  }
+
+  const shouldNormalizeVerifiedPage =
+    !error && !isCommunityTab && page > 1 && items.length === 0;
+  const shouldNormalizeCommunityPage =
+    !error && isCommunityTab && page > 1 && communityItems.length === 0;
+  if (shouldNormalizeVerifiedPage || shouldNormalizeCommunityPage) {
+    redirect(listingsHrefForPage(params, 1, isCommunityTab ? "community" : "verified"));
   }
 
   const filterValues = getFilterValues(params);

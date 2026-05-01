@@ -62,6 +62,7 @@ model User {
   first_name        String?
   last_name         String?
   username          String   @unique
+  username_changed_at DateTime?
   profile_picture_url String?
   role              Role     @default(USER)
   is_banned         Boolean  @default(false)

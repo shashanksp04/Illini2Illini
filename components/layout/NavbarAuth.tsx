@@ -82,6 +82,7 @@ export function NavbarAuth({ user, needsProfile }: { user: NavUser | null; needs
             <p className="truncate text-sm font-semibold text-gray-900">@{user.username}</p>
           </div>
           <nav className="py-1">
+            <DropdownItem href="/profile" onClick={() => setOpen(false)}>Edit Profile</DropdownItem>
             <DropdownItem href="/me/listings" onClick={() => setOpen(false)}>My Listings</DropdownItem>
             <DropdownItem href="/listings" onClick={() => setOpen(false)}>Browse</DropdownItem>
             {user.role === "ADMIN" && (
