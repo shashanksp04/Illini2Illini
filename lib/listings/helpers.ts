@@ -368,6 +368,8 @@ export interface ListingFilters {
   sort?: ListingSort;
   page?: number;
   page_size?: number;
+  /** Optional stride used for skip calculation when take uses probe size. */
+  page_stride?: number;
   /** When true (admin only), include TAKEN listings. */
   include_taken?: boolean;
 }
@@ -529,9 +531,10 @@ function buildOrderBy(sort?: ListingSort) {
 function buildPagination(filters: ListingFilters) {
   const page = filters.page && filters.page > 0 ? filters.page : 1;
   const pageSize = filters.page_size && filters.page_size > 0 ? filters.page_size : 20;
+  const pageStride = filters.page_stride && filters.page_stride > 0 ? filters.page_stride : pageSize;
 
   return {
-    skip: (page - 1) * pageSize,
+    skip: (page - 1) * pageStride,
     take: pageSize,
   };
 }

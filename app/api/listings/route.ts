@@ -143,6 +143,7 @@ export async function GET(request: Request) {
       sort: sort as any,
       page: basePage,
       page_size: effectivePageSize,
+      page_stride: basePageSize,
       include_taken: isVerified && viewer?.role === "ADMIN" && includeTaken ? true : undefined,
     };
 
