@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 
 export type ListingPhoto = {
@@ -152,13 +153,14 @@ export function PhotoUploader({ listingId, initialPhotos = [], onChange }: Photo
             {photos.map((photo) => (
               <div
                 key={photo.id ?? `${photo.image_url}-${photo.display_order}`}
-                className="group relative overflow-hidden rounded-xl bg-gray-100 shadow-card"
+                className="group relative aspect-square overflow-hidden rounded-xl bg-gray-100 shadow-card"
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   src={photo.image_url}
                   alt="Listing photo"
-                  className="aspect-square w-full object-cover"
+                  fill
+                  sizes="(min-width:640px) 25vw, 50vw"
+                  className="object-cover"
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-200 rounded-xl" />
                 {photo.id && (

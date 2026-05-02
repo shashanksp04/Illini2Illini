@@ -1,12 +1,16 @@
+import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cookies } from "next/headers";
 
 import { getApiBaseUrl } from "@/lib/api-base-url";
+import { isAnonymousRequest } from "@/lib/auth/isAnonymousRequest";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { CommunitySourceCard } from "@/components/listings/CommunitySourceCard";
 import { NegotiableBadge } from "@/components/listings/NegotiableBadge";
 import { PhotoCarousel } from "@/components/listings/PhotoCarousel";
+import { formatListingTitle, formatListingDescription } from "@/lib/seo/listingMeta";
 
 type PublicRedditDetail = {
   id: string;
@@ -62,6 +66,73 @@ function genderPreferenceLabel(g: string): string {
   return g === "MALE" ? "Male" : g === "FEMALE" ? "Female" : "Any";
 }
 
+async function fetchCommunityListingForMeta(id: string): Promise<PublicRedditDetail | VerifiedRedditDetail | null> {
+  try {
+    const base = await getApiBaseUrl();
+    const cookieStore = await cookies();
+    const cookieHeader = cookieStore.getAll().map((c) => `${c.name}=${c.value}`).join("; ");
+    const res = await fetch(`${base}/api/reddit-listings/${id}`, {
+      next: { revalidate: 300 },
+      headers: { Cookie: cookieHeader },
+    });
+    if (!res.ok) return null;
+    const json = (await res.json()) as { ok?: boolean; data?: { listing?: PublicRedditDetail | VerifiedRedditDetail } };
+    if (!json?.ok) return null;
+    return json.data?.listing ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const listing = await fetchCommunityListingForMeta(id);
+  const canonical = `/community/${id}`;
+  if (!listing) {
+    return {
+      title: "Community listing | Illini2Illini",
+      description: "Reddit-sourced UIUC housing post indexed on Illini2Illini.",
+      alternates: { canonical },
+      robots: { index: false, follow: true },
+    };
+  }
+  const title = formatListingTitle({
+    title: listing.title,
+    monthly_rent: listing.monthly_rent ?? null,
+    nearby_landmark: ("nearby_landmark" in listing ? listing.nearby_landmark : null) ?? null,
+  });
+  const description = formatListingDescription({
+    title: listing.title,
+    monthly_rent: listing.monthly_rent ?? null,
+    nearby_landmark: ("nearby_landmark" in listing ? listing.nearby_landmark : null) ?? null,
+    description: ("description" in listing ? listing.description : null) ?? null,
+    lease_type: ("lease_type" in listing ? listing.lease_type : null) ?? null,
+    start_date: ("start_date" in listing ? listing.start_date : null) ?? null,
+    end_date: ("end_date" in listing ? listing.end_date : null) ?? null,
+    total_bedrooms: listing.total_bedrooms ?? null,
+    total_bathrooms: ("total_bathrooms" in listing ? listing.total_bathrooms : null) ?? null,
+    room_type: ("room_type" in listing ? listing.room_type : null) ?? null,
+  });
+  return {
+    title,
+    description,
+    alternates: { canonical },
+    robots: { index: false, follow: true },
+    openGraph: {
+      type: "website",
+      siteName: "Illini2Illini",
+      title,
+      description,
+      url: canonical,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
+  };
+}
+
 export default async function CommunityListingPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const base = await getApiBaseUrl();
@@ -71,12 +142,15 @@ export default async function CommunityListingPage({ params }: { params: Promise
   let requiresLogin = false;
 
   try {
+    const anon = await isAnonymousRequest();
     const cookieStore = await cookies();
     const cookieHeader = cookieStore.getAll().map((c) => `${c.name}=${c.value}`).join("; ");
-    const res = await fetch(`${base}/api/reddit-listings/${id}`, {
-      cache: "no-store",
-      headers: { Cookie: cookieHeader },
-    });
+    const res = await fetch(
+      `${base}/api/reddit-listings/${id}`,
+      anon
+        ? { next: { revalidate: 60 } }
+        : { cache: "no-store", headers: { Cookie: cookieHeader } },
+    );
     const json = (await res.json()) as {
       ok?: boolean;
       data?: {
@@ -232,8 +306,16 @@ export default async function CommunityListingPage({ params }: { params: Promise
 
           {!isVerifiedView && publicListing?.thumbnail_url ? (
             <div className="overflow-hidden rounded-2xl border border-gray-200/60 bg-white shadow-card">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={publicListing.thumbnail_url} alt="" className="w-full object-cover" />
+              <div className="relative aspect-[16/10] w-full bg-gray-100">
+                <Image
+                  src={publicListing.thumbnail_url}
+                  alt={publicListing.title}
+                  fill
+                  priority
+                  sizes="(min-width:1024px) 66vw, 100vw"
+                  className="object-cover"
+                />
+              </div>
             </div>
           ) : null}
 
@@ -244,6 +326,7 @@ export default async function CommunityListingPage({ params }: { params: Promise
                   image_url,
                   display_order,
                 }))}
+                title={verifiedListing.title}
               />
             </div>
           ) : null}

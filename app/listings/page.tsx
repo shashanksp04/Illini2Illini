@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { cookies } from "next/headers";
@@ -5,12 +6,34 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 import { getApiBaseUrl } from "@/lib/api-base-url";
+import { isAnonymousRequest } from "@/lib/auth/isAnonymousRequest";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { CommunityFilterBar } from "@/components/listings/CommunityFilterBar";
 import { FilterBar } from "@/components/listings/FilterBar";
 import { ListingCard, type ListingCardItem } from "@/components/listings/ListingCard";
 import { CommunityListingCard, type CommunityListingCardItem } from "@/components/listings/CommunityListingCard";
 import { SearchBar } from "@/components/ui/SearchBar";
+
+export const metadata: Metadata = {
+  title: "Browse UIUC Subleases & Lease Takeovers | Illini2Illini",
+  description:
+    "Browse verified UIUC subleases, lease takeovers, and full-year housing in Champaign-Urbana. Filter by price, dates, bedrooms, and more.",
+  alternates: { canonical: "/listings" },
+  openGraph: {
+    type: "website",
+    siteName: "Illini2Illini",
+    title: "Browse UIUC Subleases & Lease Takeovers | Illini2Illini",
+    description:
+      "Browse verified UIUC subleases, lease takeovers, and full-year housing in Champaign-Urbana.",
+    url: "/listings",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Browse UIUC Subleases & Lease Takeovers | Illini2Illini",
+    description:
+      "Browse verified UIUC subleases, lease takeovers, and full-year housing in Champaign-Urbana.",
+  },
+};
 
 type SearchParams = { [key: string]: string | string[] | undefined };
 
@@ -212,9 +235,15 @@ export default async function ListingsPage({ searchParams }: { searchParams: Pro
   const url = isCommunityTab ? buildRedditListingsUrl(base, params) : buildListingsUrl(base, params);
 
   try {
+    const anon = await isAnonymousRequest();
     const cookieStore = await cookies();
     const cookieHeader = cookieStore.getAll().map((c) => `${c.name}=${c.value}`).join("; ");
-    const res = await fetch(url, { cache: "no-store", headers: { Cookie: cookieHeader } });
+    const res = await fetch(
+      url,
+      anon
+        ? { next: { revalidate: 60 } }
+        : { cache: "no-store", headers: { Cookie: cookieHeader } },
+    );
     const json = await res.json();
     if (!res.ok) {
       error = json?.error?.message ?? "Failed to load listings.";
@@ -278,7 +307,7 @@ export default async function ListingsPage({ searchParams }: { searchParams: Pro
         ) : null}
 
         <header className="space-y-4">
-          <h1 className="text-2xl font-bold tracking-tight text-brand md:text-3xl">Browse listings</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-brand md:text-3xl">UIUC subleases &amp; lease takeovers</h1>
 
           <div className="flex flex-wrap gap-2 border-b border-gray-200 pb-1">
             <Link

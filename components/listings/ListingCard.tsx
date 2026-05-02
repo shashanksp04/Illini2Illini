@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { NegotiableBadge } from "@/components/listings/NegotiableBadge";
@@ -80,11 +81,12 @@ export function ListingCard({ listing }: { listing: ListingCardItem }) {
       {/* Image */}
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100">
         {imageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={imageUrl}
-            alt=""
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            alt={`${listing.title} near ${listing.nearby_landmark}`}
+            fill
+            sizes="(min-width:1280px) 25vw, (min-width:1024px) 33vw, (min-width:640px) 50vw, 100vw"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
           <div className="flex h-full w-full flex-col items-center justify-center gap-2 text-gray-300">
@@ -150,8 +152,13 @@ export function ListingCard({ listing }: { listing: ListingCardItem }) {
         {/* Seller row */}
         <div className="flex items-center gap-2 border-t border-gray-100 pt-3">
           {ownerPicUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={ownerPicUrl} alt="" className="h-6 w-6 rounded-full object-cover ring-1 ring-gray-100" />
+            <Image
+              src={ownerPicUrl}
+              alt={`@${listing.owner_username}`}
+              width={24}
+              height={24}
+              className="h-6 w-6 rounded-full object-cover ring-1 ring-gray-100"
+            />
           ) : (
             <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 text-[10px] font-bold text-gray-400">
               {listing.owner_username[0]?.toUpperCase()}

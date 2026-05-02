@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useRef, useEffect, useState } from "react";
@@ -67,8 +68,13 @@ export function NavbarAuth({ user, needsProfile }: { user: NavUser | null; needs
         aria-haspopup="true"
       >
         {user.profile_picture_url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={user.profile_picture_url} alt="" className="h-9 w-9 rounded-full object-cover" />
+          <Image
+            src={user.profile_picture_url}
+            alt={`@${user.username} avatar`}
+            width={36}
+            height={36}
+            className="h-9 w-9 rounded-full object-cover"
+          />
         ) : (
           <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/15 text-sm font-bold text-white">
             {user.username[0]?.toUpperCase()}

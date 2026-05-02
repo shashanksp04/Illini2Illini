@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 export type SellerCardProps = {
@@ -33,10 +34,11 @@ export function SellerCard({
     <div className="rounded-2xl border border-gray-200/60 bg-white p-6 shadow-card transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5">
       <div className="flex items-center gap-3">
         {profile_picture_url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={profile_picture_url}
-            alt=""
+            alt={`${displayName} (@${username}) profile picture`}
+            width={48}
+            height={48}
             className="h-12 w-12 rounded-full object-cover ring-2 ring-accent/20"
           />
         ) : (

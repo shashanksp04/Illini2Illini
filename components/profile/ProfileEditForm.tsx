@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
@@ -429,10 +430,11 @@ export function ProfileEditForm() {
                       />
                     </div>
                   ) : profilePictureUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
+                    <Image
                       src={profilePictureUrl}
                       alt="Profile preview"
+                      width={80}
+                      height={80}
                       className="h-20 w-20 rounded-full object-cover ring-2 ring-accent/20 transition-all duration-200 group-hover:shadow-glow group-hover:ring-accent"
                     />
                   ) : (

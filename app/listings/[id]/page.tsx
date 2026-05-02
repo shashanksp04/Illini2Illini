@@ -1,12 +1,20 @@
+import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cookies } from "next/headers";
 
 import { getApiBaseUrl } from "@/lib/api-base-url";
+import { isAnonymousRequest } from "@/lib/auth/isAnonymousRequest";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { SellerCard } from "@/components/listings/SellerCard";
 import { PhotoCarousel } from "@/components/listings/PhotoCarousel";
 import { NegotiableBadge } from "@/components/listings/NegotiableBadge";
+import { ListingJsonLd } from "@/components/seo/ListingJsonLd";
+import { formatListingTitle, formatListingDescription } from "@/lib/seo/listingMeta";
+
+const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL?.replace(/\/+$/, "") || "https://illini2illini.com";
 
 type PublicListingDetail = {
   id: string;
@@ -54,6 +62,55 @@ function genderPreferenceLabel(g: string): string {
   return g === "MALE" ? "Male" : g === "FEMALE" ? "Female" : "Any";
 }
 
+async function fetchListingForMeta(id: string): Promise<VerifiedListingDetail | PublicListingDetail | null> {
+  try {
+    const base = await getApiBaseUrl();
+    const cookieStore = await cookies();
+    const cookieHeader = cookieStore.getAll().map((c) => `${c.name}=${c.value}`).join("; ");
+    const res = await fetch(`${base}/api/listings/${id}`, {
+      next: { revalidate: 300 },
+      headers: { Cookie: cookieHeader },
+    });
+    if (!res.ok) return null;
+    const json = (await res.json()) as { ok?: boolean; data?: { listing?: PublicListingDetail | VerifiedListingDetail } };
+    if (!json?.ok) return null;
+    return json.data?.listing ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const listing = await fetchListingForMeta(id);
+  if (!listing) {
+    return {
+      title: "Listing | Illini2Illini",
+      description: "View this UIUC student housing listing on Illini2Illini.",
+      alternates: { canonical: `/listings/${id}` },
+    };
+  }
+  const title = formatListingTitle(listing);
+  const description = formatListingDescription(listing);
+  return {
+    title,
+    description,
+    alternates: { canonical: `/listings/${id}` },
+    openGraph: {
+      type: "website",
+      siteName: "Illini2Illini",
+      title,
+      description,
+      url: `/listings/${id}`,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
+  };
+}
+
 export default async function ListingDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const base = await getApiBaseUrl();
@@ -63,9 +120,15 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
   let requiresLogin = false;
 
   try {
+    const anon = await isAnonymousRequest();
     const cookieStore = await cookies();
     const cookieHeader = cookieStore.getAll().map(c => `${c.name}=${c.value}`).join('; ');
-    const res = await fetch(`${base}/api/listings/${id}`, { cache: "no-store", headers: { Cookie: cookieHeader } });
+    const res = await fetch(
+      `${base}/api/listings/${id}`,
+      anon
+        ? { next: { revalidate: 60 } }
+        : { cache: "no-store", headers: { Cookie: cookieHeader } },
+    );
     const json = (await res.json()) as {
       ok?: boolean;
       data?: { listing?: PublicListingDetail | VerifiedListingDetail; requires_login_for_details?: boolean };
@@ -93,9 +156,29 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
   const l = (verifiedListing ?? publicListing)!;
   const dateRange = `${formatDate(l.start_date)} – ${formatDate(l.end_date)}`;
   const isVerifiedView = Boolean(verifiedListing);
+  const canonicalUrl = `${APP_URL}/listings/${id}`;
 
   return (
     <PageContainer>
+      <ListingJsonLd
+        url={canonicalUrl}
+        name={l.title}
+        description={isVerifiedView ? verifiedListing?.description : null}
+        monthly_rent={l.monthly_rent}
+        start_date={l.start_date}
+        end_date={l.end_date}
+        total_bedrooms={l.total_bedrooms}
+        total_bathrooms={l.total_bathrooms}
+        exact_address={isVerifiedView ? verifiedListing?.exact_address : null}
+        nearby_landmark={l.nearby_landmark}
+        images={
+          isVerifiedView && verifiedListing?.photos
+            ? verifiedListing.photos.map((p) => p.image_url)
+            : publicListing?.thumbnail_url
+              ? [publicListing.thumbnail_url]
+              : []
+        }
+      />
       <div className="grid gap-8 lg:grid-cols-12">
         <main className="space-y-6 lg:col-span-8">
           {/* Header */}
@@ -139,14 +222,22 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
           {/* Photos */}
           {isVerifiedView && verifiedListing && verifiedListing.photos.length > 0 && (
             <div className="overflow-hidden rounded-2xl border border-gray-200/60 bg-white shadow-card">
-              <PhotoCarousel photos={verifiedListing.photos} />
+              <PhotoCarousel photos={verifiedListing.photos} title={verifiedListing.title} />
             </div>
           )}
 
           {!isVerifiedView && publicListing?.thumbnail_url && (
             <div className="overflow-hidden rounded-2xl border border-gray-200/60 bg-white shadow-card">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={publicListing.thumbnail_url} alt="" className="w-full object-cover" />
+              <div className="relative aspect-[16/10] w-full bg-gray-100">
+                <Image
+                  src={publicListing.thumbnail_url}
+                  alt={l.title}
+                  fill
+                  priority
+                  sizes="(min-width:1024px) 66vw, 100vw"
+                  className="object-cover"
+                />
+              </div>
             </div>
           )}
 

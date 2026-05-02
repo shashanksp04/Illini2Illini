@@ -1,5 +1,5 @@
 import { Inter } from "next/font/google";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import "@/lib/env";
 import "./globals.css";
@@ -12,10 +12,51 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
+const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL?.replace(/\/+$/, "") || "https://illini2illini.com";
+
 export const metadata: Metadata = {
-  title: "Illini2Illini",
+  metadataBase: new URL(APP_URL),
+  title: {
+    default: "Illini2Illini — UIUC Subleases & Student Housing",
+    template: "%s",
+  },
   description:
     "Find Student Housing at UIUC — subleases, lease takeovers, and full-year housing from verified @illinois.edu students.",
+  applicationName: "Illini2Illini",
+  keywords: [
+    "UIUC sublease",
+    "UIUC housing",
+    "Champaign sublease",
+    "Urbana sublease",
+    "lease takeover",
+    "Illinois student housing",
+    "Illini housing",
+  ],
+  openGraph: {
+    type: "website",
+    siteName: "Illini2Illini",
+    title: "Illini2Illini — UIUC Subleases & Student Housing",
+    description:
+      "Find Student Housing at UIUC — subleases, lease takeovers, and full-year housing from verified @illinois.edu students.",
+    url: "/",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Illini2Illini — UIUC Subleases & Student Housing",
+    description:
+      "Find Student Housing at UIUC — subleases, lease takeovers, and full-year housing from verified @illinois.edu students.",
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ff5f05" },
+    { media: "(prefers-color-scheme: dark)", color: "#13294b" },
+  ],
 };
 
 export default async function RootLayout({

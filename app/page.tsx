@@ -1,9 +1,66 @@
+import type { Metadata } from "next";
+
 import { PageContainer } from "@/components/layout/PageContainer";
 import { LandingCtas } from "@/components/auth/LandingCtas";
+
+const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL?.replace(/\/+$/, "") || "https://illini2illini.com";
+
+export const metadata: Metadata = {
+  title: "UIUC Subleases & Student Housing | Illini2Illini",
+  description:
+    "Find UIUC subleases, lease takeovers, and full-year housing in Champaign-Urbana from verified @illinois.edu students. Browse, filter, and connect directly.",
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    siteName: "Illini2Illini",
+    title: "UIUC Subleases & Student Housing | Illini2Illini",
+    description:
+      "Find UIUC subleases, lease takeovers, and full-year housing in Champaign-Urbana from verified @illinois.edu students.",
+    url: "/",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "UIUC Subleases & Student Housing | Illini2Illini",
+    description:
+      "Find UIUC subleases, lease takeovers, and full-year housing in Champaign-Urbana from verified @illinois.edu students.",
+  },
+};
+
+const ORGANIZATION_JSON_LD = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Illini2Illini",
+  url: APP_URL,
+  logo: `${APP_URL}/i2i-logo.png`,
+  sameAs: [],
+  description:
+    "UIUC student housing marketplace for subleases, lease takeovers, and full-year housing from verified @illinois.edu students.",
+};
+
+const WEBSITE_JSON_LD = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "Illini2Illini",
+  url: APP_URL,
+  potentialAction: {
+    "@type": "SearchAction",
+    target: `${APP_URL}/listings?keyword={search_term_string}`,
+    "query-input": "required name=search_term_string",
+  },
+};
 
 export default function Home() {
   return (
     <PageContainer>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(ORGANIZATION_JSON_LD) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(WEBSITE_JSON_LD) }}
+      />
       <div className="flex flex-col items-center pt-4 text-center md:pt-8">
         {/* Hero */}
         <div className="relative w-full max-w-2xl overflow-hidden rounded-3xl border border-gray-200/60 bg-white px-6 py-14 shadow-card sm:px-14 md:py-20">
@@ -23,7 +80,7 @@ export default function Home() {
             </h1>
 
             <p className="mx-auto mt-5 max-w-md text-base leading-relaxed text-gray-500 sm:text-lg">
-              Find subleases, lease takeovers, and full-year housing from verified UIUC students. Browse, filter, and connect directly.
+              Find subleases, lease takeovers, and full-year housing in Champaign-Urbana from verified UIUC students. Browse, filter, and connect directly.
             </p>
 
             <div className="mt-9">

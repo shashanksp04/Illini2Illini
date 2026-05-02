@@ -1,9 +1,16 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 
 import { PageContainer } from "@/components/layout/PageContainer";
 import { AuthCard } from "@/components/auth/AuthCard";
 import { LoginForm } from "./LoginForm";
+
+export const metadata: Metadata = {
+  title: "Log in | Illini2Illini",
+  description: "Log in to Illini2Illini with your @illinois.edu account.",
+  robots: { index: false, follow: false },
+};
 
 function LoginSkeleton() {
   return (

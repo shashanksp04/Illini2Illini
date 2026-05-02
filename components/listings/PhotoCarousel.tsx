@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 
 type Photo = {
@@ -7,7 +8,7 @@ type Photo = {
   display_order: number;
 };
 
-export function PhotoCarousel({ photos }: { photos: Photo[] }) {
+export function PhotoCarousel({ photos, title }: { photos: Photo[]; title?: string }) {
   const sorted = [...photos].sort((a, b) => a.display_order - b.display_order);
   const [index, setIndex] = useState(0);
 
@@ -15,6 +16,7 @@ export function PhotoCarousel({ photos }: { photos: Photo[] }) {
 
   const current = sorted[index];
   const total = sorted.length;
+  const altPrefix = title ? `${title} — photo` : "Photo";
 
   function prev() {
     setIndex((i) => (i === 0 ? total - 1 : i - 1));
@@ -24,12 +26,15 @@ export function PhotoCarousel({ photos }: { photos: Photo[] }) {
   }
 
   return (
-    <div className="relative overflow-hidden bg-gray-100">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
+    <div className="relative h-72 w-full overflow-hidden bg-gray-100 md:h-[28rem]">
+      <Image
+        key={current.image_url}
         src={current.image_url}
-        alt={`Photo ${index + 1} of ${total}`}
-        className="h-72 w-full object-cover transition-all duration-300 md:h-[28rem]"
+        alt={`${altPrefix} ${index + 1} of ${total}`}
+        fill
+        priority={index === 0}
+        sizes="(min-width:1024px) 66vw, 100vw"
+        className="object-cover transition-all duration-300"
       />
 
       {total > 1 && (
