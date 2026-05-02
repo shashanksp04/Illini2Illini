@@ -282,6 +282,18 @@ What has been built:
 * Admin: user management, listing moderation, reports
 * Full UI per UI_SPEC.md: listings pages, profile, admin panels, auth flows
 
+**Profile editing and photo framing (post-MVP shipped feature):**
+
+* After onboarding, verified users edit profile at **`/profile`**; entry **`Edit Profile`** in the authenticated navbar menu (`components/layout/NavbarAuth.tsx`).
+* Saves **`first_name`**, **`last_name`**, **`username`**, and **`profile_picture_url`** via **`PATCH /api/me/profile`** (`app/api/me/profile/route.ts`). First-time onboarding remains **`POST /api/me/profile/complete`** only on **`/profile/setup`**.
+* **Username change cooldown:** `users.username_changed_at` (see Prisma migration `20260501231400_add_username_changed_at`); PATCH rejects changes inside the window unless optional env **`PROFILE_USERNAME_COOLDOWN_DAYS`** overrides the default (**30** days); see `.env.example`.
+* Profile picture flow reuses **`POST /api/me/profile-picture/upload`**. Users adjust **horizontal / vertical** position and **zoom** before apply; **`lib/images/cropProfileImage.ts`** produces a square JPEG client-side, then upload as before. Wired in **`components/profile/ProfileEditForm.tsx`** and **`components/profile/ProfileSetupForm.tsx`**.
+* **Cancel** beside **Save changes** on the edit form resets fields and clears pending photo drafts to the last loaded/saved values.
+
+**Browse pagination normalization (post-MVP shipped fix):**
+
+* On **`/listings`**, if **`page > 1`** and the fetched tab returns **zero** items (`items`/`communityItems` empty) while there is **no fetch error**, the server redirects to **page 1** with filters and **`tab`** preserved via `listingsHrefForPage(..., 1, tab)` (`app/listings/page.tsx`). Prevents an empty grid when the dataset shrinks (e.g. a listing marked **Taken** drops out of ACTIVE browse so **`?page=2`** is no longer valid).
+
 **Community (Reddit) listings (post-MVP shipped feature):**
 
 * Separate Postgres table `reddit_listings` (not mixed with verified `listings`); keyed by Reddit **`external_id`** (submission id).
@@ -310,6 +322,19 @@ What has been built:
 * Duplicate alias attempts return user-facing conflict guidance (`alias already taken`) with alternative suggestions.
 * Alias changes follow simple mode: when a listing alias is changed, older alias links stop working.
 * Implementation note: schema includes optional `listings.alias` with unique constraint; alias resolution is handled through dedicated alias handlers (`/api/listings/by-alias/[alias]`) and the alias page route (`/v/[alias]`).
+
+**SEO & discoverability (post-MVP shipped feature):**
+
+* **`app/layout.tsx`:** `metadataBase` derived from `NEXT_PUBLIC_APP_URL` (with a production-domain fallback); default metadata title/description, `keywords`, site-wide defaults for `openGraph` and `twitter` (`card: summary_large_image`); `viewport` export with `themeColor` for light vs dark prefers-color-scheme (accent orange / brand navy).
+* **`app/page.tsx` (home):** static `metadata` (title/description with Champaign-Urbana wording), canonical `/`, OG/Twitter; inline JSON-LD for `Organization` + `WebSite` (includes `potentialAction` `SearchAction` → `/listings?keyword=`). Hero subtitle mentions **Champaign-Urbana**; no duplicate sectional H2 above the “How it works” cards (avoid redundant heading vs hero copy).
+* **`app/listings/page.tsx`:** static `metadata` for indexable `/listings` (canonical, OG/Twitter); page H1 reads **UIUC subleases & lease takeovers** (marketing/SEO wording).
+* **Dynamic listing/community metadata:** `generateMetadata` on `app/listings/[id]/page.tsx`, `app/v/[alias]/page.tsx`, and `app/community/[id]/page.tsx`, using shared helpers in `lib/seo/listingMeta.ts`. Community detail uses **`robots: { index: false, follow: true }`** while still emitting OG/Twitter for shares.
+* **Non-index pages:** routes that must not rank (login, signup, forgot/reset password, verify email, `/me/listings`, `/listings/new`, edit/contact/report, profile/setup, `/profile`, `/admin/**`) declare **`robots: { index: false, follow: false }`** via Route Handlers or **`layout.tsx` siblings** wherever the page component is **`"use client"`** (metadata cannot export from client files).
+* **Crawler surface:** **`app/robots.ts`** (Next `robots.txt` convention)—allow `/`, `/listings`, `/v/`, `/community/`; disallow `/api/**`, `/admin`, `/me`, `/auth/**`, `/profile`, auth flows, `/listings/new`, and **patterned** `/listings/*/edit|contact|report`. **`app/sitemap.ts`**—includes `/`, `/listings`, and every **`ACTIVE`** verified row from Prisma (URL prefers **`/v/<alias>`** when set, else **`/listings/<id>`**); uses `revalidate` with try/catch so build stays resilient if DB is unavailable.
+* **Structured data for listings:** `components/seo/ListingJsonLd.tsx` emits **`schema.org` `Apartment`** plus nested **`Offer`** on both UUID and alias detail pages; payloads include only fields that match what the page actually shows (thin public/login-gated stub vs full verified content).
+* **Social preview images (`next/og`, edge):** **`app/opengraph-image.tsx`** (site default card); **`app/listings/[id]/opengraph-image.tsx`** and **`app/v/[alias]/opengraph-image.tsx`** fetch public listing JSON (5‑minute **`revalidate`**) and render title/rent/landmark fallback cards. **`app/apple-icon.tsx`** generates **`180×180`** Apple touch icon dynamically.
+* **`next/image` + remote patterns:** `next.config.ts` **`images.remotePatterns`** for **`*.supabase.co`** public storage URLs and Reddit image hosts (**`i.redd.it`**, **`preview.redd.it`**, **`external-preview.redd.it`**). Listing grids, carousel, public hero thumbnails, navbar/seller avatars, uploaded thumbs in **`PhotoUploader`**, and saved profile photos use **`next/image`**; live profile **crop previews** (`data:` URL + dynamic **`objectPosition`**) stay plain **`<img>`** elements as documented for UI safety.
+* **Caching discipline on public SSR pages:** `lib/auth/isAnonymousRequest.ts` detects absence of Supabase auth cookie (`sb-* … -auth-token`); **`/listings`**, **`/listings/[id]`**, **`/v/[alias]`**, **`/community/[id]`** use **`fetch` with `{ next: { revalidate: 60 } }`** when anonymous and **`cache: "no-store"`** with Cookie header when logged in so per-user listing detail never serves a stale verified payload from the edge cache entry.
 
 The immediate focus is:
 
